@@ -16,5 +16,8 @@ Then someone realized we didn't have to limit this server to FBO data. There's a
 * Load data into the search index using the import tools in `/loaders` -- or roll your own, or use the API's POST `/v0/opp` to post opportunities one at a time.
 * To run a simple query web page, try the sample app in `/sample-www`.
 
+### Caveat
+This project is brand new and very incomplete. No guarantees of data completeness or functionality are implied or should be assumed. There is lots to do!
+
 ### License
 This project constitutes an original work of the United States Government. This is free and unencumbered software released into the public domain. see the LICENSE file for more.
