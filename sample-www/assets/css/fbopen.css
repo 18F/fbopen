@@ -1,0 +1,191 @@
+/* 
+ * fbopen.css
+ * simple stylesheet for FBOpen sample web app
+ */
+
+body {
+	padding: 40px 10px;
+}
+
+#footer {
+	padding-top: 60px;
+	text-align: right;
+}
+
+h1 {
+	font-size: 48px;
+	margin-top: 10px;
+}
+.sub-h1 {
+	margin-top: -10px;
+	font-style: italic;
+}
+
+#fbopen-search-form {
+	margin-top: 20px;
+}
+
+#naics {
+	width: 100px;
+}
+
+.close {
+	position: relative;
+	right: 25px;
+	top: 2px;
+	float: none;
+}
+
+#fbopen-search-form .form-group label {
+	margin: auto 5px;
+	font-weight: normal;
+	width: 100px;
+}
+
+#results-list > li {
+	font-size: 150%;
+}
+.no-listing-url {
+	font-size: smaller;
+	font-style: italic;
+}
+highlight {
+	color: crimson;
+	text-decoration: underline;
+}
+.edit-summary {
+	padding: 0;
+	margin: 0;
+	vertical-align: top;
+	line-height: 1.428571429;
+}
+.content-snippet {
+	color: #999999;
+	font-size: 70%;
+}
+.content-snippet p {
+	font-size: 100%;
+}
+.word-tag-outer {
+	padding: 3px;
+}
+.word-tag {
+	background-color: yellow;
+	font-weight: bold;
+}
+
+.list-group {
+	margin-top: 20px;
+}
+
+#test-box {
+	border: solid 1px gray;
+	padding: 10px;
+	box-shadow: 3px 3px 0 0 lightgray;
+	background-color: beige;
+}
+
+.naics-facets .badge {
+	height: 20px;
+	margin-left: 5px;
+}
+.naics-facets .list-group-item {
+	color: #428bca;
+	border: 0 none;
+}
+.naics-facets .list-group-item.text-muted {
+	color: #999999;
+}
+.naics-facets .list-group-header {
+	color: black;
+}
+.naics-facets a.active {
+	color: white;
+}
+
+.form-group label
+, .result-industry
+, .result-where 
+{
+	margin: 10px;
+}
+
+#portfolios-container {
+	display: none;
+}
+
+#q, #naics, #data_source, #go, #more-options {
+	display: inline;
+}
+#more-options {
+	margin-left: 5px;
+}
+#q {
+	font-size: 125%;
+	width: 560px;
+	margin-left: 0;
+}
+#naics, #data_source {
+	width: 150px;
+}
+
+.brand h6 {
+	display: none;
+}
+
+.pagination > li > a, .pagination > .disabled > span {
+	height: 35px;
+}
+.numFound {
+	line-height: 35px;
+	margin: 20px;
+}
+
+/* results content */
+.score_therm_outer {
+	width: 300px;
+	height: 12px;
+	border: solid 1px gray;
+	/* gradient generator: http://freehtml5templates.com/gradientgenerator/gradient-generator2.php */
+	background-color: #F12D0A;
+	background: -webkit-gradient(linear, left center, right center, from(#5EAEF3), to(#F12D0A));
+	background: -moz-linear-gradient(left, #5EAEF3 0%, #F12D0A 100%);
+}
+.score_therm {
+	height: 10px;
+	float: right;
+	background-color: white;
+	opacity: .9;
+}
+.attachment-title, .attachment-icon {
+	font-size: 75%;
+}
+
+/* tagging */
+ul.opp-tags {
+	display: inline-block;
+	border: 0 !important;
+	font-size: 90%;
+	padding-left: 0;
+}
+ul.opp-tags > li {
+	border: 0;
+}
+
+ul.tagit li.tagit-new {
+	padding-bottom: 0;
+}
+.tagit-new > input {
+	font-size: 12px;
+	vertical-align: top;
+	border: solid 1px lightgray;
+	padding: 2px 7px;
+	width: 140px;
+	margin-top: -2px;
+}
+.tags-label {
+	vertical-align: top;
+	margin-right: 10px;
+	font-size: 12px;
+	line-height: 32px;
+}

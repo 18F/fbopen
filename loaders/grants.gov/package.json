@@ -1,0 +1,17 @@
+{
+  "name": "loaders-grants.gov",
+  "version": "0.0.1",
+  "description": "Parses nightly grants.gov data dumps and loads them into Solr.",
+  "dependencies": {
+    "string": "*"
+    , "underscore": "*"
+    , "big-xml": "*"
+    , "request": "*"
+		, "optimist": "*"
+		, "moment": "*"
+    , "solr-client": "*"
+    , "unzip": "*"
+    , "date-format-lite": "*"
+    , "wget": "*"
+  }
+}

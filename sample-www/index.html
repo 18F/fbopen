@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>FBOpen Demo</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <link href="bootstrap/css/bootstrap-1600.css" rel="stylesheet">
+  <link href="bootstrap/css/navbar-fixed-top.css" rel="stylesheet">
+  <link href="assets/css/jquery-ui-1.10.0.custom.css" rel="stylesheet">
+  <link href="assets/css/jquery.tagit.css" rel="stylesheet">
+  <link href="assets/css/fbopen.css" rel="stylesheet">
+
+  <!--[if lt IE 9]>
+    <script src="bootstrap/assets/js/html5shiv.js"></script>
+    <script src="bootstrap/assets/js/respond.min.js"></script>
+  <![endif]-->
+
+</head>
+
+<body>
+
+  <div class="container" id="outer-container">
+
+    <div class="row">
+
+      <div class="col-md-4">
+
+          <div class="container brand">
+
+            <a href="/" style="color: #333;"><h1>FBOpen</h1></a>
+
+          </div>
+        
+        <div id="naics-facets" class="list-group naics-facets">
+          <p class="list-group-item list-group-header">Top FedBizOpps results by industry:</p>
+        </div>
+        
+        <div id="naics-facets-more" class="list-group naics-facets collapse">
+        </div>
+
+
+      </div>
+
+      <div class="col-md-8">
+
+          <form id="fbopen-search-form" role="form" class="form" method="get" action="">
+            <div class="form-group">
+              <input id="q" name="q" type="search" class="form-control" />
+              <button type="button" class="close" data-close="q" aria-hidden="true">&times;</button>
+              <button id="go" type="submit" class="btn btn-primary">Search</button>
+              <a id="more-options" href="?options=more" data-toggle="collapse" data-target=".form-group-more">more options</a>
+            </div>
+
+            <div class="checkbox">
+              <label>
+                <input id="show_closed" name="show_closed" type="checkbox" /> Show closed listings
+              </label>
+            </div>
+
+            <div class="checkbox form-group-more collapse">
+              <label>
+                <input id="show_noncompeted" name="show_noncompeted" type="checkbox" /> Show non-competed listings (sole source)
+              </label>
+            </div>
+
+            <div class="form-group form-group-more collapse">
+              <label for="data_source">Data Source:</label>
+              <select id="data_source" name="data_source" type="search" class="form-control">
+                <option value="">All</option>
+                <option value="FBO">FedBizOpps (fbo.gov)</option>
+                <option value="SBIR">SBIR</option>
+                <option value="grants.gov">grants.gov</option>
+              </select>
+            </div>
+
+            <div class="form-group form-group-more collapse">
+              <label for="naics">NAICS code:</label>
+              <input id="naics" name="naics" type="search" class="form-control" />
+              <button type="button" class="close" data-close="naics" aria-hidden="true">&times;</button>
+            </div>
+
+            <input id="parent_only" name="parent_only" type="hidden" value="" />
+            <input id="p" name="p" type="hidden" value="" />
+          </form>
+
+        <div id="results-container">
+
+<!-- 
+          <p class="lead">
+            <div>Total results: <span id="numFound"></span></div>
+            <div>Results shown: <span id="numShown"></span></div>
+          </p>
+ -->
+          <ul class="pagination"></ul>
+
+          <ol id="results-list">
+          </ol>
+
+          <ul class="pagination"></ul>
+
+          <h5 data-toggle="collapse" data-target="#result-raw">Raw result (click to show/hide)</h5>
+          <div id="result-raw"></div>
+        
+        </div><!-- results-container -->
+
+      </div><!-- results column -->
+
+    </div><!-- row -->
+
+  </div><!-- outer-container -->
+
+  <div id="footer">
+    <div class="container">
+      <p class="text-muted credit">
+        FBOpen and this sample application are joint projects of the <a href="http://whitehouse.gov/innovationfellows">Presidential Innovation Fellows</a> and the <a href="http://www.gsa.gov/portal/content/105036">Integrated Award Environment</a>.
+      </p>
+    </div>
+  </div>
+
+  <!-- replace with your own analytics -->
+  <script src="../assets/js/google-analytics.js"></script>
+
+  <script src="../assets/js/jquery-1.10.2.js"></script>
+  <script src="../assets/js/jquery-ui-1.9.2.custom.min.js"></script>
+  <script src="../assets/js/dust-full-2.1.0.js"></script>
+  <script src="../assets/js/tag-it.min.js"></script>
+  <script src="../assets/js/consolelog.min.js"></script>
+  <script src="../assets/js/underscore-1.5.2.min.js"></script>
+  <script src="../assets/js/json2.js"></script>
+  <script src="../assets/js/URI.min.js"></script>
+  <script src="../assets/js/string.min.js"></script>
+  <script src="../assets/js/moment.min.js"></script>
+  <script src="bootstrap/js/bootstrap.min.js"></script>
+  <script src="../assets/js/fbopen.js"></script>
+
+</body>
+</html>

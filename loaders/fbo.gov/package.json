@@ -1,0 +1,16 @@
+{
+  "name": "loaders-fbo.gov",
+  "version": "0.0.1",
+  "description": "parses FBO FTP weekly data dumps and loads them into Solr, including attachments",
+  "dependencies": {
+    "string": "*"
+    , "big-xml": "*"
+    , "date-format-lite": "*"
+    , "request": "*"
+    , "cheerio": "*"
+		, "jsftp": "*"
+		, "optimist": "*"
+		, "moment": "*"
+    , "solr-client": "*"
+  }
+}
