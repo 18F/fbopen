@@ -1,0 +1,13 @@
+www-sails
+solr-4.5.1
+sftp-config*.json
+node_modules
+.DS_Store
+tmp
+old
+fbo-attachments/*
+nightly-downloads/*
+workfiles/*
+*.log
+*.out
+*.urls
