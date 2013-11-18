@@ -11,3 +11,13 @@ workfiles/*
 *.log
 *.out
 *.urls
+lib-cov
+*.seed
+*.csv
+*.dat
+*.pid
+*.gz
+pids
+logs
+results
+npm-debug.log
