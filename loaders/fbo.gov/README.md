@@ -1,5 +1,17 @@
 # Importing FedBizOpps data into FBOpen using the fbo.gov loader
 
+## Limitations
+* The fbo.gov loader currently loads only **COMBINE** and **PRESOL** opportunity notices, and only loads notices for which the due date has not yet passed.
+* **The loader does not yet handle MOD notices.** This is high priority on the open issues list.
+* The attachment crawler/loader is still very primitive. It works for attachments uploaded to fbo.gov or to which the listing's synopsis links directly. Attachments that are more than one hop removed from the listing page are *not* retrieved, but we hope to improve the crawler to do this.
+
+## To do
+* load MOD notices, updating existing data
+* load AWARD and other notices types
+* survey FBO listing archetypes to determine the algorithms for retrieving the relevant attachments for various types of notices, and implement that logic in the crawler/loader
+* better failure handling for the metadata loader, attachment crawler, and attachment loader
+* script to automatically run the nightly update
+
 ## To install the loader
 * Install Solr. See the README in `/solr-files` .
 * `npm install`
