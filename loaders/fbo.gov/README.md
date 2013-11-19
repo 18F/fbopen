@@ -22,7 +22,7 @@ After install, first load a full set of data using the one-time/weekly loader. T
 	
 	Optional arguments:
 
-	`$1` = filepath/name 3. of weekly FBO XML file "dump"; default = *./workfiles/FBOFullXML.xml*
+	`$1` = filepath/name of a weekly FBO XML "dump" file; default = *./workfiles/FBOFullXML.xml*
 
  	`$2` = output filepath/name for the "solrized" xml (which will be imported into Solr); default = *./workfiles/listings-solrized.xml*
 
@@ -52,4 +52,4 @@ After install, first load a full set of data using the one-time/weekly loader. T
 * To load the nightly data into FBOpen: `node nightly-fbo-parser.js [-d YYYYMMDD]` (defaults to yesterday)
 * To collect and load listings' attachments into FBOpen: `process-listing-links.sh < links-YYYYMMDD.txt`
 
-The core of the nightly parser code is borrowed wholesale from our predecessor [Adam Becker's](https://github.com/adamjacobbecker/) [fbo-parser](https://github.com/presidential-innovation-fellows/fbo-parser). Thanks Adam!
+The parser in the nightly code -- that is, the hard part -- is borrowed wholesale from our predecessor [Adam Becker's](https://github.com/adamjacobbecker/) [fbo-parser](https://github.com/presidential-innovation-fellows/fbo-parser). Thanks Adam!
