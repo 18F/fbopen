@@ -60,6 +60,10 @@ After install, first load a full set of data using the one-time/weekly loader. T
 	**NOTE 2:** It's also very buggy. There are many files that shouldn't be downloaded but are, and there are many files that are behind multiple clicks and/or unreachable without login. The algorithm for doing these downloads will have to improve significantly.
 	
 ### Nightly updates
+All at once: **`fbo-nightly.sh [YYYYMMDD]`** (defaults to yesterday)
+
+Or, if you want to do it in steps:
+
 * To download the nightly data file: `node nightly-fbo-parser.js -o [-d YYYYMMDD]` (defaults to yesterday)
 * To load the nightly data into FBOpen: `node nightly-fbo-parser.js [-d YYYYMMDD]` (defaults to yesterday)
 * To collect and load listings' attachments into FBOpen: `process-listing-links.sh < links-YYYYMMDD.txt`
