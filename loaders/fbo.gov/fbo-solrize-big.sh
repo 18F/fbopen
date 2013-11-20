@@ -11,6 +11,12 @@ date | tee $logfile
 
 # you can specify just the input file, or all four files, or none at all
 
+if [[ !(-d "workfiles") ]]
+then
+	echo "directory workfiles/ does not exist. Creating it now ..."
+	mkdir workfiles
+fi
+
 xml_input_file='workfiles/FBOFullXML.xml'
 xml_output_file='workfiles/listings-solrized.xml'
 links_output_file='workfiles/listings-links.txt'

@@ -20,8 +20,17 @@ else
 	exit
 fi
 
+nightly_dir="nightly-downloads"
+
+if [[ !(-d "$nightly_dir") ]]
+then
+	echo "directory $nightly_dir/ does not exist. Creating it now ..."
+	mkdir $nightly_dir
+fi
+
+
 # download the nightly listing metadata, if not downloaded already
-nightly_download_file="nightly-downloads/FBOFeed$download_date.txt"
+nightly_download_file="$nightly_dir/FBOFeed$download_date.txt"
 echo "nightly download = $nightly_download_file"
 
 if [[ ! (-s $nightly_download_file) ]]

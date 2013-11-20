@@ -12,6 +12,19 @@ else
 fi
 zipped_basename="GrantsDBExtract$download_date" # .zip
 download_dir="downloads"
+
+if [[ !(-d "$download_dir/") ]]
+then
+	echo "Directory $download_dir/ does not exist. Creating it now ..."
+	mkdir "$download_dir"
+fi
+
+if [[ !(-d "workfiles/") ]]
+then
+	echo "Directory workfiles/ does not exist. Creating it now ..."
+	mkdir workfiles
+fi
+
 download_url="http://www.grants.gov/web/grants/xml-extract.html?p_p_id=xmlextract_WAR_grantsxmlextractportlet_INSTANCE_5NxW0PeTnSUa&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_cacheability=cacheLevelPage&p_p_col_id=column-1&p_p_col_pos=1&p_p_col_count=2&download=$zipped_basename.zip"
 
 downloaded_zipped_file=$download_dir/$zipped_basename.zip

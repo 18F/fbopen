@@ -7,5 +7,11 @@ else
 	outfile=$1
 fi
 
+if [[ !(-d "workfiles") ]]
+then
+	echo "directory workfiles/ does not exist. Creating it now ..."
+	mkdir workfiles
+fi
+
 wget ftp://ftp.fbo.gov/datagov/FBOFullXML.xml -O $outfile
 
