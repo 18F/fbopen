@@ -116,6 +116,8 @@ function process_mods() {
 	notice_idx = 0;
 	notices_written = 0;
 
+	// NYI
+	
 	// var mod_reader = bigXml.createReader(fileinfo.input_filename, /^MOD$/, { gzip: false});
 	// mod_reader.on('record', function(record) {
 	// 	console.log('processing record ' + record['tag'] + ', notice_idx = ' + notice_idx);
@@ -134,16 +136,18 @@ function process_awards() {
 	notice_idx = 0;
 	notices_written = 0;
 
-	var award_reader = bigXml.createReader(fileinfo.input_filename, /^AWARD$/, { gzip: false});
-	award_reader.on('record', function(record) {
-		console.log('processing record ' + record['tag'] + ', notice_idx = ' + notice_idx);
-		process_notice(record, notice_idx++);
-	});
+	// NYI
 
-	award_reader.on('end', function() {
-		console.log('AWARD notices read = ' + notice_idx + ', notices written = ' + notices_written);
+	// var award_reader = bigXml.createReader(fileinfo.input_filename, /^AWARD$/, { gzip: false});
+	// award_reader.on('record', function(record) {
+	// 	console.log('processing record ' + record['tag'] + ', notice_idx = ' + notice_idx);
+	// 	process_notice(record, notice_idx++);
+	// });
+
+	// award_reader.on('end', function() {
+	// 	console.log('AWARD notices read = ' + notice_idx + ', notices written = ' + notices_written);
 		close_streams();
-	});
+	// });
 }
 
 function close_streams() {
