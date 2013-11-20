@@ -14,7 +14,11 @@
 
 ## To install the loader
 * Install Solr. See the README in `/solr-files` .
-* `npm install`
+* In the loaders/fbo.gov/ directory:
+	* `npm install`
+	* `mkdir workfiles nightly-downloads fbo-attachments tmp`
+
+	**Note:** you can configure the fbo.gov loader to use a different directory for fbo attachments by editing `fbo-loader-config.js`.
 
 ## To import FedBizOpps data
 After install, first load a full set of data using the one-time/weekly loader. Then you can simply run nightly updates.
