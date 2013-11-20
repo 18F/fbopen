@@ -22,8 +22,8 @@ print "Processing $FILES ..."
 # make these settable options
 solrURL=http://localhost:8983/solr/update
 logfile=load-solrized.log
-postjarfile=../../solr-4.4.0/example/exampledocs/post.jar
-solrlogdir=../../solr-4.4.0/example/logs
+postjarfile=../../solr-4.5.1/example/exampledocs/post.jar
+solrlogdir=../../solr-4.5.1/example/logs
 
 # temp files
 haserr=tmp/load-solrized.has_err
