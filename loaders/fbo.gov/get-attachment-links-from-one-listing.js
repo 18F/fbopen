@@ -221,6 +221,7 @@ function download(attachment) {
 		+ solr_server_url 
 		+ 'update/extract'
 		+ '?literal.id=' + literal_id
+		+ '&literal.data_type=opp' 
 		+ '&literal.data_source=FBO' 
 		+ '&literal.solnbr=' + solnbr
 		+ '&literal.attachment_url=' + attachment_url

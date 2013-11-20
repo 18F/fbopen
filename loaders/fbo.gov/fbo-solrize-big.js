@@ -364,6 +364,7 @@ function solrize_date(fbo_date) {
 function solr_add_string(notice_fields, notice_tag) {
 
 	s_out = '<doc>\n' 
+			+ '<field name="data_type">opp</field>\n'
 			+ '<field name="data_source">' + datasource_id + '</field>\n'
 			+ '<field name="notice_type">' + notice_tag + '</field>\n';
 

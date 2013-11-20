@@ -201,6 +201,7 @@ app.post('/v0/opp', function(req, res) {
 
 		// create unique (?) Solr ID for this record
 		solr_doc.id = solr_doc.data_source + ':' + solr_doc.solnbr;
+		solr_doc.data_type = 'opp';
 		return_data.id = solr_doc.id;
 
 		solr_client.add(solr_doc, function(err, obj) {

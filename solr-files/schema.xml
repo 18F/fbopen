@@ -113,6 +113,7 @@
     Core FBOpen metadata fields 
    -->
 
+   <field name="data_type" type="string" indexed="true" stored="true" />
    <field name="solnbr" type="string" indexed="true" stored="true" multiValued="false" />
    <field name="data_source" type="string" indexed="true" stored="true" />
    <field name="notice_type" type="string" indexed="true" stored="true" />

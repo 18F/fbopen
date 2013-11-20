@@ -202,6 +202,7 @@ function post_notice_to_solr(notice_json) {
 function build_notice_json(notice_type, notice) {
 
 	notice_out = {};
+	notice_out.data_type = 'opp';
 	notice_out.data_source = datasource_id;
 	notice_out.notice_type = notice_type;
 
