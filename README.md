@@ -16,6 +16,10 @@ Then someone realized we didn't have to limit this server to FBO data. There's a
 * Load data into the search index using the import tools in `/loaders` -- or roll your own, or use the API's POST `/v0/opp` to post opportunities one at a time.
 * To run a simple query web page, try the sample app in `/sample-www`.
 
+### Examples
+* The BusinessUSA PIF team coded up a sample form specifically geared toward submitting or tweaking SBIR solicitations in FBOpen. The relevant code can be found here: [https://github.com/GSA-OCSIT/hyabusa](https://github.com/GSA-OCSIT/hyabusa). Hyabusa is a test-bed Rails 4 app, and includes several other mini-applications, so look for the SbirSolicitationsController and [related views](https://github.com/GSA-OCSIT/hyabusa/tree/master/app/views/sbir_solicitations).
+* One of the BusinessUSA PIF's also coded up a sample site to showcase how SBIR.gov could function if FBOpen were the backend data source for the solicitation listings. That repo, as of this writing very much a work in progress, can be found here: [https://github.com/arowla/sbiropen](https://github.com/arowla/sbiropen). This is a Python app built with the Flask microframework.
+
 ### Caveat
 This project is brand new and very incomplete. No guarantees of data completeness or functionality are implied or should be assumed. There is lots to do!
 
