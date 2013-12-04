@@ -60,5 +60,5 @@ then
 		echo "ERROR: cannot find $xml_file."
 	fi
 else
-	echo "ERROR: cannot file $downloaded_zipped_file."
+	echo "ERROR: cannot find file $downloaded_zipped_file."
 fi
