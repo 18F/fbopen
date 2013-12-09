@@ -1,0 +1,36 @@
+download_date="20131204"
+
+; download and process the nightly file
+date.txt <- [python]
+	import datetime
+	print (datetime.date.today() - datetime.timedelta(days=1)).strftime('%Y%m%d')
+
+nightly_filename="FBOFeed$[download_date]"
+nightly_download_file="FBOFeed$[download_date].txt"
+
+; download the nightly file
+nightly.txt <- [-timecheck]
+	wget -O $OUTPUT ftp://ftp.fbo.gov/FBOFeed$[download_date]
+
+; process the nightly file and extract links
+notices.json <- nightly.txt [node]
+	console.log('Current directory: ' + process.cwd());
+	var fs = require('fs');
+	var	parser = require('../nightly-fbo-parser-def');
+	var notices = parser.parse(fs.readFileSync("$[INPUT]", 'UTF-8'));
+	fs.writeFileSync("$[OUTPUT]", JSON.stringify(notices, undefined, 2));
+
+; nightly_links_file="workfiles/links-$[download_date].txt"
+; ingest the metadata if not ingested already
+nightly_links.txt <- notices.json
+	cat $INPUT | node process_notices.js $OUTPUT
+	
+; var processor = require('../process_notices');
+; var fs = require('fs');
+; var outputfh = fs.openSync("$[OUTPUT]", 'w');
+; processor.process(outputfh, fs.readFileSync("$[INPUT]", 'UTF-8'));
+; outputfh.close();
+
+; if i can do stdin with the node script, then I don't need to use node in Drake
+; e.g.: cat $INPUT | node process_notices.js $OUTPUT
+
