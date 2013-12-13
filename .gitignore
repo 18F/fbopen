@@ -4,6 +4,7 @@ sftp-config*.json
 config.js
 node_modules
 .DS_Store
+.drake
 tmp
 old
 fbo-attachments/*
