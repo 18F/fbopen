@@ -1,10 +1,8 @@
 var util = require('util');
 var datasource_id = 'FBO';
-var fs = require('fs');
 var moment = require('moment');
-//var jsonsp = require('jsonsp');
 var S = require('string');
-var transfuse = require('transfuse');
+var es = require('event-stream');
 
 var field_map = {
 	'DATE': 'posted_dt'
@@ -19,19 +17,22 @@ var field_map = {
 	, 'URL': 'listing_url'
 }
 
-var tr = transfuse(function(foo) {
-    parent_notice = foo[0];
-    for (notice_type in parent_notice) {
-        // util.log('notice type: ' + notice_type);
-        notice = parent_notice[notice_type]
-        if (notice_type == 'PRESOL' || notice_type == 'COMBINE') {
+es.pipeline(
+    process.openStdin(),
+    es.split(),
+    es.parse(),
+    es.map(function (data, callback) {
+        parent_notice = data;
+        key = Object.keys(parent_notice)[0];
+        notice = parent_notice[key]
+        if (key == 'PRESOL' || key == 'COMBINE' || key == 'MOD') {
             notice_out = {};
             notice_out.data_type = 'opp';
             notice_out.data_source = datasource_id;
-            notice_out.notice_type = notice_type;
+            notice_out.notice_type = key;
 
             notice_out.solnbr = clean_solnbr(notice.SOLNBR);
-            notice_out.id = datasource_id + ':' + notice_type + ':' + notice_out.solnbr;
+            notice_out.id = datasource_id + ':' + key + ':' + notice_out.solnbr;
 
             var mapped_field;
             //util.log(util.inspect(notice));
@@ -67,7 +68,7 @@ var tr = transfuse(function(foo) {
                 }
 
                 // exceptions
-                if (field in ['EMAIL', 'EMAIL2']) {
+                if (field == 'EMAIL' || field == 'EMAIL2') {
                     field_out = 'FBO_EMAIL_ADDRESS';
                 }
                 if (field == 'DESC3') { // email description always goes here (smh)
@@ -86,21 +87,14 @@ var tr = transfuse(function(foo) {
                 notice_out[field_out] = val_out;
             }
             
-            // TEST
-            //util.log('notice_out = ' + JSON.stringify(notice_out, null, "  "));
-            //util.log(util.inspect(notice_out));
-
-            return notice_out;
+            callback(null, notice_out);
+        } else {
+            callback();
         }
-
-        return 'baz';
-    }
-});
-
-var stream = fs.createReadStream('notices.json');
-stream.pipe(tr).pipe;
-tr.pipe(process.stdout);
-process.stdin.resume();
+    }),
+    es.stringify(),
+    process.stdout
+);
 
 function clean_solnbr(solnbr) {
 	return S(solnbr).trim().slugify().s;
@@ -148,24 +142,3 @@ function clean_field_value(field, val) {
 }
 
 
-// var util = require('util');
-// 
-// console.log('Starting');
-// 
-// // Intialize a new JSON stream parser.
-// //   Listen for the 'object' event, which is emitted whenever a complete JSON
-// //   object is parsed from the stream.  In this example, each object is a tweet
-// //   from the Twitter Streaming API.
-// 
-// var parser = new jsonsp.Parser()
-// parser.on('object', function(notice) {
-//     util.log(util.inspect(notice));
-// });
-// 
-// 
-// var stream = fs.createReadStream('notices.json').addListener('data', function(chunk) {
-//   // Feed each chunk of data incrementally to the JSON stream parser.  For each
-//   // complete JSON object parsed, an 'object' event will be emitted.
-//     parser.parse(chunk.toString('utf8'));
-// });
-// //stream.end();
