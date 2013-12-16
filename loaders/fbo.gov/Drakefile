@@ -5,26 +5,19 @@ nightly.txt <-
 	wget -O $OUTPUT ftp://ftp.fbo.gov/FBOFeed$[DOWNLOAD_DATE]
 
 ; process the nightly file and extract links
-; TODO: get rid of the node here and make this into a stdin/stdout script
-notices.json <- nightly.txt [node]
-	console.log('Current directory: ' + process.cwd());
-	var fs = require('fs');
-	var	parser = require('../nightly-fbo-parser-def');
-	var notices = parser.parse(fs.readFileSync("$[INPUT]", 'UTF-8'));
-	fs.writeFileSync("$[OUTPUT]", JSON.stringify(notices, undefined, 2));
+notices.json <- nightly.txt
+    cat $INPUT | node xml2json.js > $OUTPUT
 
 ; ingest the metadata if not ingested already
 notices_preprocessed.json <- notices.json
 	cat $INPUT | node process_notices.js > $OUTPUT
 
 nightly_links.txt <- notices_preprocessed.json
-    cat $INPUT | json -a listing_url > $OUTPUT
+    cat $INPUT | json -ga listing_url > $OUTPUT
 
 ; process notices into ES's bulk format
 notices_es.bulk <- notices_preprocessed.json
-    cat $INPUT | sed 's/^[\[,]$/{ "index" : { "_index" : "fbopen", "_type" : "type1" } }/' > $OUTPUT.tmp
-    cat $OUTPUT.tmp | sed 's/^\]$//' > $OUTPUT
-    rm $OUTPUT.tmp
+    cat $INPUT | node format-bulk.js > $OUTPUT
 
 ; load into ES
 $[ELASTICSEARCH_URI] <- notices_es.bulk
