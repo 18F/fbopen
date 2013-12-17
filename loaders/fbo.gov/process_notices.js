@@ -29,10 +29,16 @@ es.pipeline(
             notice_out = {};
             notice_out.data_type = 'opp';
             notice_out.data_source = datasource_id;
-            notice_out.notice_type = key;
+            notice_out.is_mod = (key == 'MOD');
+
+            if (notice_out.is_mod) {
+                notice_out.notice_type = notice.NTYPE;
+            } else {
+                notice_out.notice_type = key;
+            }
 
             notice_out.solnbr = clean_solnbr(notice.SOLNBR);
-            notice_out.id = datasource_id + ':' + key + ':' + notice_out.solnbr;
+            notice_out.id = datasource_id + ':' + notice_out.notice_type + ':' + notice_out.solnbr;
 
             var mapped_field;
             //util.log(util.inspect(notice));
@@ -41,13 +47,10 @@ es.pipeline(
                 //util.log("field: " + field);
 
                 // skip solnbr, already handled above
-                if (field == 'SOLNBR') continue;
-
+                // skip ntype
                 // skip YEAR because it gets combined with DATE instead (smh)
-                if (field == 'YEAR') continue;
-
                 // 'DESC2' is always "Link to Document"
-                if (field == 'DESC2') continue;
+                if (['SOLNBR', 'NTYPE', 'YEAR', 'DESC2'].indexOf(field) >= 0) continue;
 
                 // skip empty fields
                 if (notice[field] == '') continue;
