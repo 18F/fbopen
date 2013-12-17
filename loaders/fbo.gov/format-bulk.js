@@ -28,7 +28,9 @@ var update_command = function(id, type, index) {
 };
 
 var bulkify_data = function (data) {
-    if (data.notice_type == 'MOD') {
+    if (data.is_mod) {
+        // remove is_mod from fields to be inserted
+        delete data['is_mod'];
         command = JSON.stringify(update_command(data.id));
         // for updates, we need to wrap the data in a "doc" attribute
         new_data = {};
