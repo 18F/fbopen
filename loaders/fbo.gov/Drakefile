@@ -17,7 +17,7 @@ nightly_links.txt <- notices_preprocessed.json
 
 ; process notices into ES's bulk format
 notices_es.bulk <- notices_preprocessed.json
-    cat $INPUT | node format-bulk.js > $OUTPUT
+    cat $INPUT | node ../common/format-bulk.js > $OUTPUT
 
 ; load into ES
 $[ELASTICSEARCH_URI] <- notices_es.bulk
