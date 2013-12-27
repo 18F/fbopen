@@ -15,10 +15,10 @@ event_stream.pipeline(
     process.stdout
 );
 
-var index_command = function(type, index) {
+var index_command = function(id, type, index) {
     type = type || DEFAULT_TYPE;
     index = index || DEFAULT_INDEX;
-    return { index: { _index: index, _type: type }};
+    return { index: { _id: id, _index: index, _type: type }};
 };
 
 var update_command = function(id, type, index) {
@@ -28,16 +28,22 @@ var update_command = function(id, type, index) {
 };
 
 var bulkify_data = function (data) {
-    if (data.is_mod) {
+    is_mod = data.is_mod;
+    delete data['is_mod'];
+
+    id = data['id'];
+    delete data['id'];
+
+    if (is_mod) {
         // remove is_mod from fields to be inserted
-        delete data['is_mod'];
-        command = JSON.stringify(update_command(data.id));
+        command = JSON.stringify(update_command(id));
         // for updates, we need to wrap the data in a "doc" attribute
         new_data = {};
+        new_data['doc_as_upsert'] = true;
         new_data['doc'] = data;
         data_str = JSON.stringify(new_data);
     } else {
-        command = JSON.stringify(index_command());
+        command = JSON.stringify(index_command(id));
         data_str = JSON.stringify(data);
     }
 
