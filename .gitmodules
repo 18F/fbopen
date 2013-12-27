@@ -1,0 +1,3 @@
+[submodule "vendor/assert.sh"]
+	path = vendor/assert.sh
+	url = https://github.com/lehmannro/assert.sh
