@@ -1,0 +1,39 @@
+{
+  "took" : 2,
+  "timed_out" : false,
+  "_shards" : {
+    "total" : 5,
+    "successful" : 5,
+    "failed" : 0
+  },
+  "hits" : {
+    "total" : 5,
+    "max_score" : 1.0,
+    "hits" : [ {
+      "_index" : "fbopen_test",
+      "_type" : "type1",
+      "_id" : "FBO:PRESOL:fa4890-14-q-0007",
+      "_score" : 1.0
+    }, {
+      "_index" : "fbopen_test",
+      "_type" : "type1",
+      "_id" : "FBO:PRESOL:fa4890-14-q-0006",
+      "_score" : 1.0
+    }, {
+      "_index" : "fbopen_test",
+      "_type" : "type1",
+      "_id" : "FBO:PRESOL:14-0004",
+      "_score" : 1.0
+    }, {
+      "_index" : "fbopen_test",
+      "_type" : "type1",
+      "_id" : "FBO:PRESOL:ag-4604-s-14-0001",
+      "_score" : 1.0
+    }, {
+      "_index" : "fbopen_test",
+      "_type" : "type1",
+      "_id" : "FBO:SRCSGT:fa4890rfi120413",
+      "_score" : 1.0
+    } ]
+  }
+}
