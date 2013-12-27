@@ -1,8 +1,6 @@
 #!/bin/bash
 
-PATH=$PATH:${FBOPEN_ROOT:?"FBOPEN_ROOT must be defined"}
-
-. $FBOPEN_ROOT/vendor/assert.sh/assert.sh
+source setup.sh
 
 echo "Creating a test index"
 curl -XPUT 'http://localhost:9200/fbopen_test'
@@ -29,7 +27,7 @@ cat sample/output/fbo.json | json -ag hits > sample/output/fbo__hits.json
 
 # assert return contents
 echo "Asserting output (/tmp/fbopen_output__hits) equals expected (sample/output/fbo__hits.json)"
-assert "diff -q /tmp/fbopen_output__hits sample/output/fbo__hits.json" ""
+assert "diff -q /tmp/fbopen_output__hits sample/output/fbo__hits.json"
 assert_end
 
 echo "Dropping the test index"
