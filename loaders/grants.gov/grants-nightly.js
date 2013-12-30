@@ -20,9 +20,6 @@ var fs = require("fs")
 	, moment = require('moment')
 	, date_format_lite = require('date-format-lite')
 	, optimist = require('optimist')
-	// , solr = require('solr-client')
-	// , unzip = require('unzip')
-	// , wget = require('wget')
 	;
 
 var config = require('./grants-loader-config.js');
@@ -30,13 +27,7 @@ var config = require('./grants-loader-config.js');
 var log_file = config.log_file || 'grants-nightly.log';
 var datasource_id = config.datasource_id || 'grants.gov';
 
-
 var cdata_regex = /<!\[CDATA\[(.*)\]\]>/;
-
-// Create Solr client
-// var solr_client = solr.createClient();
-// solr_client.autoCommit = true; // Switch on "auto commit"
-
 
 // command line options
 var argv = optimist
@@ -345,18 +336,8 @@ function get_listing_url(solnbr_raw) {
 
 
 function write_solr_files(notice_type, notice_values, notice_fields, notice_idx) {
-
-	// write the Solr-ingestible XML file
-	// xml_output_filename = fileinfo.xml_output_filepath + notice_values['SOLNBR'] + '--' + notice_idx + '.xml';
-	// INEFFICIENT; SKIP IT
-	// fs.writeFile(xml_output_filename, '<add>\n' + s_out + '</add>', xml_output_cb(notice_values['SOLNBR']));
-
-	// separately:
-	// write to a single large file (faster ingestion?)
-	// fs.appendFileSync(fileinfo.xml_output_filename, s_out);
 	xml_output_stream.write(s_out, track_xml_completion());
-
-} // write_solr_files()
+}
 
 
 function track_xml_completion() {
@@ -366,7 +347,6 @@ function track_xml_completion() {
 function close_streams() {
 	xml_output_stream.end('</add>');
 }
-
 
 
 function simple_log(str, console_too) {
