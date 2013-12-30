@@ -3,5 +3,6 @@
   "version": "0.0.1",
   "description": "Common utilities for parsing and loading data into FBOpen.",
   "dependencies": {
+      "event-stream": ""
   }
 }
