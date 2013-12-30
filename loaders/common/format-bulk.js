@@ -5,7 +5,9 @@ var argv = optimist
 	.alias('a', 'append-description')
 	.describe('a', 'flag to indicate that modified descriptions should be appended to the old ones with a datestamp')
     .alias('d', 'description-field')
-    .alias('d', 'the name of the description field ("description" by default)')
+    .describe('d', 'the name of the description field ("description" by default)')
+    .alias('i', 'index')
+    .describe('i', 'the name of the index to insert data into')
 	.alias('h', 'Help')
 	.argv;
 
@@ -19,9 +21,13 @@ if (argv.a) {
     append_description = true;
 }
 
+var index_name = null;
+if (argv.i) {
+    index_name = argv.i;
+}
+
 var event_stream = require('event-stream');
 
-var DEFAULT_INDEX = 'fbopen';
 var DEFAULT_TYPE = 'type1';
 
 
@@ -33,20 +39,25 @@ event_stream.pipeline(
         new_data = bulkify_data(data);
         callback(null, new_data);
     }), 
-    //event_stream.stringify(),
     process.stdout
 );
 
-var index_command = function(id, type, index) {
+var index_command = function(id, type) {
     type = type || DEFAULT_TYPE;
-    index = index || DEFAULT_INDEX;
-    return { index: { _id: id, _index: index, _type: type }};
+    bulk_fmt = {index: { _id: id, _type: type }};
+    if (index_name) {
+        bulk_fmt['index']['_index'] = index_name;
+    }
+    return bulk_fmt;
 };
 
-var update_command = function(id, type, index) {
+var update_command = function(id, type) {
     type = type || DEFAULT_TYPE;
-    index = index || DEFAULT_INDEX;
-    return { update: { _id: id, _type: type, _index: index } };
+    bulk_fmt = {update: { _id: id, _type: type }};
+    if (index_name) {
+        bulk_fmt['update']['_index'] = index_name;
+    }
+    return bulk_fmt;
 };
 
 var bulkify_data = function (data) {
