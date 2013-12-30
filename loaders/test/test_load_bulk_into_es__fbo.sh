@@ -23,8 +23,6 @@ echo "Parsing out just the \"hits\" portion of the JSON"
 cat /tmp/fbopen_output | json -ag hits > /tmp/fbopen_output.tmp
 cat sample/output/fbo.json | json -ag hits > sample/output/fbo.json.tmp
 
-#TODO: change format_bulk.js to put the id in _id and add upsert statements. also take out is_mod from the index records
-
 # assert return contents
 echo "Asserting output (/tmp/fbopen_output.tmp) equals expected (sample/output/fbo.json.tmp)"
 assert "diff -q /tmp/fbopen_output.tmp sample/output/fbo.json.tmp"
