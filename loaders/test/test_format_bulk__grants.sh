@@ -7,6 +7,9 @@ echo "Formatting standard JSON into Elasticsearch bulk format JSON"
 
 cat sample/grants.json | node $FBOPEN_ROOT/loaders/common/format-bulk.js > /tmp/fbopen_output
 
+# make sure file is not empty
+assert "wc -l /tmp/fbopen_output" "10 /tmp/fbopen_output"
+
 assert "diff -q /tmp/fbopen_output sample/output/grants.bulk"
 
 assert_end
