@@ -8,7 +8,7 @@ curl -XPUT 'http://localhost:9200/fbopen_test'
 echo "Indexing sample/fbo.bulk in ElasticSearch"
 curl -s -XPOST 'http://localhost:9200/fbopen_test/_bulk' --data-binary @sample/fbo.bulk; echo
 
-echo "Waiting a couple seconds..."
+echo "Waiting for indexing..."
 sleep 2
 
 # query ES via the multi get API
@@ -31,7 +31,7 @@ assert "diff -q /tmp/fbopen_output__hits sample/output/fbo__hits.json"
 assert_end
 
 echo "Dropping the test index"
-curl -XDELETE 'http://localhost:9200/fbopen_test'
+curl -XDELETE 'http://localhost:9200/fbopen_test'; echo
 
 echo "Done."
 
