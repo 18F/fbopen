@@ -1,7 +1,4 @@
-var es = require('event-stream');
 var parser = require('./nightly-fbo-parser-def');
-var fs = require('fs');
-var util = require('util');
 
 var data = '';
 process.stdin.on('data', function(chunk) {
