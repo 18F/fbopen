@@ -220,6 +220,7 @@ function process_notice(notice, notice_idx) {
 				// For awards, add the sequential number of this award.
 				// NOTE: when importing from a daily update file, we will need to query for all existing first.
 				// (This could be tricky.)
+                // AKR NOTE/TODO: We should be able to do this via a script update in ES (we can increment a counter value with an insert/update)
 				notice_solr_id = solnbr;
 				if (notice_type == 'AWARD') {
 					award_count = ++award_counts[solnbr] || (award_counts[solnbr] = 0);
