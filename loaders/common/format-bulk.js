@@ -1,7 +1,29 @@
+var optimist = require('optimist');
+
+var argv = optimist
+	.usage('Usage: node format-bulk.js (accepts input from STDIN and generates output on STDOUT)')
+	.alias('a', 'append-description')
+	.describe('a', 'flag to indicate that modified descriptions should be appended to the old ones with a datestamp')
+    .alias('d', 'description-field')
+    .alias('d', 'the name of the description field ("description" by default)')
+	.alias('h', 'Help')
+	.argv;
+
+if (argv.h) { // show help
+	console.log(optimist.help());
+	process.exit(0);
+}
+
+var append_description = false;
+if (argv.a) {
+    append_description = true;
+}
+
 var event_stream = require('event-stream');
 
 var DEFAULT_INDEX = 'fbopen';
 var DEFAULT_TYPE = 'type1';
+
 
 event_stream.pipeline(
     process.openStdin(),
@@ -28,25 +50,43 @@ var update_command = function(id, type, index) {
 };
 
 var bulkify_data = function (data) {
-    is_mod = data.is_mod;
-    delete data['is_mod'];
+    // remove is_mod from fields to be inserted
+    is_mod = _delete(data, 'is_mod');
 
-    id = data['id'];
-    delete data['id'];
+    // id goes in the top-level data
+    id = _delete(data, 'id');
 
+    lines = [];
     if (is_mod) {
-        // remove is_mod from fields to be inserted
-        command = JSON.stringify(update_command(id));
+
+        if (append_description) {
+            description = _delete(data, 'description');
+            // we may need to figure out how to bypass this for grants
+            descrip_obj = {};
+            descrip_obj['script'] = "ctx._source.description += \"\nModified \" + posted_dt + \":\n\" + description";
+            descrip_obj['params'] = { "description": description, "posted_dt": data['posted_dt'] };
+
+            lines.push(JSON.stringify(update_command(id)));
+            lines.push(JSON.stringify(descrip_obj));
+        }
+
         // for updates, we need to wrap the data in a "doc" attribute
         new_data = {};
         new_data['doc_as_upsert'] = true;
         new_data['doc'] = data;
-        data_str = JSON.stringify(new_data);
+
+        lines.push(JSON.stringify(update_command(id)));
+        lines.push(JSON.stringify(new_data));
     } else {
-        command = JSON.stringify(index_command(id));
-        data_str = JSON.stringify(data);
+        lines.push(JSON.stringify(index_command(id)));
+        lines.push(JSON.stringify(data));
     }
 
-    return command + "\n" + data_str + "\n";
+    return lines.join("\n") + "\n";
 };
 
+function _delete(obj, key) {
+    val = obj[key];
+    delete obj[key];
+    return val;
+}
