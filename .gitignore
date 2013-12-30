@@ -6,6 +6,7 @@ node_modules
 .DS_Store
 .drake
 tmp
+*.tmp
 old
 fbo-attachments/*
 nightly-downloads/*
