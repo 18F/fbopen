@@ -1,10 +1,16 @@
+#!/bin/bash
+
 # fbo-nightly.sh [YYYYMMDD]
 
-# download and process the nightly file
+# download the nightly file
 
-if [[ $1 == "" ]]
+# get/require a date. yesterday by default.
+# TODO: this works on Linux but needs testing on OSX
+if [[ $# -eq 0 ]]
 then
-	if date --version >/dev/null 2>&1 ;
+	date --version >/dev/null 2>&1
+	# check return code
+	if [[ $? -eq 0 ]]
 	then
 		# GNU date format
 		download_date=`date --date yesterday +"%Y%m%d"`
@@ -12,15 +18,23 @@ then
 		# try this instead
 		download_date=$(date -v 1d +"%Y%m%d")
 	fi
-elif [[ $1 == [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9] ]] # require 8-digit YYYYMMDD
+elif [[ $1 -ne "" ]]
 then
-	download_date=$1
-else
-	echo "Usage: fbo-nightly.sh [YYYYMMDD]"
-	exit
+	date -d $1
+	if [[ $? -eq 1 ]]
+	then
+		echo "Usage: fbo-nightly.sh [YYYYMMDD]"
+	else
+		download_date=$1
+	fi
 fi
 
-nightly_dir="nightly-downloads"
+echo $download_date;
+exit
+#else
+#	echo "Usage: fbo-nightly.sh [YYYYMMDD]"
+#	exit
+#fi
 
 if [[ !(-d "$nightly_dir") ]]
 then
