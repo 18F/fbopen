@@ -5,7 +5,6 @@
 # download the nightly file
 
 # get/require a date. yesterday by default.
-# TODO: this works on Linux but needs testing on OSX
 if [[ $# -eq 0 ]]
 then
 	date --version >/dev/null 2>&1
