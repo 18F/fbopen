@@ -29,36 +29,45 @@ then
 	fi
 fi
 
-echo $download_date;
-exit
-#else
-#	echo "Usage: fbo-nightly.sh [YYYYMMDD]"
-#	exit
-#fi
+ELASTICSEARCH_URI=${ELASTICSEARCH_URI:-"localhost:9200"}
+echo $ELASTICSEARCH_URI
+ELASTICSEARCH_INDEX=${ELASTICSEARCH_INDEX:-"fbopen"}
+echo $ELASTICSEARCH_INDEX
 
-if [[ !(-d "$nightly_dir") ]]
-then
-	echo "directory $nightly_dir/ does not exist. Creating it now ..."
-	mkdir $nightly_dir
-fi
+# mkdir -p will ensure the nightly download dir is in place, but won't fail if it already exists
+nightly_dir="nightly-downloads"
+mkdir -p $nightly_dir
 
-# download the nightly listing metadata, if not downloaded already
+# download the nightly file, if not downloaded already
 nightly_download_file="$nightly_dir/FBOFeed$download_date.txt"
 echo "nightly download = $nightly_download_file"
 
 if [[ ! (-s $nightly_download_file) ]]
 then
-	node nightly-fbo-parser.js -o -d $download_date
+	wget -O $nightly_download_file ftp://ftp.fbo.gov/FBOFeed$download_date
 else
 	echo "(already downloaded $nightly_download_file)"
 fi
 
-# ingest the metadata if not ingested already
-nightly_links_file="workfiles/links-$download_date.txt"
-echo "nightly links file = $nightly_links_file"
-node nightly-fbo-parser.js -d $download_date
+# process the nightly file into JSON
+cat $nightly_download_file | node xml2json.js > $nightly_download_file.json
+
+# prep the JSON further
+prepped_json_notices_file=$nightly_dir/prepped_notices.$download_date.json
+cat $nightly_download_file.json | node process_notices.js > $prepped_json_notices_file
+
+# extract links
+nightly_links_file=$nightly_dir/links.$download_date.txt
+cat $prepped_json_notices_file | json -ga listing_url > $nightly_links_file
+
+# convert notices to Elasticsearch's bulk format, adding -a flag to append descriptions in MODs
+bulk_notices_file=$nightly_dir/notices.$download_date.bulk
+cat $prepped_json_notices_file | node ../common/format-bulk.js -a > $bulk_notices_file
+
+# load into Elasticsearch
+curl -s -XPOST "$ELASTICSEARCH_URI/$ELASTICSEARCH_INDEX/_bulk" --data-binary @$bulk_notices_file; echo
 
 # download and ingest attachments
 # (To do: detect whether this is already done, too)
-process-listing-links.sh < $nightly_links_file
+#cat $nightly_links_file | ./process-listing-links.sh | tee fbo-attachment-downloads.log
 
