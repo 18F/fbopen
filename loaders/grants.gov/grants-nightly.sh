@@ -1,29 +1,38 @@
-#
+
 # grants-nightly.sh
 
 # download the nightly file
 # http://www.grants.gov/web/grants/xml-extract.html?p_p_id=xmlextract_WAR_grantsxmlextractportlet_INSTANCE_5NxW0PeTnSUa&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_cacheability=cacheLevelPage&p_p_col_id=column-1&p_p_col_pos=1&p_p_col_count=2&download=GrantsDBExtract20131108.zip
 
-if [[ $1 == "" ]]
+# get/require a date. yesterday by default.
+if [[ $# -eq 0 ]]
 then
-	download_date=`date --date yesterday +"%Y%m%d"`
-else
-	download_date=$1
+	date --version >/dev/null 2>&1
+	# check return code
+	if [[ $? -eq 0 ]]
+	then
+		# GNU date format
+		download_date=`date --date yesterday +"%Y%m%d"`
+	else
+		# try this instead
+		download_date=$(date -v -1d +"%Y%m%d")
+	fi
+elif [[ $1 -ne "" ]]
+then
+	date -d $1
+	if [[ $? -eq 1 ]]
+	then
+		echo "Usage: grants-nightly.sh [YYYYMMDD]"
+	else
+		download_date=$1
+	fi
 fi
+
 zipped_basename="GrantsDBExtract$download_date" # .zip
 download_dir="downloads"
 
-if [[ !(-d "$download_dir/") ]]
-then
-	echo "Directory $download_dir/ does not exist. Creating it now ..."
-	mkdir "$download_dir"
-fi
-
-if [[ !(-d "workfiles/") ]]
-then
-	echo "Directory workfiles/ does not exist. Creating it now ..."
-	mkdir workfiles
-fi
+mkdir -p "$download_dir"
+mkdir -p workfiles
 
 download_url="http://www.grants.gov/web/grants/xml-extract.html?p_p_id=xmlextract_WAR_grantsxmlextractportlet_INSTANCE_5NxW0PeTnSUa&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_cacheability=cacheLevelPage&p_p_col_id=column-1&p_p_col_pos=1&p_p_col_count=2&download=$zipped_basename.zip"
 
@@ -62,3 +71,12 @@ then
 else
 	echo "ERROR: cannot find file $downloaded_zipped_file."
 fi
+
+echo "Converting XML to JSON"
+cat workfiles/listings-solrized.xml | node xml2json.js > workfiles/grants.json
+echo "Converting JSON to Elasticsearch bulk JSON format"
+cat workfiles/grants.json | node ../common/format-bulk.js > workfiles/grants.bulk
+
+echo "Extracting links"
+# the '-c "this.listing_url"' part filters the results to only lines where the listing_url is defined
+cat workfiles/grants.json | json -agc "this.listing_url" listing_url > workfiles/links.txt
