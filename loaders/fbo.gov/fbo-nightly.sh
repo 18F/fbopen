@@ -15,7 +15,7 @@ then
 		download_date=`date --date yesterday +"%Y%m%d"`
 	else
 		# try this instead
-		download_date=$(date -v 1d +"%Y%m%d")
+		download_date=$(date -v -1d +"%Y%m%d")
 	fi
 elif [[ $1 -ne "" ]]
 then
