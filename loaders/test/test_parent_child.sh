@@ -47,14 +47,20 @@ sleep 5
 echo "Querying the ES API for what we just indexed"
 curl 'localhost:9200/fbopen_test/opp/_search' -d '{
     "query" : {
-        "match" : {
-            "_all" : "john"
-        },
-        "has_child" : {
-            "type" : "opp_attachment",
-            "query" : {
-                "term" : {
-                    "_all" : "john"   
+        "bool" : {
+            "should" : {
+                "match" : {
+                    "_all" : "john"
+                }
+            },
+            "should" : {
+                "has_child" : {
+                    "type" : "opp_attachment",
+                    "query" : {
+                        "term" : {
+                            "_all" : "john"
+                        }
+                    }
                 }
             }
         }
