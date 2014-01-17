@@ -41,11 +41,25 @@ file=$(openssl base64 -in sample/attachments/test.rtf)
 json="{\"_name\" : \"test.rtf\", \"content\" : \"${file}\"}"
 echo $json | curl -i -XPOST 'http://localhost:9200/fbopen_test/opp_attachment?parent=FBO:PRESOL:14-0004' -d @-
 
-echo "Waiting for attachment indexing... (10s)"
-sleep 10
+echo "Waiting for attachment indexing... (5s)"
+sleep 5
 
 echo "Querying the ES API for what we just indexed"
-curl 'localhost:9200/fbopen_test/_search?pretty=true&q=john'
+curl 'localhost:9200/fbopen_test/opp/_search' -d '{
+    "query" : {
+        "match" : {
+            "_all" : "john"
+        },
+        "has_child" : {
+            "type" : "opp_attachment",
+            "query" : {
+                "term" : {
+                    "_all" : "john"   
+                }
+            }
+        }
+    }
+}'
 exit
 
 echo "Parsing out just the \"hits\" portion of the JSON"
