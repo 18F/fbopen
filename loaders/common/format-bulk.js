@@ -28,7 +28,7 @@ if (argv.i) {
 
 var event_stream = require('event-stream');
 
-var DEFAULT_TYPE = 'type1';
+var DEFAULT_TYPE = 'opp';
 
 
 event_stream.pipeline(
