@@ -27,7 +27,6 @@ es.pipeline(
         notice = parent_notice[key]
         if (key == 'PRESOL' || key == 'COMBINE' || key == 'MOD') {
             notice_out = {};
-            notice_out.data_type = 'opp';
             notice_out.data_source = datasource_id;
             notice_out.is_mod = (key == 'MOD');
 

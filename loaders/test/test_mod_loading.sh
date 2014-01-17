@@ -16,7 +16,12 @@ curl -s 'localhost:9200/fbopen_test/_search?size=50&pretty=true&q=*:*' > /tmp/fb
 
 echo "Parsing out just the \"hits\" portion of the JSON"
 #TODO: this process could really be better
-cat /tmp/fbopen_output | json -ag hits.hits
+cat /tmp/fbopen_output | json -ag hits.hits > /tmp/fbopen_output.json
+
+# make sure it looks like we expect
+assert "diff -q /tmp/fbopen_output.json sample/output/fbo_mod_loaded.json"
+
+assert_end
 
 echo "Dropping the test index"
 curl -XDELETE 'http://localhost:9200/fbopen_test'; echo
