@@ -1,35 +1,43 @@
+#!/bin/bash
+
 # fbo-nightly.sh [YYYYMMDD]
 
-# download and process the nightly file
+# download the nightly file
 
-if [[ $1 == "" ]]
+# get/require a date. yesterday by default.
+if [[ $# -eq 0 ]]
 then
-	if date --version >/dev/null 2>&1 ;
+	date --version >/dev/null 2>&1
+	# check return code
+	if [[ $? -eq 0 ]]
 	then
 		# GNU date format
 		download_date=`date --date yesterday +"%Y%m%d"`
 	else
 		# try this instead
-		download_date=$(date -v 1d +"%Y%m%d")
+		download_date=$(date -v -1d +"%Y%m%d")
 	fi
-elif [[ $1 == [0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9] ]] # require 8-digit YYYYMMDD
+elif [[ $1 -ne "" ]]
 then
-	download_date=$1
-else
-	echo "Usage: fbo-nightly.sh [YYYYMMDD]"
-	exit
+	date -d $1
+	if [[ $? -eq 1 ]]
+	then
+		echo "Usage: fbo-nightly.sh [YYYYMMDD]"
+	else
+		download_date=$1
+	fi
 fi
 
+ELASTICSEARCH_URI=${ELASTICSEARCH_URI:-"localhost:9200"}
+echo "ELASTICSEARCH_URI = $ELASTICSEARCH_URI"
+ELASTICSEARCH_INDEX=${ELASTICSEARCH_INDEX:-"fbopen"}
+echo "ELASTICSEARCH_INDEX = $ELASTICSEARCH_INDEX"
+
+# mkdir -p will ensure the nightly download dir is in place, but won't fail if it already exists
 nightly_dir="nightly-downloads"
+mkdir -p $nightly_dir
 
-if [[ !(-d "$nightly_dir") ]]
-then
-	echo "directory $nightly_dir/ does not exist. Creating it now ..."
-	mkdir $nightly_dir
-fi
-
-
-# download the nightly listing metadata, if not downloaded already
+# download the nightly file, if not downloaded already
 nightly_download_file="$nightly_dir/FBOFeed$download_date.txt"
 echo "nightly download = $nightly_download_file"
 
