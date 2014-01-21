@@ -29,9 +29,9 @@ then
 fi
 
 ELASTICSEARCH_URI=${ELASTICSEARCH_URI:-"localhost:9200"}
-echo $ELASTICSEARCH_URI
+echo "ELASTICSEARCH_URI = $ELASTICSEARCH_URI"
 ELASTICSEARCH_INDEX=${ELASTICSEARCH_INDEX:-"fbopen"}
-echo $ELASTICSEARCH_INDEX
+echo "ELASTICSEARCH_INDEX = $ELASTICSEARCH_INDEX"
 
 # mkdir -p will ensure the nightly download dir is in place, but won't fail if it already exists
 nightly_dir="nightly-downloads"
