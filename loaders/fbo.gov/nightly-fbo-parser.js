@@ -63,7 +63,6 @@ var field_map = {
 }
 
 
-
 var nightly_download_date_str = get_download_date_str(argv.d);
 var nightly_filename = 'FBOFeed' + nightly_download_date_str;
 var download_filename = 'nightly-downloads/' + nightly_filename + '.txt';
@@ -76,38 +75,51 @@ var nightly_links_file = 'workfiles/links-' + nightly_download_date_str + '.txt'
 var links_output_stream = fs.createWriteStream(nightly_links_file);
 
 // download if we don't have it yet
-var file_exists = fs.existsSync(nightly_json);
+var processed_file_exists = fs.existsSync(nightly_json);
+var download_file_exists = fs.existsSync(download_filename);
 
 // test
-if (file_exists) simple_log(nightly_json + ' already exists', true);
+if (processed_file_exists) simple_log(nightly_json + ' already exists', true);
 
-if (!file_exists || argv.f) {
+if (!download_file_exists || force_download) {
 
-	// test
-	// simple_log('get_and_process_notices: ' + nightly_filename);
-
+    simple_log('Downloading ' + nightly_filename + '...');
 	get_and_process_notices(nightly_filename, download_filename);
-	// process.exit(0);
-
 } else {
 
 	// test
-	simple_log('loading from file: ' + nightly_json, true);
+	simple_log('loading from already downloaded file: ' + download_filename, true);
 
-	notices_str = fs.readFileSync(nightly_json);
-	notices = JSON.parse(notices_str);
-
-	if (!argv.o) {
-		process_notices(notices);
-	} else {
-		process.exit(0);
-	}
-	// process.exit(1);
+    read_and_process_notices(download_filename);
 }
 
 
 function get_and_process_notices(nightly_filename, download_filename) {
+    if ((!fs.existsSync(download_filename)) || force_download)  {
+        download_file(nightly_filename, download_filename, read_and_process_notices);
+    }
+} // get_and_process()
 
+
+function read_and_process_notices(download_filename) {
+    // parse it into JSON
+    var notices = parser.parse(fs.readFileSync(download_filename, 'utf8'));
+    
+    // save to file
+    fs.writeFileSync(nightly_json, JSON.stringify(notices, undefined, 2));
+
+    simple_log('Parsed and saved to ' + nightly_json + '.', true);
+
+    if (!argv.o) {
+        process_notices(notices);
+        return;
+    } else {
+        process.exit(0);
+    }
+} // read_and_process()
+
+
+function download_file(nightly_filename, download_filename, callback) {
 	var ftp = new jsftp({ host: 'ftp.fbo.gov' });
 	ftp.get(nightly_filename, download_filename, function(hadErr) {
 		if (hadErr) {
@@ -115,30 +127,12 @@ function get_and_process_notices(nightly_filename, download_filename) {
 			console.error('ERROR: could not download file' + nightly_filename + '.');
 			process.exit(1);
 		} else {
-
 			simple_log('Downloaded ' + nightly_filename + '.', true);
+            callback(download_filename);
+        }
+    });
+} // download_file()
 
-			// parse it into JSON
-			var notices = parser.parse(fs.readFileSync(download_filename, 'UTF-8'));
-			
-			// save to file
-			fs.writeFileSync(nightly_json, JSON.stringify(notices, undefined, 2));
-
-			simple_log('Parsed and saved to ' + nightly_json + '.', true);
-
-			if (!argv.o) {
-				process_notices(notices);
-				return;
-			} else {
-				process.exit(0);
-			}
-		}
-
-	});
-
-	return;
-
-} // get_and_process
 
 function process_notices(notices) {
 
