@@ -15,16 +15,32 @@ body {
 	text-align: right;
 }
 #footer .container {
-	background-color: #f5f5f5;
-	text-align: left;
-	max-width: 100%;
+	/*background-color: #f5f5f5;*/
+/*	text-align: left;
+*/	max-width: 100%;
 	padding: 0 5px;
+	text-align: center;
 }
 #footer .container .credit {
 	margin: 1em;
 }
 
-h1 {
+#github-link, #twitter-link {
+	width: 33px;
+	height: 33px;
+	margin: 10px;
+	display: inline-block;
+}
+#github-link {
+	background: url('../images/FBOpen-socialicon-github.png') no-repeat 0 1px;
+}
+#twitter-link {
+	background: url('../images/FBOpen-socialicon-twitter.png') no-repeat 0 1px;
+}
+
+
+
+h1, .logo {
 	display: none;
 	font-size: 48px;
 	margin-top: 10px;
@@ -528,21 +544,50 @@ ul.tagit li.tagit-new {
   border-color : #E6E6E6;
   border-width : 1px;
 }
+#q::-ms-clear { display: none; } /* don't show IE's clear-input "x" button because we have our own */
+
+/* center placeholder on splash page */
+#q.intro::-webkit-input-placeholder { text-align:center; }
+#q.intro:-moz-placeholder { /* Firefox 18- */ text-align:center; }
+#q.intro::-moz-placeholder {  /* Firefox 19+ */ text-align:center; }
+#q.intro:-ms-input-placeholder { text-align:center; }
+#q.intro {
+	text-align: center;
+}
+
 .active-filter {
   background : #E6E6E6;
 }
 
+#intro {
+	display: none;
+	text-align: center;
+	width: 50%;
+	margin: 70px auto;
+	min-width: 300px;
+	max-width: 425px;
+}
+#intro .brand {
+	margin-bottom: 30px;
+}
+#intro .brand > span {
+	display: block;
+	bottom: auto;
+	left: auto;
+}
 .landing-copy {
   font-family : Enriqueta;
   font-size : 22px;
   line-height : 36px;
   color : #EA461F;
 }
+#fbopen-search-form.intro {
+	margin-top: 60px;
+}
 
 .landing-copy-small {
   font-family : Enriqueta;
   font-size : 13px;
   line-height : 36px;
-  color : #0DA8CC;
+  color : #999999; /* #0DA8CC; */
 }
-

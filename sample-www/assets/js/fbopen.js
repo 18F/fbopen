@@ -153,7 +153,19 @@
         $('#form-advanced-options').collapse('show');
       }
 
-      do_search(opps, search_params);
+      if (search_params['q']) {
+        do_search(opps, search_params);
+      } else {
+        // rearrange a little for the home page
+        $('#fbopen-search-form').addClass('intro').appendTo('#intro');
+        $('#q').attr('placeholder', 'Start searching').addClass('intro');
+        $('#form-advanced-label').hide();
+        $('#main .brand').hide();
+        $("#intro").show();
+
+        // without a setTimeout delay, $('#q').focus() doesn't work in IE
+        window.setTimeout(function(){ $('#q').focus(); }, 50);
+      }
 
     }
   });
