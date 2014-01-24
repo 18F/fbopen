@@ -65,7 +65,11 @@ var bulkify_data = function (data) {
     is_mod = _delete(data, 'is_mod');
 
     // id goes in the top-level data
-    id = _delete(data, 'id');
+    if ('id' in data) {
+        id = _delete(data, 'id');
+    } else {
+        id = _delete(data, '_id');
+    }
 
     lines = [];
     if (is_mod) {
