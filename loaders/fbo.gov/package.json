@@ -7,8 +7,8 @@
   },
   "dependencies": {
     "string": "*"
-    , "big-xml": "*"
-    , "date-format-lite": "*"
+    , "xml-splitter": "*"
+    , "moment": "*"
     , "request": "*"
     , "cheerio": "*"
 		, "jsftp": "*"
