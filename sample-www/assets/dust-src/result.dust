@@ -1,0 +1,119 @@
+<div id="results-topline" class="row">
+	<div id="result-count" class="col-md-6">
+		{@result_count count="{numFound}" /}
+	</div>
+	<div id="results-sorted-by" class="col-md-6">
+		Sorted by 
+		<span class="selected">Relevance</span>
+	</div>
+</div>
+<div class="pagination-box">
+	<ul class="pagination">{@pager /}</ul>
+</div>
+{#docs}
+<div class="result-item" data-solr-id="{solr_id}" data-attachment-url="{attachment_url}">
+	<div class="row listing-top">
+		<div class="listing-top-left col-md-10">
+			<h3 class="title">
+				<a href="{@view_listing_url /}" target="_blank">
+					{?parent_title_t}
+						{parent_title_t}
+					{:else}
+						{title}
+					{/parent_title_t}
+				</a>
+			</h3>
+			<div class="agency-name">{agency}</div>
+		</div>
+		<div class="listing-top-right col-md-2">
+			<div class="score">
+				<div class="score-dots">
+					<span class="score-dots">{@score_dots score="{score}" /}</span>
+				</div>
+				<div class="score-text">
+					<strong>{score}%</strong> RELEVANT
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="row listing-main">
+		<div class="listing-left col-md-8">
+			<blockquote class="listing-text">
+				<div class="content-snippet">
+					{@content_short /}
+				</div>
+			</blockquote>
+			<!--
+			{?highlights}
+			<blockquote class="listing-text-more">{! @content_more / !}</blockquote>
+			{/highlights}
+			-->
+		</div>
+
+		<div class="listing-right col-md-4">
+			<div class="tags">
+				{#tags}
+				<span class="tag">{tag}</span>
+				{/tags}
+			</div>
+
+			<div class="listing-right-more">
+				{?id}
+				<div class="listing-id-box listing-data-box">
+					<div class="listing-data-label">Opportunity #</div>
+					<div class="listing-id listing-data">{solnbr}</div>
+				</div>
+				{/id}
+				{?contact}
+				<div class="listing-contact-box listing-data-box">
+					<div class="listing-data-label">Contact</div>
+					<div class="listing-contact listing-data">{contact}</div>
+				</div>
+				{/contact}
+				{?FBO_SETASIDE}
+				<div class="listing-setaside-box listing-data-box">
+					<div class="listing-data-label">Set aside for</div>
+					<div class="listing-setaside listing-data">{@set_aside /}</div>
+				</div>
+				{/FBO_SETASIDE}
+				<div class="listing-source-box listing-data-box">
+					<span class="listing-data-label">
+						<span class="glyphicon glyphicon-link"></span>
+						Source: 
+					</span>
+					<span class="listing-data">{@data_source_link data_source="{data_source}" /}</span>
+				</div>
+				<div class="view-listing-box listing-data-box">
+					<a class="listing-data view-listing" href="{@view_listing_url /}" target="_blank">
+						<span class="glyphicon glyphicon-arrow-right"></span>
+						<span>View listing</span>
+					</a>
+				</div>
+			</div>
+
+		</div>
+	</div>
+	
+	<div class="row listing-bottom">
+
+		<div class="listing-dates col-md-7 row">
+			<div class="listing-due-box col-md-6">
+				<span class="glyphicon glyphicon-calendar"></span>
+				Due: <span class="listing-due-date">{@formatDate value="{close_dt}"/}</span>
+			</div>
+			<div class="listing-posted-box col-md-6">
+				<span class="glyphicon glyphicon-pushpin"></span>
+				Posted: <span class="listing-posted-date">{@formatDate value="{posted_dt}"/}</span>
+			</div>
+		</div>
+
+		<div class="listing-actions col-md-5">
+			<a class="listing-save"><span class="glyphicon glyphicon-star-empty"></span>Save</a>
+			<a class="listing-more"><span class="glyphicon glyphicon-plus"></span>More detail</a>
+		</div>
+	
+	</div>
+</div>
+{/docs}
+<ul class="pagination"></ul>
