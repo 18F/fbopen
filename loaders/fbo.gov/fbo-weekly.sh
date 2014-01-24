@@ -16,11 +16,10 @@ bulk_output_file='workfiles/notices.bulk'
 # NOT USED
 attachment_download_dir='fbo-attachments/'
 
-if [ $# -eq 4 ]
+if [ $# -eq 2 ]
 then
-	json_output_file=$2
-	links_output_file=$3
-	attachment_download_dir=$4
+	links_output_file=$1
+	attachment_download_dir=$2
 fi
 
 FBO_WEEKLY_XML_FILE=${FBO_WEEKLY_XML_FILE:-"workfiles/FBOFullXML.xml"}
