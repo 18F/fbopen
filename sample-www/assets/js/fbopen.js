@@ -56,10 +56,11 @@
   $('#results-raw').collapse('hide');
 
 
+  var search_params = {};
+
   // re-fill query terms
   if (location.search != '') {
 
-    var search_params = {};
     form_params = ['q', 'parent_only', 'p', 'naics', 'data_source'];
     for (i in form_params) {
       $('#' + form_params[i]).val(getParameterByName(form_params[i]));
