@@ -30,7 +30,7 @@
   // CONFIGURATION
   //
 
-  // var PAGESIZE = 10; // results per page
+  var PAGESIZE = 10; // results per page -- fixed by the API, not customizable here
 
   var ie = (function(){ // http://abbett.org/post/a-guide-to-building-webapps-with-ie8-support
       var undef,
@@ -202,8 +202,10 @@
     // tweak params for API call
 
     if (search_params['p']) {
-      search_params['start'] = (search_params['p'] - 1) * 10;
+      search_params['start'] = (search_params['p'] - 1) * PAGESIZE;
     }
+
+    $.extend(search_params, fbopen_config.API_PARAMS); // add any/all API_PARAMS to search_params
 
     opps.fetch({
       data: $.param(search_params),
@@ -349,8 +351,8 @@
     var numFound = context.get('numFound');
     var start = context.get('start');
 
-    numPages = Math.floor(numFound / fbopen_config.PAGESIZE) + 1;
-    currentPage = parseInt(start) / fbopen_config.PAGESIZE + 1;
+    numPages = Math.floor(numFound / PAGESIZE) + 1;
+    currentPage = parseInt(start) / PAGESIZE + 1;
 
     console.log('numPages, currentPage = ' + numPages + ', ' + currentPage);
 
