@@ -169,7 +169,7 @@ module.exports = (function(){
             var record = {};
             var obj = {};
         
-            // FBO has multiple attribtes with the same key.
+            // FBO has multiple attributes with the same key.
             // We'll append a number to the key if it has already been used.
             for (i = 0, len = data.length; i < len; ++i) {
               var trySave = function(key, val, increment) {
@@ -182,7 +182,7 @@ module.exports = (function(){
                 }
               }
         
-              trySave(data[i]['key'], data[i]['val']);
+              trySave(data[i][0], data[i][1]);
             }
         
             record[recname] = obj;
@@ -320,10 +320,7 @@ module.exports = (function(){
           pos = pos1;
         }
         if (result0 !== null) {
-          result0 = (function(offset, key, val) {
-            var obj = {key: key, val: val};
-            return obj;
-          })(pos0, result0[0], result0[1]);
+          result0 = (function(offset, key, val) { return [key, val] })(pos0, result0[0], result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -447,26 +444,26 @@ module.exports = (function(){
         var pos0;
         
         pos0 = pos;
-        if (/^[A-Z]/.test(input.charAt(pos))) {
+        if (/^[0-9a-zA-Z "'=\-]/.test(input.charAt(pos))) {
           result1 = input.charAt(pos);
           pos++;
         } else {
           result1 = null;
           if (reportFailures === 0) {
-            matchFailed("[A-Z]");
+            matchFailed("[0-9a-zA-Z \"'=\\-]");
           }
         }
         if (result1 !== null) {
           result0 = [];
           while (result1 !== null) {
             result0.push(result1);
-            if (/^[A-Z]/.test(input.charAt(pos))) {
+            if (/^[0-9a-zA-Z "'=\-]/.test(input.charAt(pos))) {
               result1 = input.charAt(pos);
               pos++;
             } else {
               result1 = null;
               if (reportFailures === 0) {
-                matchFailed("[A-Z]");
+                matchFailed("[0-9a-zA-Z \"'=\\-]");
               }
             }
           }
@@ -487,26 +484,26 @@ module.exports = (function(){
         var pos0;
         
         pos0 = pos;
-        if (/^[A-Z]/.test(input.charAt(pos))) {
+        if (/^[A-Z]/i.test(input.charAt(pos))) {
           result1 = input.charAt(pos);
           pos++;
         } else {
           result1 = null;
           if (reportFailures === 0) {
-            matchFailed("[A-Z]");
+            matchFailed("[A-Z]i");
           }
         }
         if (result1 !== null) {
           result0 = [];
           while (result1 !== null) {
             result0.push(result1);
-            if (/^[A-Z]/.test(input.charAt(pos))) {
+            if (/^[A-Z]/i.test(input.charAt(pos))) {
               result1 = input.charAt(pos);
               pos++;
             } else {
               result1 = null;
               if (reportFailures === 0) {
-                matchFailed("[A-Z]");
+                matchFailed("[A-Z]i");
               }
             }
           }
@@ -546,15 +543,26 @@ module.exports = (function(){
             }
           }
           if (result0 === null) {
-            pos0 = pos;
-            reportFailures++;
-            result0 = parse_newTag();
-            reportFailures--;
-            if (result0 === null) {
-              result0 = "";
+            if (input.substr(pos, 4) === "</A>") {
+              result0 = "</A>";
+              pos += 4;
             } else {
               result0 = null;
-              pos = pos0;
+              if (reportFailures === 0) {
+                matchFailed("\"</A>\"");
+              }
+            }
+            if (result0 === null) {
+              pos0 = pos;
+              reportFailures++;
+              result0 = parse_newTag();
+              reportFailures--;
+              if (result0 === null) {
+                result0 = "";
+              } else {
+                result0 = null;
+                pos = pos0;
+              }
             }
           }
         }
@@ -672,7 +680,7 @@ module.exports = (function(){
           pos = pos1;
         }
         if (result0 !== null) {
-          result0 = (function(offset, nnt, val) { return nnt + val })(pos0, result0[0], result0[1]);
+          result0 = (function(offset, nnt, val) { return nnt ? nnt + val : val })(pos0, result0[0], result0[1]);
         }
         if (result0 === null) {
           pos = pos0;
@@ -795,7 +803,7 @@ module.exports = (function(){
       
       foundHumanized = found ? quote(found) : "end of input";
       
-      return "Expected " + expectedHumanized + " but " + foundHumanized + " found at line " + line + ', column ' + column + ".";
+      return "Expected " + expectedHumanized + " but " + foundHumanized + " found.";
     }
     
     this.name = "SyntaxError";
