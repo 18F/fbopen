@@ -17,9 +17,9 @@
 			<h3 class="title">
 				<a href="{@view_listing_url /}" target="_blank">
 					{?parent_title_t}
-						{parent_title_t}
+						{parent_title_t|s}
 					{:else}
-						{title}
+						{title|s}
 					{/parent_title_t}
 				</a>
 			</h3>
