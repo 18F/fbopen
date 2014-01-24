@@ -9,22 +9,20 @@
   <meta name="description" content="">
   <meta name="author" content="">
 
+  <link href='http://fonts.googleapis.com/css?family=Enriqueta:400,700|Roboto:100,300,400,700|Merriweather' rel='stylesheet' type='text/css'>
+
   <link href="bootstrap/css/bootstrap-1600.css" rel="stylesheet">
   <link href="bootstrap/css/navbar-fixed-top.css" rel="stylesheet">
-  <link href="assets/css/jquery-ui-1.10.0.custom.css" rel="stylesheet">
-  <link href="assets/css/jquery.tagit.css" rel="stylesheet">
+
   <link href="assets/css/fbopen.css" rel="stylesheet">
-
-  <!--[if lt IE 9]>
-    <script src="bootstrap/assets/js/html5shiv.js"></script>
-    <script src="bootstrap/assets/js/respond.min.js"></script>
+  <!--[if lte IE 9]>
+    <style>#outer-container { display: none !important; }</style>
+    <script type="text/javascript">
+      window.location.href = '/index-oldie.html';
+    </script>
   <![endif]-->
-
 </head>
-
 <body>
-
-  <a href="https://github.com/presidential-innovation-fellows/fbopen"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_green_007200.png" alt="Fork me on GitHub"></a>
 
   <div class="container" id="outer-container">
 
@@ -32,11 +30,58 @@
 
       <div class="col-md-4">
 
-          <div class="container brand">
+        <div class="container brand">
+          <a href="/" style="color: #333;"><h1>fbopen</h1></a>
+          <span>pilot</span>
+        </div>
 
-            <a href="/" style="color: #333;"><h1>FBOpen</h1></a>
+        <form name="fbopen-search-form" id="fbopen-search-form" role="form" class="form" method="get" action="">
+          <div class="form-group">
+            <input id="q" name="q" type="search" class="form-control" />
+            <button type="button" class="close" data-close="q" aria-hidden="true">&times;</button>
+          </div>
+          <a id="form-advanced-label" data-toggle="collapse" data-target="#form-advanced-options">
+            <span class="filter-category-title advanced">ADVANCED</span>
+            <button id="advanced-toggle" type="button" class="btn">+</button>
+          </a>
+          <div id="form-advanced-options" class="collapse">
+
+            <div class="checkbox">
+              <label class="filter-text">
+                <input id="show_closed" name="show_closed" type="checkbox" /> Show closed listings
+              </label>
+            </div>
+
+            <div class="checkbox form-group-more">
+              <label class="filter-text">
+                <input id="show_noncompeted" name="show_noncompeted" type="checkbox" /> Show non-competed listings (sole source)
+              </label>
+            </div>
+            <div class="form-group form-group-more">
+              <label for="data_source" class="filter-text">Data Source:</label>
+              <select id="data_source" name="data_source" type="search" class="form-control">
+                <option value="">All</option>
+                <option value="FBO">FedBizOpps (fbo.gov)</option>
+                <option value="SBIR">SBIR</option>
+                <option value="grants.gov">grants.gov</option>
+              </select>
+
+             </div>
+
+            <div class="form-group form-group-more collapse">
+              <label for="naics">NAICS code:</label>
+              <input id="naics" name="naics" type="search" class="form-control" />
+              <button type="button" class="close" data-close="naics" aria-hidden="true">&times;</button>
+            </div>
+
+            <button id="go" type="submit" class="btn btn-primary btn-block">Search</button>
 
           </div>
+
+          <input id="parent_only" name="parent_only" type="hidden" value="" />
+          <input id="p" name="p" type="hidden" value="" />
+        </form>
+
         
         <div id="naics-facets" class="list-group naics-facets">
           <p class="list-group-item list-group-header">Top FedBizOpps results by industry:</p>
@@ -45,71 +90,22 @@
         <div id="naics-facets-more" class="list-group naics-facets collapse">
         </div>
 
-
       </div>
 
       <div class="col-md-8">
 
-          <form id="fbopen-search-form" role="form" class="form" method="get" action="">
-            <div class="form-group">
-              <input id="q" name="q" type="search" class="form-control" />
-              <button type="button" class="close" data-close="q" aria-hidden="true">&times;</button>
-              <button id="go" type="submit" class="btn btn-primary">Search</button>
-              <a id="more-options" href="?options=more" data-toggle="collapse" data-target=".form-group-more">more options</a>
-            </div>
-
-            <div class="checkbox">
-              <label>
-                <input id="show_closed" name="show_closed" type="checkbox" /> Show closed listings
-              </label>
-            </div>
-
-            <div class="checkbox form-group-more collapse">
-              <label>
-                <input id="show_noncompeted" name="show_noncompeted" type="checkbox" /> Show non-competed listings (sole source)
-              </label>
-            </div>
-
-            <div class="form-group form-group-more collapse">
-              <label for="data_source">Data Source:</label>
-              <select id="data_source" name="data_source" type="search" class="form-control">
-                <option value="">All</option>
-                <option value="FBO">FedBizOpps (fbo.gov)</option>
-                <option value="SBIR">SBIR</option>
-                <option value="grants.gov">grants.gov</option>
-              </select>
-            </div>
-
-            <div class="form-group form-group-more collapse">
-              <label for="naics">NAICS code:</label>
-              <input id="naics" name="naics" type="search" class="form-control" />
-              <button type="button" class="close" data-close="naics" aria-hidden="true">&times;</button>
-            </div>
-
-            <input id="parent_only" name="parent_only" type="hidden" value="" />
-            <input id="p" name="p" type="hidden" value="" />
-          </form>
-
         <div id="results-container">
 
-<!-- 
-          <p class="lead">
-            <div>Total results: <span id="numFound"></span></div>
-            <div>Results shown: <span id="numShown"></span></div>
-          </p>
- -->
-          <ul class="pagination"></ul>
+          <div id="results-list">
+          </div>
 
-          <ol id="results-list">
-          </ol>
-
-          <ul class="pagination"></ul>
-
-          <h5 data-toggle="collapse" data-target="#result-raw">Raw result (click to show/hide)</h5>
-          <div id="result-raw"></div>
-        
         </div><!-- results-container -->
 
+        <div id="results-raw-outer">
+          <h5 data-toggle="collapse" data-target="#results-raw">Raw result (click to show/hide)</h5>
+          <div id="results-raw"></div>
+        </div>
+        
       </div><!-- results column -->
 
     </div><!-- row -->
@@ -126,21 +122,36 @@
     </div>
   </div>
 
-  <!-- replace with your own analytics -->
-  <script src="../assets/js/google-analytics.js"></script>
-
+  <!-- core scripts -->
   <script src="../assets/js/jquery-1.10.2.js"></script>
-  <script src="../assets/js/jquery-ui-1.9.2.custom.min.js"></script>
-  <script src="../assets/js/dust-full-2.1.0.js"></script>
-  <script src="../assets/js/tag-it.min.js"></script>
-  <script src="../assets/js/consolelog.min.js"></script>
   <script src="../assets/js/underscore-1.5.2.min.js"></script>
-  <script src="../assets/js/json2.js"></script>
+  <script src="../assets/js/backbone-1.1.0.min.js"></script>
+
+  <script src="../assets/js/dust-full-2.1.0.js"></script>
+  <script src="../assets/js/dust-helpers-1.1.2.js"></script>
+
+  <!-- load after dust-full and dust-helpers -->
+  <script src="../assets/dust-compiled/result.js"></script>
+
+  <!-- misc helper libraries -->
   <script src="../assets/js/URI.min.js"></script>
   <script src="../assets/js/string.min.js"></script>
   <script src="../assets/js/moment.min.js"></script>
   <script src="bootstrap/js/bootstrap.min.js"></script>
+  <script src="../assets/js/consolelog.min.js"></script>
+
+  <!-- our code -->
   <script src="../assets/js/fbopen.js"></script>
 
+  <!-- Google Analytics -->
+  <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+    (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+    m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+    ga('create', 'UA-45715201-2', 'gsa.gov');
+    ga('send', 'pageview');
+  </script>
+
 </body>
-</html>
+</html> 
