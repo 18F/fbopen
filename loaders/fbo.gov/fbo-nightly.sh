@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/ksh
 
 # fbo-nightly.sh [YYYYMMDD]
 
@@ -28,14 +28,11 @@ then
 	fi
 fi
 
-ELASTICSEARCH_URI=${ELASTICSEARCH_URI:-"localhost:9200"}
-echo "ELASTICSEARCH_URI = $ELASTICSEARCH_URI"
-ELASTICSEARCH_INDEX=${ELASTICSEARCH_INDEX:-"fbopen"}
-echo "ELASTICSEARCH_INDEX = $ELASTICSEARCH_INDEX"
-
-# mkdir -p will ensure the nightly download dir is in place, but won't fail if it already exists
 nightly_dir="nightly-downloads"
-mkdir -p $nightly_dir
+
+# ensure directories are in place
+# mkdir -p will ensure they are in place, but not throw an error if they already exist
+mkdir -p $nightly_dir workfiles
 
 # download the nightly file, if not downloaded already
 nightly_download_file="$nightly_dir/FBOFeed$download_date.txt"
@@ -55,5 +52,5 @@ node nightly-fbo-parser.js -d $download_date
 
 # download and ingest attachments
 # (To do: detect whether this is already done, too)
-process-listing-links.sh < $nightly_links_file
+./process-listing-links.sh < $nightly_links_file
 
