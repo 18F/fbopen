@@ -26,6 +26,12 @@
 
 (function( fbopen, $, undefined ) { // http://stackoverflow.com/q/5947280/185839
 
+  //
+  // CONFIGURATION
+  //
+
+  // var PAGESIZE = 10; // results per page
+
   var ie = (function(){ // http://abbett.org/post/a-guide-to-building-webapps-with-ie8-support
       var undef,
           v = 3,
@@ -41,8 +47,6 @@
   }());
 
   if (ie) { $.ajaxSetup({ cache: false }); };
-
-  PAGESIZE = 10; // results per page
 
   // hack for IE submit w/out button http://stackoverflow.com/a/14869071/185839
   $(window).on('keydown', function(event) {
@@ -109,7 +113,7 @@
   };
 
   $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
-    options.url = 'http://fbopen.dev:3000/v0' + options.url;
+    options.url = fbopen_config.API_SERVER + '/v0' + options.url;
   });
 
   // http://stackoverflow.com/a/901144
@@ -345,8 +349,8 @@
     var numFound = context.get('numFound');
     var start = context.get('start');
 
-    numPages = Math.floor(numFound / PAGESIZE) + 1;
-    currentPage = parseInt(start) / PAGESIZE + 1;
+    numPages = Math.floor(numFound / fbopen_config.PAGESIZE) + 1;
+    currentPage = parseInt(start) / fbopen_config.PAGESIZE + 1;
 
     console.log('numPages, currentPage = ' + numPages + ', ' + currentPage);
 
