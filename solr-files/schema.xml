@@ -115,6 +115,7 @@
 
    <field name="data_type" type="string" indexed="true" stored="true" />
    <field name="solnbr" type="string" indexed="true" stored="true" multiValued="false" />
+   <field name="solnbr_ci" type="string_ci" indexed="true" multiValued="false" />
    <field name="data_source" type="string" indexed="true" stored="true" />
    <field name="notice_type" type="string" indexed="true" stored="true" />
    <field name="posted_dt" type="date" indexed="true" stored="true" />
@@ -338,6 +339,7 @@
   
    <!-- FBOpen fields in default catch-all search -->
    <copyField source="solnbr" dest="text"/>
+   <copyField source="solnbr" dest="solnbr_ci"/>
    <copyField source="agency" dest="text"/>
    <copyField source="title" dest="text"/>
    <copyField source="office" dest="text"/>
@@ -521,6 +523,15 @@
         <tokenizer class="solr.WhitespaceTokenizerFactory"/>
       </analyzer>
     </fieldType>
+
+    <!-- a text field that's just a bare string, but case-insensitive. no other processing. -->
+
+    <fieldType name="string_ci" class="solr.TextField" sortMissingLast="true" omitNorms="true">
+      <analyzer>
+        <tokenizer class="solr.KeywordTokenizerFactory"/>           
+        <filter class="solr.LowerCaseFilterFactory" />
+      </analyzer>
+    </fieldType> 
 
     <!-- A general text field that has reasonable, generic
          cross-language defaults: it tokenizes with StandardTokenizer,

@@ -1,4 +1,4 @@
-// fbopen.js: JS-driven sample/demo app
+// fbopen2.js
 
 // console.log stub for IE compatibility -- see http://forum.jquery.com/topic/ie-console-log
 (function() {
@@ -26,775 +26,561 @@
 
 (function( fbopen, $, undefined ) { // http://stackoverflow.com/q/5947280/185839
 
-	NAICS_FILE = '/assets/naics2012-complete.json';
-	DESC_LENGTH = 10;
-	ELLIPSIS = '&hellip;';
-
-	SOLR_BASE_URL = '/search.php';
-
-	// lame hack
-	WORD_TAG_OUTER_CLASSES = 'word-tag-outer tagit-choice ui-widget-content ui-corner-all';
-	need_parent_queue = [];
-
-	$('#result-raw').collapse();
-	$('#result-raw').collapse('hide');
-
-	if (getParameterByName('options') == 'more') display_options('show');
-
-	if (location.search != '') {
-
-		form_params = ['q', 'parent_only', 'p', 'naics', 'data_source'];
-		for (i in form_params) {
-			$('#' + form_params[i]).val(getParameterByName(form_params[i]));
-		}
-
-		// checkboxen:
-		form_checkboxes = ['show_closed', 'show_noncompeted'];
-		for (i in form_checkboxes) {
-			if (getParameterByName(form_checkboxes[i])) {
-				$('#' + form_checkboxes[i]).prop('checked', true);
-			} else {
-				$('#' + form_checkboxes[i]).prop('checked', false);
-			}
-		}
-
-		do_search();
-	}
-
-	$('#fbopen-search-form').on('submit', function() {
-		$('#p').val(1);
-		// do_search();
-	});
-
-	function do_search() {
-		
-		$('#results-container').hide();
-
-		// construct the query
-		var q = $('#q').val();
-		var p = $('#p').val();
-		var naics = $('#naics').val();
-		var data_source = $('#data_source option:selected').val();
-		var show_closed = $('#show_closed').is(':checked');
-		var show_noncompeted = $('#show_noncompeted').is(':checked');
-
-		if (naics != '' || data_source != '' || show_noncompeted) display_options('show');
-
-		var solr_data = {};
-		if (p != '') solr_data['p'] = p;
-		if (q != '') solr_data['q'] = q;
-		if (naics != '') solr_data['naics'] = naics;
-		if (data_source != '') solr_data['data_source'] = data_source;
-
-		solr_data['show_closed'] = show_closed;
-		solr_data['show_noncompeted'] = show_noncompeted;
-
-		$.ajax({
-			'url': SOLR_BASE_URL
-			, 'data': solr_data
-			, 'success': display_results
-			, 'error': display_error
-			, 'dataType': 'json'
-			// , 'jsonpCallback': callback, 'jsonp': 'json.wrf' // future jsonp?
-		});
-
-		function display_error(jqXHR, textStatus, errorThrown) {
-
-			$('#results-list').html('');
-			$('#results-other').html('textStatus = ' + textStatus + ', error thrown = ' + errorThrown);
-
-			$('#results-container').show();
-
-		}
-
-		function display_results(data) {
-
-			try {
-				results = data.response.docs;
-			} catch(e) {
-				display_error(null, 'error', 'no results');
-				return;
-			}
-
-			// dust.js template TESTING
-			test_template = '{title} - {solnbr}';
-			doc0 = results[0];
-			compiled = dust.compile(test_template, 'test0');
-			dust.loadSource(compiled);
-			dust.render("test0", doc0, function(err, out) {
-			  // console.log(out);
-			  // $('.lead').append('<h3>Dust test</h3>' + out);
-			});
-
-
-
-			// TESTING
-			// $('#result-raw').html('<pre>' + JSON.stringify(data, undefined, 2) + '</pre>');
-			// return;
-
-			// if (results == undefined || results.length == 0) {
-			// 	display_error(null, 'error', 'no results');
-			// 	exit;
-			// }
-
-			pageSize = 10; // make this customizable
-
-			numFound = data.response.numFound;
-			$('#numFound').html(numFound);
-
-			if (numFound == 0) {
-				$('#results-list').replaceWith('<p>No results.</p>');
-				$('#results-container').show();
-
-				return;
-			}
-
-			numPages = Math.floor(numFound / pageSize) + 1;
-			currentPage = parseInt(data.response.start) / pageSize + 1;
-
-			// build the pager
-			$('ul.pagination').html(pager_html(currentPage, numPages));
-			$('ul.pagination').append('<li class="numFound">Showing results ' + ((currentPage - 1) * pageSize + 1) + '-' + Math.min((currentPage * pageSize), numFound) + ' of ' + numFound + '</li>');
-
-			// disable links that should be disabled
-			$('ul.pagination > li.disabled > a').on('click', function(e) {
-				e.preventDefault();
-			});
-
-			// clean out any previous results
-			$('#results-list, #results-other').html('');
-
-			// get all data_source values
-			data_sources_flat = data.facet_counts.facet_fields.data_source;
-			data_sources_JSON = flat_list_to_json(data_sources_flat);
-
-			naics_facets_flat = data.facet_counts.facet_fields.FBO_NAICS;
-			naics_facets_JSON = flat_list_to_json(data.facet_counts.facet_fields.FBO_NAICS);
-			highlights = data.highlighting;
-
-			numResults = 0;
-			for (idx in results) {
-
-				doc = results[idx];
-				doc_id = doc.id;
-
-				toggle_description = false; // default
-
-				// get the descriptive content
-				content_snippet = get_content_snippet(doc);
-
-				close_dt = date_display(doc.close_dt) || 'unknown; check listing';
-				posted_dt = date_display(doc.posted_dt);
-
-				data_source = doc.data_source || '';
-				notice_type = doc.notice_type || 'N/A';
-
-				score = doc.score;
-				score_therm = '<div class="score_therm_outer"><div class="score_therm" style="width:' + parseInt(100 * (1 - score)) + '%;"></div></div>';
-
-				if (data_source == 'FBO' || data_source == '') { // for now, some attachments have no data_source field
-					if (doc.notice_type != '' && doc.notice_type != undefined) {
-
-						// how to display FBO listings
-
-						doc_title = doc.title;
-
-						if (doc.listing_url != undefined) {
-							listing_link = '<a target="_blank" href="' + doc.listing_url + '">View listing</a>';
-						} else {
-							listing_link = '<span class="no-listing-url">(listing link unavailable)</span>';
-						}
-
-						datestuff = '<p>'
-							+ '<strong>Due: ' + close_dt + '</strong>'
-							+ (posted_dt ? ' (posted ' + posted_dt + ')' : '') 
-							+ '</p>';
-
-					} else { // FBO attachment
-
-						// skip attachments if param says to
-						if ($('#parent_only').val() == 'true') continue;
-
-						doc_title = doc.subject;
-						if (doc_title == '' || doc_title == undefined) doc_title = doc.title;
-
-						doc_parent_title = doc.parent_title_t || '';
-						doc_attachment_url = doc.attachment_url || '';
-						if (doc_parent_title) {
-							doc_title = format_attachment_title(doc_parent_title, doc_title, doc_attachment_url);
-						} else {
-							if (need_parent_queue.indexOf(doc.solnbr) == -1) {
-								need_parent_queue.push(doc.solnbr);
-								get_parent_listing(doc.solnbr); // async API call, fills in when data comes available
-							}
-						}
-
-						if (doc.parent_link_t) {
-							fbo_listing_url = doc.parent_link_t;
-						} else {
-							fbo_listing_url = '?q=' 
-							+ encodeURIComponent('solnbr:' + doc.solnbr)
-							+ '&parent_only=true';
-						}
-
-						if (doc.listing_url != undefined) {
-							listing_link = '<a target="_blank" class="text-success a-find-parent" data-solnbr="' + doc.solnbr + '" href="' + fbo_listing_url + '">View listing</a>';
-						} else {
-							listing_link = '<span class="no-listing-url">(listing link unavailable)</span>';
-						}
-
-						datestuff = '';
-
-					}
-				} else { // not FBO
-
-					doc_title = doc.subject;
-					if (doc_title == '' || doc_title == undefined) doc_title = doc.title;
-
-					if (doc.listing_url != undefined) {
-						listing_link = '<a target="_blank" href="' + doc.listing_url + '">View listing</a>';
-					} else {
-						listing_link = '<span class="no-listing-url">(listing link unavailable)</span>';
-					}
-
-					datestuff = '<p>'
-						+ '<strong>Due: ' + close_dt + '</strong>'
-						+ (posted_dt ? ' (posted ' + posted_dt + ')' : '') 
-						+ '</p>';
-				}
-
-				tag_string = '<ul data-id="' + doc.id + '" class="opp-tags">';
-				if (doc.content_tags) {
-					for (i in doc.content_tags) {
-						tag_string += '<li>' + doc.content_tags[i] + '</li>';
-					}
-				}
-				tag_string += '</ul>';
-
-				str = '<li class="result-item" data-solr-id="' + doc.solnbr + '" data-attachment-url="' + (doc.attachment_url || '') + '">'
-				+ '<h3 class="title">' + doc_title + '</h3>'
-				+ score_therm
-				+ '<blockquote>'
-				+ '<p>' + data_source + ' Solicitation Number: ' + doc.solnbr + '&nbsp;&nbsp;&nbsp;&nbsp;' + listing_link + '</p>'
-				+ datestuff
-				+ tag_string
-				+ content_snippet
-				+ '</blockquote>'
-				+ '</li>';
-
-				numResults++;
-
-				$('#results-list')
-				.attr('start', parseInt(data.response.start) + 1)
-				.append(str);
-
-			}
-
-			// add tagging
-			var $oppTags = $('.opp-tags');
-			$oppTags.tagit({
-				placeholderText: 'add tag'
-				, afterTagAdded: function(event, ui) {
-
-					if (!ui.duringInitialization) {
-						tag = $(this).tagit('tagLabel', ui.tag);
-						id = $(this).attr('data-id');
-						console.log('adding tag ' + tag + ' to doc.id ' + id);
-
-						// highlight
-						// [copied from tag_selected_word -- make this common code!]
-						$this_result = $(this).closest('li.result-item');
-						$this_result.find('.summary-snippet, .content-snippet, h3.title').each(function() {
-
-							fulltext = $(this).html();
-							selected_regex = new RegExp('(\\b' + tag + '\\b|<span[^>]*>' + tag + '<\/span>)', 'gi');
-							tagged_fulltext = fulltext.replace(selected_regex, '<span class="' + WORD_TAG_OUTER_CLASSES + '"><span class="word-tag">' + tag + '</span></span>');
-							$(this).html(tagged_fulltext);
-
-							// attach untag event handler
-							$(this).find('span.word-tag')
-							.off('click', tag_selected_word)
-							.on('click', untag_selected_word);
-						})
-
-						updateTags($(this));
-					}
-				}
-				, afterTagRemoved: function(event, ui) {
-
-					if (!ui.duringInitialization) {
-						tag = $(this).tagit('tagLabel', ui.tag);
-						id = $(this).attr('data-id');
-						console.log('removing tag ' + tag + ' from doc.id ' + id);
-
-						// un-highlight
-						// [copied from untag_selected_word -- make this common code!]
-						$this_result = $(this).closest('li.result-item');
-						$this_result.find('.summary-snippet, .content-snippet, h3.title').each(function() {
-							fulltext = $(this).html();
-							selected_regex = new RegExp('<span class="' + WORD_TAG_OUTER_CLASSES + '"><span class="word-tag">' + tag + '<\/span><\/span>', 'gi');
-							tagged_fulltext = fulltext.replace(selected_regex, tag);
-							$(this).html(tagged_fulltext);
-
-							// attach untag event handler
-							// $(this).find('span.word-tag')
-							// .on('click', tag_selected_word) // remove?
-							// .off('click', untag_selected_word);
-
-						});
-
-						updateTags($(this));
-					}
-				}
-			});
-
-			// attach click handler for tagging
-			$(".result-item .summary-snippet, .result-item .content-snippet, .result-item h3.title").on('click', tag_selected_word);
-
-			$('#numShown').html(numResults);
-
-			$('#result-raw').html('<pre>' + JSON.stringify(data, undefined, 2) + '</pre>');
-
-
-			// NAICS code fanciness
-			if (q != '') {
-
-				$.getJSON('http://api.naics.us/v0/s?year=2012&terms=' + q, function(data, textStatus, jqXHR) {
-					$('#results-other').append('<p><a data-toggle="collapse" href="#raw-naics-lookup">Click to show/hide RAW NAICS lookup on <em>' + q + '</em></a>.</p><pre id="raw-naics-lookup" class="collapse">' + JSON.stringify(data, undefined, 2) + '</pre>');
-					naics_list = '';
-					for (idx in data) {
-						naics_code = data[idx].code;
-						if (naics_code.toString().length >= 6) {
-							naics_title = data[idx].title;
-							facet_idx = _.indexOf(naics_facets_flat, naics_code.toString());
-							if (facet_idx > -1) {
-								result_count = naics_facets_flat[facet_idx + 1];
-							} else {
-								result_count = 0;
-							}
-							naics_list += result_count + ' results for NAICS code: ' + naics_code + ' = ' + naics_title + '\n\r';
-						}
-					}
-
-					// TO DO: handle if api.naics.us is unavailable, returns an error, or returns no results
-
-					$('#results-other').append('<p><a data-toggle="collapse" href="#suggested-naics-codes">Click to show/hide suggested NAICS codes for <em>' + q + '</em></a>.</p><pre id="suggested-naics-codes" class="collapse">' + naics_list + '</pre>');
-
-				});
-			}
-
-			if (naics != '') {
-				clear_facets_url = new URI(window.location.href)
-				.removeSearch(['naics', 'p', 'parent_only']);
-				$('#naics-facets').append(
-					'<a class="list-group-item" href="' + clear_facets_url + '">'
-					+ 'All results'
-					+ '</a>'
-					);
-			} else {
-				// "all" link
-				all_facets_url = window.location.href;
-				$('#naics-facets').append(
-					'<a class="list-group-item active" href="' + all_facets_url + '">'
-					+ '<span class="badge">' + numFound + '</span>'
-					+ 'All results'
-					+ '</a>'
-					);
-			}
-
-			// get the complete set of NAICS codes
-			naics_all = {};
-			$.getJSON(NAICS_FILE, function(data, textStatus, jqXHR) {
-				naics_all = data;
-
-				naics_facet_count = 0;
-				for (idx in naics_facets_JSON) {
-
-					naics_facet_count++;
-
-					facet = naics_facets_JSON[idx];
-
-					if (facet.count == 0) continue;
-
-					// find this code in the full list
-					naics_detail = _.findWhere(naics_all, { "code": parseInt(facet.code) } );
-					if (naics_detail != undefined) {
-						// construct URL
-						var facet_url = new URI(window.location.href)
-							.removeSearch(['naics', 'p', 'parent_only'])
-							.addSearch('naics', facet.code);
-
-						if (facet.code == naics) {
-							active_class = ' active';
-						} else {
-							active_class = '';
-						}
-
-					if (naics_facet_count == 6) {
-						$('#naics-facets').after('<div class="naics-facets"><a id="naics-facets-more-toggle" class="list-group-item" data-toggle="collapse" href="#naics-facets-more">More</a></div>');
-						$('#naics-facets-more-toggle').on('click', function() {
-							$(this).remove();
-						});
-					}
-
-					if (naics_facet_count > 5) { // remaining results go into pager
-						facet_container = '#naics-facets-more';
-					} else {
-						facet_container = '#naics-facets';
-					}
-
-						$(facet_container).append(
-							'<a class="list-group-item' + active_class + '" href="' + facet_url + '">'
-								+ '<span class="badge">' + facet.count + '</span>'
-								+ naics_detail.title + ' [' + facet.code + ']'
-							+ '</a>'
-						);
-					}
-				}
-			});
-
-			$('#results-container').show();
-
-		}
-
-	} // do_search()
-
-
-	function get_parent_listing(solnbr) {
-
-		// look up this solnbr in Solr
-		var solr_url ='/search.php';
-
-		var solr_data = {};
-		solr_data.get_parent = true;
-		solr_data.solnbr = solnbr;
-
-		$.ajax( {
-			url: solr_url, 
-			dataType: 'json',
-			data: solr_data, 
-			success: function(data) {
-				if (data.response.docs) {
-					solnbr = data.response.docs[0].solnbr;
-					parent_title = data.response.docs[0].title;
-					// add the parent title as a data attribute; then in the each() loop read it from the attribute
-					// (basically a back-door way to "pass" the parent_title variable into the each() function)
-					$('li.result-item[data-solr-id="' + solnbr + '"]')
-					.attr('data-parent-title', parent_title)
-					.attr('data-parent-listing-url', data.response.docs[0].listing_url);
-
-					$('li.result-item[data-solr-id="' + solnbr + '"]').each(function() {
-						$title = $(this).find('.title');
-						attachment_title = $title.text();
-						parent_title = $(this).attr('data-parent-title');
-						parent_listing_url = $(this).attr('data-parent-listing-url');
-						attachment_url = $(this).attr('data-attachment-url'); // if available
-						
-						$title.html(format_attachment_title(parent_title, attachment_title, attachment_url));
-						
-						$(this)
-						.find('.no-listing-url')
-						.replaceWith('<a target="_blank" href="' + parent_listing_url + '">View listing</a>');
-					});
-				}
-			}
-		});
-	}
-
-
-	function format_attachment_title(parent_title, attachment_title, attachment_url) {
-
-		ret_HTML = parent_title 
-		+ '<br />'
-		+ '<span class="attachment-icon glyphicon glyphicon-file"></span> ';
-
-		if (attachment_url) {
-			ret_HTML += '<a href="' + attachment_url + '" class="attachment-title">' + attachment_title + '</a>';
-		} else {
-			ret_HTML += '<span class="attachment-title">' + attachment_title + '</span>';
-		}
-
-		return ret_HTML;
-	}
-
-
-	function updateTags($tag) {
-
-		doc_id = $tag.attr('data-id');
-		tags = $tag.tagit('assignedTags');
-		tags_serial = tags.join(',');
-
-		tag_data = { 'action': 'opp/' + doc_id + '/tags/' + tags_serial }
-
-		// console.log('POSTing: ' + SOLR_BASE_URL + ' + ' + JSON.stringify(tag_data, undefined,2));
-
-		$.ajax({
-			'url': SOLR_BASE_URL
-			, 'type': 'post'
-			, 'data': tag_data
-			, 'success': function(data) {
-				console.log('updateTags returned ' + JSON.stringify(data, undefined, 2));
-			}
-			, 'error': function(jqXHR, textStatus, errorThrown) {
-				console.error('error: ' + textStatus + ': ' + errorThrown);
-			}
-			, 'dataType': 'json'
-		});
-
-	}
-
-
-	function get_content_snippet(doc) {
-
-		// Order of preference:
-		// summary highlight
-		// summary
-		// description highlight(s)
-		// description, truncated
-		// content highlight(s)
-		// content, truncated
-
-		doc_highlights = highlights[doc.id];
-		content_snippet = '';
-
-		summary_open = '<div class="content-snippet">';
-		summary_close = '</div>';
-		content_open = '<p class="summary-snippet"><small>';
-		content_close = '</small></p>';
-		summary_edit = ''; summary_edit_boxed = '';
-
-		CONTENT_MAX_LENGTH = 600;
-
-		if (doc_highlights.summary) {
-			content_snippet = summary_open + doc_highlights.summary.join(ELLIPSIS + '</div><div class="content-snippet">') 
-			+ ' ' + summary_edit
-			+ summary_close;
-		} else if (doc.summary) {
-			content_snippet = summary_open + S(doc.summary).stripTags().s 
-			+ ' ' + summary_edit
-			+ summary_close;
-		} else if (doc_highlights.description) {
-			content_snippet = summary_edit_boxed + summary_open + S(doc_highlights.description.join(ELLIPSIS + '</div><div class="content-snippet">')).truncate(CONTENT_MAX_LENGTH).s + summary_close;
-		} else if (doc.description) {
-			content_snippet = summary_edit_boxed + summary_open + S(doc.description).stripTags().truncate(CONTENT_MAX_LENGTH).s + summary_close;
-		} else if (doc_highlights.content) {
-			content_snippet = summary_edit_boxed + content_open + S(doc_highlights.content.join(ELLIPSIS + '</small></p><p><small>')).truncate(CONTENT_MAX_LENGTH).s + content_close;
-		} else if (doc.content) {
-			content_snippet = summary_edit_boxed + content_open + S(doc.content).stripTags().truncate(CONTENT_MAX_LENGTH).s + content_close;
-		}
-
-		return content_snippet;
-
-	}	
-
-
-	$('#more-options').on('click', function(e) {
-		display_options('toggle');
-		e.preventDefault();
-		return false;
-	});
-
-	$('.close').on('click', function(e) {
-		close_id = $(this).attr('data-close');
-		$('#' + close_id).val('').select().focus();
-		e.preventDefault();
-		return false;
-	});
-
-
-	function display_options(opt) {
-		if (opt == 'show') {
-			$('.form-group-more').collapse('show');
-			$('#more-options').text('fewer options');
-		} else if (opt == 'less') {
-			$('.form-group-more').collapse('hide');
-			$('#more-options').text('more options');
-		} else if (opt == 'toggle') {
-			$('.form-group-more').collapse('toggle');
-			$('#more-options').text(($('#more-options').text() == 'more options' ? 'fewer options' : 'more options'));
-		}
-	}
-
-
-	function date_display(dt_str) {
-
-		var dt = moment(dt_str, 'YYYY-MM-DD[T]HH:mm:ss[Z]');
-
-		if (dt.isValid()) {
-			return dt.format('MMMM Do YYYY');
-		} else {
-			return false;
-		}
-	}
-
-
-	// for testing (for now)
-	function display_naics_facet_list() {
-
-		// TESTING
-		naics_facets_display_list = '';			
-		for (idx in naics_facets_JSON) {
-			facet = naics_facets_JSON[idx];
-			if (facet.count > 0) 
-				naics_facets_display_list += 'code: ' + facet.code + ', count = ' + facet.count + '\n\r';
-		}
-		$('#results-other').append('<p>Code facet list:</p><pre>' + naics_facets_display_list + '</pre>');
-
-	}
-
-
-	// translate solr facets into JSON
-	// Strangely, Solr returns facets as a flat list of code/count pairs: e.g., NAICS code, count, NAICS code, count, ... etc.
-	// This function creates an array of JSON objects, each containing a code and a count.
-	function flat_list_to_json(flat_list) {
-		var list_out = {};
-		for (var i = 0; i < flat_list.length; i+=2) {
-			idx = parseInt(i/2);
-			list_out[idx] = {
-				code: flat_list[i],
-				count: flat_list[i + 1]
-			};
-		}
-		return list_out;
-	}
-
-	function get_naics_title(naics_code) {
-		// NYI
-		return '';
-	}
-
-
-	// http://stackoverflow.com/a/901144
-	function getParameterByName(name) {
-	    name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-	    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-	        results = regex.exec(location.search);
-	    return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-	}
-
-
-	function pager_html(currentPage, numPages) {
-		pager_str = '';
-
-		button_disabled = (currentPage > 1 ? '' : ' class="disabled"');
-		pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, 1) + '"><span class="glyphicon glyphicon-fast-backward"></span></a></li>';
-		pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, Math.max(currentPage - 1, 1)) + '"><span class="glyphicon glyphicon-backward"></span></a></li>';
-
-		pager_str += '<li class="disabled"><span>page ' + currentPage + ' of ' + numPages + '</span></li>';
-
-		button_disabled = (currentPage < numPages ? '' : ' class="disabled"');
-		pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, Math.min(currentPage + 1, numPages)) + '"><span class="glyphicon glyphicon-forward"></span></a></li>';
-		pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, numPages) + '"><span class="glyphicon glyphicon-fast-forward"></span></a></li>';
-
-		return pager_str;
-	}
-
-	function pager_link(currentPage, i) {
-		current_url = location.href;
-		page_str = '&p=' + i;
-		if (current_url.match('&p=' + currentPage)) {
-			out_url = current_url.replace('&p=' + currentPage, page_str);
-		} else {
-			out_url = current_url + page_str;
-		}
-		return out_url;
-	}
-
-
-	// "un-click" words that are already selected
-	function untag_selected_word(e) {
-
-		// do no more
-		e.preventDefault();
-
-		selected_text = $(this).text();
-		$this_result = $(this).closest('li.result-item');
-		solr_id = $this_result.attr('data-solr-id');
-		$('#tag-list').append('<li>UNTAGGED: ' + selected_text + ' in ' + solr_id + '</li>');
-
-		$(this).closest('li.result-item').find('.opp-tags').tagit("removeTagByLabel", selected_text);
-
-		// get rid of all instances of the tag, detach this event handler, and reattach tag click event handler
-
-		$this_result.find('.summary-snippet, .content-snippet, h3.title').each(function() {
-			e.preventDefault();
-			fulltext = $(this).html();
-			selected_regex = new RegExp('<span class="' + WORD_TAG_OUTER_CLASSES + '"><span class="word-tag">' + selected_text + '<\/span><\/span>', 'gi');
-			tagged_fulltext = fulltext.replace(selected_regex, selected_text);
-			$(this).html(tagged_fulltext);
-
-			// attach untag event handler
-			// $(this).find('span.word-tag')
-			// .on('click', tag_selected_word) // remove?
-			// .off('click', untag_selected_word);
-
-		});
-		// $(this).removeClass('word-tag')
-		// .off('click', untag_selected_word);
-		// .on('click', tag_selected_word);
-
-		return false;
-
-	} // untag_selected_word()
-
-	function tag_selected_word(e) {
-
-		// Gets clicked on word (or selected text if text is selected)
-		var selected_text = '';
-		if (window.getSelection && (sel = window.getSelection()).modify) {
-			// Webkit, Gecko
-			var window_selection = window.getSelection();
-			if (window_selection.isCollapsed) {
-				window_selection.modify('move', 'forward', 'character');
-				window_selection.modify('move', 'backward', 'word');
-				window_selection.modify('extend', 'forward', 'word');
-				selected_text = window_selection.toString();
-				window_selection.modify('move', 'forward', 'character'); //clear selection
-			}
-			else {
-				selected_text = window_selection.toString();
-			}
-		} else if ((sel = document.selection) && sel.type != "Control") {
-			// IE 4+
-			var textRange = sel.createRange();
-			if (!textRange.text) {
-				textRange.expand("word");
-			}
-			// Remove trailing spaces
-			while (/\s$/.test(textRange.text)) {
-				textRange.moveEnd("character", -1);
-			}
-			selected_text = textRange.text;
-		}
-		
-		console.log('clicked: ' + selected_text);
-
-		$this_result = $(this).closest('li.result-item');
-		solr_id = $this_result.attr('data-solr-id');
-		$('#tag-list').append('<li>' + selected_text + ' in ' + solr_id + '</li>');
-
-		// add to tag list
-		$(this).closest('li.result-item').find('.opp-tags').tagit("createTag", selected_text);
-
-		// highlight word throughout this entry
-		$this_result.find('.summary-snippet, .content-snippet, h3.title').each(function() {
-
-			e.preventDefault();
-			// fulltext = $(this).html();
-			// selected_regex = new RegExp('(\\b' + selected_text + '\\b|<span[^>]*>' + selected_text + '<\/span>)', 'gi');
-			// // tagged_fulltext = fulltext.replace(selected_regex, '<span class="word-tag">' + selected_text + '</span>');
-			// tagged_fulltext = fulltext.replace(selected_regex, '<span class="' + WORD_TAG_OUTER_CLASSES + '"><span class="word-tag">' + selected_text + '</span></span>');
-			// $(this).html(tagged_fulltext);
-
-			// tagit-choice ui-widget-content ui-state-default ui-corner-all tagit-choice-editable
-
-			// attach untag event handler
-			$(this).find('span.word-tag')
-			.off('click', tag_selected_word)
-			.on('click', untag_selected_word);
-		})
-
-	}
-
+  //
+  // CONFIGURATION
+  //
+
+  // var PAGESIZE = 10; // results per page
+
+  var ie = (function(){ // http://abbett.org/post/a-guide-to-building-webapps-with-ie8-support
+      var undef,
+          v = 3,
+          div = document.createElement('div'),
+          all = div.getElementsByTagName('i');
+      while (
+        div.innerHTML = '<!--[if gt IE ' + (++v) + ']><i></i><![endif]-->', all[0]
+      );
+      if (Function('/*@cc_on return document.documentMode===10@*/')()) {
+        v = 10;
+      }
+      return v > 4 ? v : undef;
+  }());
+
+  if (ie) { $.ajaxSetup({ cache: false }); };
+
+  // hack for IE submit w/out button http://stackoverflow.com/a/14869071/185839
+  $(window).on('keydown', function(event) {
+      if(event.which == 13) {
+          $('#fbopen-search-form').submit();
+          // return false;
+      }
+  });
+
+  $('#results-raw').collapse();
+  $('#results-raw').collapse('hide');
+
+
+  var search_params = {};
+
+  // re-fill query terms
+  if (location.search != '') {
+
+    form_params = ['q', 'parent_only', 'p', 'naics', 'data_source'];
+    for (i in form_params) {
+      $('#' + form_params[i]).val(getParameterByName(form_params[i]));
+      search_params[form_params[i]] = getParameterByName(form_params[i]);
+    }
+
+    // checkboxen:
+    form_checkboxes = ['show_closed', 'show_noncompeted'];
+    for (i in form_checkboxes) {
+      if (getParameterByName(form_checkboxes[i])) {
+        $('#' + form_checkboxes[i]).prop('checked', true);
+        search_params[form_checkboxes[i]] = true;
+      } else {
+        $('#' + form_checkboxes[i]).prop('checked', false);
+      }
+    }
+
+    // do the search
+    // var opps = new Opps();
+    // var opps = {};
+    // do_search(opps, search_params);
+    // var oppListView = new OppListView();
+    // oppListView.render();
+
+  }
+
+
+  function htmlEncode(value){
+    return $('<div/>').text(value).html();
+  }
+
+  $.fn.serializeObject = function() {
+    var o = {};
+    var a = this.serializeArray();
+    $.each(a, function() {
+        if (o[this.name] !== undefined) {
+            if (!o[this.name].push) {
+                o[this.name] = [o[this.name]];
+            }
+            o[this.name].push(this.value || '');
+        } else {
+            o[this.name] = this.value || '';
+        }
+    });
+    return o;
+  };
+
+  $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
+    options.url = fbopen_config.API_SERVER + '/v0' + options.url;
+  });
+
+  // http://stackoverflow.com/a/901144
+  function getParameterByName(name) {
+      name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
+      var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+          results = regex.exec(location.search);
+      return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+  }
+
+
+  var Opps = Backbone.Collection.extend({
+    url: '/opps'
+  });
+
+  var Opp = Backbone.Model.extend({
+    urlRoot: '/opp'
+  });
+
+  var OppListView = Backbone.View.extend({
+
+    el: '#results-list',
+    render: function () {
+      var that = this;
+      var opps = new Opps();
+      
+      // search params, messy-ish version
+      // var search_params = {
+      //   'q': getParameterByName('q')
+      // };
+
+      console.log('searching using params: ');
+      console.dir(search_params);
+
+      // show advanced options if any of them are set
+      var data_source = $('#data_source option:selected').val();
+      var show_closed = $('#show_closed').is(':checked');
+      var show_noncompeted = $('#show_noncompeted').is(':checked');
+
+      if (data_source != '' || show_closed != '' || show_noncompeted) {
+        $('#form-advanced-options').collapse('show');
+      }
+
+      if (search_params['q']) {
+        do_search(opps, search_params);
+      } else {
+        // rearrange a little for the home page
+        $('#fbopen-search-form').addClass('intro').appendTo('#intro');
+        $('#q').attr('placeholder', 'Start searching').addClass('intro');
+        $('#form-advanced-label').hide();
+        $('#main .brand').hide();
+        $("#intro").show();
+
+        // without a setTimeout delay, $('#q').focus() doesn't work in IE
+        window.setTimeout(function(){ $('#q').focus(); }, 50);
+      }
+
+    }
+  });
+
+  var oppListView = new OppListView();
+
+  var Router = Backbone.Router.extend({
+      routes: {
+        "": "home"
+        // , 
+        // "edit/:id": "edit",
+        // "new": "edit",
+      }
+  });
+
+  var router = new Router;
+  router.on('route:home', function() {
+    // render opp list
+    oppListView.render();
+  })
+  // router.on('route:edit', function(id) {
+  //   userEditView.render({id: id});
+  // })
+  
+  Backbone.history.start();
+
+
+  function do_search(opps, search_params) {
+
+    // tweak params for API call
+
+    if (search_params['p']) {
+      search_params['start'] = (search_params['p'] - 1) * 10;
+    }
+
+    opps.fetch({
+      data: $.param(search_params),
+      success: function (opps) {
+
+        // not using models yet, so just access the JSON directly
+        var results = opps.models[0].attributes;
+
+        console.dir(results);
+
+        // format dates [move this to a dust.js helper]
+        // doc_out.close_dt = date_display(doc.close_dt) || 'unknown; check listing';
+        // doc_out.posted_dt = date_display(doc.posted_dt);
+
+        // dust.render('result', model: opps.models, function(err, out) {
+        dust.render('result', results, function(err, out) {
+          // console.log('out = ' + out);
+          $('#results-list').html(out);
+          $('#results-container').show();
+
+          // also show raw API response
+          $('#results-raw').html('<pre>' + JSON.stringify(results, undefined, 2) + '</pre>');
+          $('#results-raw').collapse('hide');
+          $('#results-raw-outer').show();
+
+          // enable tooltips created in the rendering
+          $('.setaside_tooltip').popover({
+            'placement': 'auto'
+            , 'html': true
+          });
+
+        });
+
+        // var template = _.template($('#opp-list-template').html(), {opps: opps.models});
+        // that.$el.html(template);
+      }
+    });
+
+  } // do_search()
+
+
+  // TEMPLATE HELPERS
+
+  dust.helpers.view_listing_url = function(chunk, context, bodies, params) {
+    var listing_url = context.get('listing_url') || '';
+    if (listing_url) {
+      return chunk.write(listing_url);
+    }
+
+    // get parent url
+    var solnbr = context.get('solnbr');
+    var data_source = context.get('data_source');
+    return chunk.write('')
+  }
+
+  dust.helpers.set_aside = function(chunk, context, bodies, params) {
+
+    var data_source = context.get('data_source')
+    , eligibility_category = context.get('grants.gov_EligibilityCategory_t') || ''
+    , additional_eligibility = context.get('grants.gov_AdditionalEligibilityInfo_t') || ''
+    , set_aside_html = '';
+
+    if (data_source == 'FBO') {
+      set_aside_html = context.get('FBO_SETASIDE');
+    } else if (data_source == 'grants.gov') {
+      
+      // for now, do not display, as we are not yet properly handling grants.gov multi-valued EligibilityCategory data.
+      set_aside_html = '';
+      
+      // if (eligibility_category != '') {
+      //   if (eligibility_category == '25' && additional_eligibility != '') {
+      //     set_aside_html = '<span class="setaside_tooltip" data-toggle="popover" title="Eligibility" data-content="<div>' + S(additional_eligibility).stripTags().s + '</div>">Other (click for more)</span>';
+      //   } else {
+      //     eligibility_description = grants_eligibility_description(eligibility_category);
+      //     set_aside_html = '<span class="setaside_tooltip" data-toggle="popover" title="Eligibility" data-content="<div>' + S(eligibility_description).stripTags().s + '</div>">' + S(eligibility_description).truncate(20).s + '</span>';
+      //   }
+      // }
+    }
+
+    // console.log('setaside html = ' + set_aside_html);
+
+    return chunk.write(set_aside_html);
+  }
+
+  // var grants_categories = {
+  //   '99': 'Unrestricted'
+  //   , '00' : 'State governments'
+  //   , '01' : 'County governments' 
+  //   , '02' : 'City or township governments' 
+  //   , '04' : 'Special district governments' 
+  //   , '05' : 'Independent school districts' 
+  //   , '06' : 'Public and State controlled institutions of higher education' 
+  //   , '07' : 'Native American tribal governments (Federally recognized)' 
+  //   , '08' : 'Public housing authorities/Indian housing authorities' 
+  //   , '11' : 'Native American tribal organizations (other than Federally recognized tribal governments)' 
+  //   , '12' : '501(c)(3)s (except higher ed)' 
+  //   , '13' : 'Non-501(c)(3) nonprofits (except higher ed)' 
+  //   , '20' : 'Private institutions of higher education' 
+  //   , '21' : 'Individuals' 
+  //   , '22' : 'Non-small-business for-profits' 
+  //   , '23' : 'Small businesses' 
+  //   , '25' : 'Others'
+  // }
+
+  // function grants_eligibility_description(cat) {
+  //   return grants_categories[cat];
+  // }
+
+
+  dust.helpers.score_dots = function(chunk, context, bodies, params) {
+    var score = dust.helpers.tap(params.score, chunk, context);
+    console.log('score = ' + score);
+    if (score > 90) {
+      return chunk.write('<span class="blackdot">&#9679;</span><span class="blackdot">&#9679;</span><span class="blackdot">&#9679;</span><span class="blackdot">&#9679;</span><span class="blackdot">&#9679;</span>');
+    } else if (score > 70) {
+      return chunk.write('<span class="blackdot">&#9679;</span><span class="blackdot">&#9679;</span><span class="blackdot">&#9679;</span><span class="blackdot">&#9679;</span><span class="whitedot">&#9675;</span>');
+    } else if (score > 50) {
+      return chunk.write('<span class="blackdot">&#9679;</span><span class="blackdot">&#9679;</span><span class="blackdot">&#9679;</span><span class="whitedot">&#9675;</span><span class="whitedot">&#9675;</span>');
+    } else if (score > 30) {
+      return chunk.write('<span class="blackdot">&#9679;</span><span class="blackdot">&#9679;</span><span class="whitedot">&#9675;</span><span class="whitedot">&#9675;</span><span class="whitedot">&#9675;</span>');
+    } else if (score > 10) {
+      return chunk.write('<span class="blackdot">&#9679;</span><span class="whitedot">&#9675;</span><span class="whitedot">&#9675;</span><span class="whitedot">&#9675;</span><span class="whitedot">&#9675;</span>');
+    } else {
+      return chunk.write('<span class="whitedot">&#9679;</span><span class="whitedot">&#9675;</span><span class="whitedot">&#9675;</span><span class="whitedot">&#9675;</span><span class="whitedot">&#9675;</span>');
+    }
+  }
+  dust.helpers.data_source_link = function(chunk, context, bodies, params) {
+    var data_source = dust.helpers.tap(params.data_source, chunk, context);
+    var data_source_html;
+    if (data_source == 'FBO') {
+      data_source_html = '<a href="//www.fbo.gov">fbo.gov</a>';
+    } else if (data_source == 'grants.gov') {
+      data_source_html = '<a href="//www.grants.gov">grants.gov</a>';
+    } else if (data_source == 'SBIR') {
+      data_source_html = '<a href="//www.sbir.gov/solicitations">SBIR/STTR</a>';
+    } else {
+      data_source_html = data_source;
+    }
+    return chunk.write(data_source_html);
+  }
+
+  dust.helpers.pager = function(chunk, context, bodies, params) {
+    var numFound = context.get('numFound');
+    var start = context.get('start');
+
+    numPages = Math.floor(numFound / fbopen_config.PAGESIZE) + 1;
+    currentPage = parseInt(start) / fbopen_config.PAGESIZE + 1;
+
+    console.log('numPages, currentPage = ' + numPages + ', ' + currentPage);
+
+    pager_str = '';
+
+    button_disabled = (currentPage > 1 ? '' : ' class="disabled"');
+    // pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, 1) + '">&lt;&lt;</a></li>';
+    pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, Math.max(currentPage - 1, 1)) + '">&lt;</a></li>';
+
+    begin_page = Math.max(1, currentPage - 3);
+    end_page = Math.min(begin_page + 7, numPages);
+    for (this_page = begin_page; this_page <= end_page; this_page++) {
+      console.log('currentPage, this_page = [' + currentPage + '], [' + this_page + ']');
+      button_disabled = (currentPage != this_page ? '' : ' class="disabled"');
+      if (button_disabled) {
+        pager_str += '<li class="current"><span>' + this_page + '</span></li>';
+      } else {
+        pager_str += '<li><span><a href="' + pager_link(currentPage, this_page) + '">' + this_page + '</a></span></li>';
+      }
+    }
+    // pager_str += '<li class="disabled"><span>page ' + currentPage + ' of ' + numPages + '</span></li>';
+
+    button_disabled = (currentPage < numPages ? '' : ' class="disabled"');
+    pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, Math.min(currentPage + 1, numPages)) + '">&gt;</a></li>';
+    // pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, numPages) + '">&gt;&gt;</a></li>';
+
+    return chunk.write(pager_str);
+  }
+
+  // pagination
+
+  function pager_link(currentPage, i) {
+    
+    console.log('pager_link: currentPage, i = ' + currentPage + ', ' + i);
+
+    current_url = location.href;
+    page_str = '&p=' + i;
+    if (current_url.match(/&p=[0-9]*/)) {
+      out_url = current_url.replace(/&p=[0-9]*/, page_str);
+    } else {
+      out_url = current_url + page_str;
+    }
+    return out_url;
+  }
+
+
+  // date formatting
+  dust.helpers.formatDate = function(chunk, context, bodies, params) {
+    var value = dust.helpers.tap(params.value, chunk, context);
+    
+    var dt = moment(value, 'YYYY-MM-DD[T]HH:mm:ss[Z]');
+
+    if (dt.isValid()) {
+      var dt_out = dt.format('MMM Do, YYYY');
+      // console.log('dt_out = ' + dt_out);
+      return chunk.write(dt_out);
+    } else {
+      // console.log('invalid dt: ' + value);
+      return chunk.write('check listing');
+    }
+  }
+
+  dust.helpers.result_count = function(chunk, context, bodies, params) {
+    var count = dust.helpers.tap(params.count, chunk, context);
+    
+    if (count > 1) {
+      return chunk.write('<strong>' + count + '</strong> Search results');
+    } else if (count == 1) {
+      return chunk.write('<strong>1</strong> Search result');
+    } else {
+      return chunk.write('No results.');
+    }
+  }
+
+
+  ELLIPSIS = '&hellip;';
+  function opening_ellipsis(str) {
+    // console.log('str0= ' + str[0] + ', test = ' + (/^[A-Z]/).test(str[0]));
+    if ((/^[A-Z]/).test(str[0])) {
+      return '';
+    } else {
+      return ELLIPSIS;
+    }
+  }
+
+  dust.helpers.content_short = function(chunk, context, bodies, params) {
+
+    var doc = {};
+    doc.summary = context.get('summary');
+    doc.content = context.get('content');
+    doc.description = context.get('description');
+    doc.highlights = context.get('highlights');
+
+    // doc_highlights = highlights[doc.id];
+    content_snippet = '';
+
+    CONTENT_MAX_LENGTH = 300;
+
+    if (doc.highlights.summary) {
+      content_snippet = opening_ellipsis(doc.highlights.summary[0]) + doc.highlights.summary.join(ELLIPSIS + '</div><div class="content-snippet">');
+    } else if (doc.summary) {
+      content_snippet = opening_ellipsis(doc.summary) + S(doc.summary).stripTags().s;
+    } else if (doc.highlights.description) {
+      content_snippet = opening_ellipsis(doc.highlights.description[0]) + S(doc.highlights.description.join(ELLIPSIS + '</div><div class="content-snippet">')).truncate(CONTENT_MAX_LENGTH).s;
+    } else if (doc.description) {
+      content_snippet = opening_ellipsis(doc.description) + S(doc.description).stripTags().truncate(CONTENT_MAX_LENGTH).s;
+    } else if (doc.highlights.content) {
+      content_snippet = opening_ellipsis(doc.highlights.content[0]) + S(doc.highlights.content.join(ELLIPSIS + '</div><div class="content-snippet">')).truncate(CONTENT_MAX_LENGTH).s;
+    } else if (doc.content) {
+      content_snippet = opening_ellipsis(doc.content) + S(doc.content).stripTags().truncate(CONTENT_MAX_LENGTH).s;
+    } else {
+      content_snippet = '<em>No description is available.</em>'
+    }
+
+    return chunk.write(content_snippet);
+
+  } 
+
+
+  dust.helpers.content_top = function(chunk, context, bodies, params) {
+
+    var doc = {};
+    doc.summary = context.get('summary');
+    doc.content = context.get('content');
+    doc.description = context.get('description');
+    doc.highlights = context.get('highlights');
+
+    // console.dir(context);
+    // console.log('agency = ' + context.get('agency'));
+    // console.log('summary = ' + doc.summary);
+
+    // Order of preference:
+    // summary highlight
+    // summary
+    // description highlight(s)
+    // description, truncated
+    // content highlight(s)
+    // content, truncated
+
+    // doc_highlights = highlights[doc.id];
+    content_snippet = '';
+
+    CONTENT_MAX_LENGTH = 300;
+
+    if (doc.summary) {
+      content_snippet = opening_ellipsis(doc.summary) + S(doc.summary).stripTags().s;
+    } else if (doc.description) {
+      content_snippet = opening_ellipsis(doc.description) + S(doc.description).stripTags().truncate(CONTENT_MAX_LENGTH).s;
+    } else if (doc.highlights.description) {
+      content_snippet = opening_ellipsis(doc.highlights.description[0]) + S(doc.highlights.description[0]).truncate(CONTENT_MAX_LENGTH).s;
+    } else if (doc.content) {
+      content_snippet = opening_ellipsis(doc.content) + S(doc.content).stripTags().truncate(CONTENT_MAX_LENGTH).s;
+    } else if (doc.highlights.content) {
+      content_snippet = opening_ellipsis(doc.highlights.content[0]) + S(doc.highlights.content[0]).truncate(CONTENT_MAX_LENGTH).s;
+    } else {
+      content_snippet = '<em>No synopsis is available.</em>'
+    }
+
+    return chunk.write(content_snippet);
+
+  } 
+
+
+  dust.helpers.content_more = function(chunk, context, bodies, params) {
+
+    // return chunk.write('');
+
+    // var doc = dust.helpers.tap(params.doc, chunk, context);
+    var doc = {};
+    doc.summary = context.get('summary');
+    doc.content = context.get('content');
+    doc.description = context.get('description');
+    doc.highlights = context.get('highlights');
+
+    console.log('processing # ' + context.get('solnbr') + ', ' + context.get('title'));
+
+    if (doc.highlights.summary) {
+      console.log('summary highlights count = ' + doc.highlights.summary.length);
+    }
+    if (doc.highlights.description) {
+      console.log('description highlights count = ' + doc.highlights.description.length);
+    }
+    if (doc.highlights.content) {
+      console.log('content highlights count = ' + doc.highlights.content.length);
+    }
+
+    console.dir(doc.highlights);
+
+    // Order of preference:
+    // summary highlight
+    // summary
+    // description highlight(s)
+    // description, truncated
+    // content highlight(s)
+    // content, truncated
+
+    // doc_highlights = highlights[doc.id];
+    content_snippet = '';
+
+    CONTENT_MAX_LENGTH = 300;
+
+    summary_count = description_count = content_count = 0;
+    if (doc.highlights.summary) summary_count = doc.highlights.summary.length;
+    if (doc.highlights.description) description_count = doc.highlights.description.length;
+    if (doc.highlights.content) content_count = doc.highlights.content.length;
+
+    if (summary_count > 0) {
+      console.log('adding more summary');
+      content_snippet = doc.highlights.summary.join(ELLIPSIS + '</div><div class="content-snippet">');
+    } else if (description_count > 0) {
+      console.log('adding more description highlights');
+      additional_highlights = doc.highlights.description; // .slice(1);
+      content_snippet = opening_ellipsis(additional_highlights[0]) + S(additional_highlights.join(ELLIPSIS + '</div><div class="content-snippet">')).truncate(CONTENT_MAX_LENGTH).s;
+    } else if (doc.description) {
+      console.log('adding more description');
+      content_snippet = opening_ellipsis(doc.description) + S(doc.description).stripTags().s;
+    } else if (content_count > 0) {
+      console.log('adding more content highlights');
+      additional_highlights = doc.highlights.content; // .slice(1);
+      content_snippet = opening_ellipsis(additional_highlights[0]) + S(additional_highlights.join(ELLIPSIS + '</div><div class="content-snippet">')).truncate(CONTENT_MAX_LENGTH).s;
+    } else if (doc.content) {
+      console.log('adding more content');
+      content_snippet = opening_ellipsis(doc.content) + S(doc.content).stripTags().s;
+    } else {
+      console.log('nothing to add');
+      content_snippet = '';
+    }
+
+    return chunk.write('<div class="content-snippet">' + content_snippet + '</div>');
+
+  } 
 
 }( window.fbopen = window.fbopen || {}, jQuery ));
