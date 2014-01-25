@@ -187,6 +187,10 @@ app.get('/v0/opps', function(req, res) {
 		misc_params += '&get_parent=true&solnbr=' + url_parts.query['solnbr'];
 	}
 
+	// pagination
+	if (url_parts.query['start']) {
+		misc_params += '&start=' + url_parts.query['start'];
+	}
 
 	// let caller trim down which fields are returned
 	// (TO DO: allow for other (all?) non-default params)
