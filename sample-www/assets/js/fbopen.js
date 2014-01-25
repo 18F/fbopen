@@ -56,6 +56,12 @@
       }
   });
 
+  // clear button in input field
+  $('#q-clear').on('click', function() { 
+    $('#q').val('');
+  });
+
+  // hide raw JSOn by default
   $('#results-raw').collapse();
   $('#results-raw').collapse('hide');
 
