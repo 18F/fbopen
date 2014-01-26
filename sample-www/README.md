@@ -2,7 +2,9 @@
 
 ### Install
 * Copy these files and folders to any web server. (They're all static assets; no special server config is necessary.)
-* In `config/fbopen_config.js`, modify `API_SERVER` as necessary to point at your API server.
+* `cp config-sample.js config.js`, and in `config.js`, modify `API_SERVER` as necessary to point at your FBOpen API server.
+
+### Run
 * Point your browser at `index.html`.
 
 ### To do
