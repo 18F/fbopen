@@ -1,9 +1,11 @@
+// Create config.js, in this directory, based on this sample file.
+
 var config = {}
 
-config.solr = {};
+config.app = {};
+config.app.port = process.env.PORT || 3000;
 
-// config.solr.base_url should point to your FBOpen Solr endpoint,
-// e.g., 'http://localhost:8983/solr/collection1/select'
-config.solr.base_url = 'http://fbopen.gsa.gov:8983/solr/collection1/select';
+config.solr = {};
+config.solr.base_url = 'http://localhost:8983/solr/collection1/select'; // your FBOpen Solr endpoint
 
 module.exports = config;
