@@ -10,6 +10,14 @@
  *
  */
 
+//
+// CONFIGURATION:
+// Replace with the location of your FBOpen Solr endpoint:
+// e.g., 'http://localhost:8983/solr/collection1/select'
+//
+var solr_url = 'http://YOUR_FBOPEN_SOLR_SERVER/solr/collection1/select';
+
+
 var express = require('express')
 
 	// express.js standard scaffolding components (some overkill here)
@@ -200,9 +208,6 @@ app.get('/v0/opps', function(req, res) {
 	} else {
 		fl = '*,score';
 	}
-
-	// solr_url = 'http://localhost:8983/solr/collection1/select';
-	solr_url = 'http://fbopen-lb2-828401007.us-west-2.elb.amazonaws.com:8983/solr/collection1/select';
 
 	solnbr = url_parts.query['solnbr'] || '';
 
