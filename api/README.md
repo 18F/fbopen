@@ -3,7 +3,7 @@
 ### Install and Run
 To install:
 * First [install your fbopen Solr server](https://github.com/presidential-innovation-fellows/fbopen/tree/master/solr-files) if you haven't already.
-* Edit `app.js` and replace `YOUR_FBOPEN_SOLR_SERVER` with the name/address and port of your fbopen Solr server (e.g., `'localhost:8983'`).
+* `cp config-sample.js config.js`, and in`config.js`, replace `localhost:8983` with the name/address and port of your fbopen Solr server (if you're not running it on localhost).
 * Install dependencies: `npm install`
 
 To run: `node app.js` (or, say, [`nodemon app.js`](https://github.com/remy/nodemon))
