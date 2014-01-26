@@ -10,13 +10,7 @@
  *
  */
 
-//
-// CONFIGURATION:
-// Replace with the location of your FBOpen Solr endpoint:
-// e.g., 'http://localhost:8983/solr/collection1/select'
-//
-var solr_url = 'http://YOUR_FBOPEN_SOLR_SERVER/solr/collection1/select';
-
+var config = require('./config');
 
 var express = require('express')
 
@@ -43,7 +37,7 @@ solr_client.autoCommit = true; // Switch on "auto commit"
 // all environments
 // (express.js standard scaffolding -- see http://expressjs.com/guide.html#executable )
 // some of this is unused/overkill at the moment
-app.set('port', process.env.PORT || 3000);
+app.set('port', config.app.port);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express.favicon());
@@ -142,6 +136,9 @@ app.get('/v0/opps', function(req, res) {
 	// console.log('request = ' + req.originalUrl);
 
 	// execute the Solr query and return results
+
+	// start with base endpoint, then add query params
+	var solr_url = config.solr.base_url;
 
 	var url_parts = url.parse(req.url, true);
 
