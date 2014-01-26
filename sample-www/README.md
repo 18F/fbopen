@@ -6,6 +6,11 @@
 * Point your browser at `index.html`.
 
 ### To do
-* clean up tagging code
+* add more query filter options
+* support arbitrary rather than hard-coded data sources (by querying for available data sources; requires concomitant API change)
+* sorting
+* restore (and clean up) tagging code
 * authentication
-* add portfolios
+* saved queries and/or saved results (aka "portfolios")
+* your great ideas
+
