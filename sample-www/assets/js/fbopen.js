@@ -263,7 +263,7 @@
   dust.helpers.score_dots = function(chunk, context, bodies, params) {
     var score = dust.helpers.tap(params.score, chunk, context);
     var BLACKDOT = '<span class="blackdot">&#9679;</span>';
-    var WHITEDOT = '<span class="whitedot">&#9679;</span>';
+    var WHITEDOT = '<span class="whitedot">&#9675;</span>';
     if (score > 90) {
       return chunk.write(BLACKDOT + BLACKDOT + BLACKDOT + BLACKDOT + BLACKDOT);
     } else if (score > 70) {
@@ -415,7 +415,7 @@
 
 
   // special display mods for splash page
-  
+
   function show_splash_page() {
     // rearrange a little for the home page
     $('#fbopen-search-form').addClass('intro').appendTo('#intro');
