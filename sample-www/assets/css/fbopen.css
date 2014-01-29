@@ -575,14 +575,15 @@ ul.tagit li.tagit-new {
 	bottom: auto;
 	left: auto;
 }
+#fbopen-search-form.intro {
+	margin-top: 60px;
+}
+
 .landing-copy {
   font-family : Enriqueta;
   font-size : 22px;
   line-height : 36px;
   color : #EA461F;
-}
-#fbopen-search-form.intro {
-	margin-top: 60px;
 }
 
 .landing-copy-small {
@@ -590,6 +591,10 @@ ul.tagit li.tagit-new {
   font-size : 13px;
   line-height : 36px;
   color : #999999; /* #0DA8CC; */
+}
+
+.landing-copy > small {
+	font-size: 75%;
 }
 
 @media (max-width: 992px) {
