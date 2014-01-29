@@ -42,7 +42,7 @@
 
   // clear button in input field
   $('#q-clear').on('click', function() { 
-    $('#q').val('');
+    $('#q').val('').focus();
   });
 
   // hide raw JSOn by default
