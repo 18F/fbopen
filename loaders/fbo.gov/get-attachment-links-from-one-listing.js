@@ -149,10 +149,11 @@ function download(attachment) {
 
 	// special handling: DLA.mil requires this cookie to pass a warning page
 	// TO-DO: GO GET THE SOLICITATION ON THE RESULTING PAGE
-	var j = request.jar();
-	if (S(download_url).contains('dibbs.bsm.dla.mil')) {
-		var cookie = request.cookie('DIBBSDoDWarning=AGREE; path=/; domain=www.dibbs.bsm.dla.mil;');
-		j.add(cookie);
+    if (S(download_url).contains('www.dibbs.bsm.dla.mil')) {
+        var j = request.jar();
+        console.log(S(download_url));
+        var cookie = request.cookie('DIBBSDoDWarning=AGREE; path=/;');
+        j.setCookie(cookie, S(download_url));
 	}
 
 	// Skip these (generic) links
@@ -178,8 +179,16 @@ function download(attachment) {
 
 	idx_str = attachment_idx.toString();
 	var ws = fs.createWriteStream(attachment_download_path + solnbr + '/' + idx_str);
+
+    // don't send the cookie jar with the request unless it has been defined
+    if (j) {
+        var request_options = {url: download_url, strictSSL: false, jar: j};
+    } else {
+        var request_options = {url: download_url, strictSSL: false};
+    }
+
 	request( 
-		{url: download_url, strictSSL: false, jar: j }, 
+        request_options,
 		function(err, resp, body) {
 			if (err) {
 				log_download('download request error: ' + err);
