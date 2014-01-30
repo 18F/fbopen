@@ -10,6 +10,8 @@
  *
  */
 
+var config = require('./config');
+
 var express = require('express')
 
 	// express.js standard scaffolding components (some overkill here)
@@ -35,7 +37,7 @@ solr_client.autoCommit = true; // Switch on "auto commit"
 // all environments
 // (express.js standard scaffolding -- see http://expressjs.com/guide.html#executable )
 // some of this is unused/overkill at the moment
-app.set('port', process.env.PORT || 3000);
+app.set('port', config.app.port);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express.favicon());
@@ -135,6 +137,9 @@ app.get('/v0/opps', function(req, res) {
 
 	// execute the Solr query and return results
 
+	// start with base endpoint, then add query params
+	var solr_url = config.solr.base_url;
+
 	var url_parts = url.parse(req.url, true);
 
 	var q_param = '';
@@ -187,6 +192,10 @@ app.get('/v0/opps', function(req, res) {
 		misc_params += '&get_parent=true&solnbr=' + url_parts.query['solnbr'];
 	}
 
+	// pagination
+	if (url_parts.query['start']) {
+		misc_params += '&start=' + url_parts.query['start'];
+	}
 
 	// let caller trim down which fields are returned
 	// (TO DO: allow for other (all?) non-default params)
@@ -196,9 +205,6 @@ app.get('/v0/opps', function(req, res) {
 	} else {
 		fl = '*,score';
 	}
-
-	// solr_url = 'http://localhost:8983/solr/collection1/select';
-	solr_url = 'http://fbopen-lb2-828401007.us-west-2.elb.amazonaws.com:8983/solr/collection1/select';
 
 	solnbr = url_parts.query['solnbr'] || '';
 

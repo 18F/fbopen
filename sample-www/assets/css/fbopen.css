@@ -392,7 +392,7 @@ ul.tagit li.tagit-new {
 }
 #results-topline {
   width: 100%;
-  margin: 68px 0 0;
+  margin: 80px 0 0;
   padding: 10px 0 0;
 }
 #result-count {
@@ -562,10 +562,10 @@ ul.tagit li.tagit-new {
 #intro {
 	display: none;
 	text-align: center;
-	width: 50%;
+	width: 100%;
 	margin: 70px auto;
 	min-width: 300px;
-	max-width: 425px;
+	max-width: 330px;
 }
 #intro .brand {
 	margin-bottom: 30px;
@@ -575,14 +575,15 @@ ul.tagit li.tagit-new {
 	bottom: auto;
 	left: auto;
 }
+#fbopen-search-form.intro {
+	margin-top: 60px;
+}
+
 .landing-copy {
   font-family : Enriqueta;
   font-size : 22px;
   line-height : 36px;
   color : #EA461F;
-}
-#fbopen-search-form.intro {
-	margin-top: 60px;
 }
 
 .landing-copy-small {
@@ -590,4 +591,17 @@ ul.tagit li.tagit-new {
   font-size : 13px;
   line-height : 36px;
   color : #999999; /* #0DA8CC; */
+}
+
+.landing-copy > small {
+	font-size: 75%;
+}
+
+@media (max-width: 992px) {
+	#results-topline {
+		margin-top: 10px;
+	}
+	#advanced-toggle {
+		float: left;
+	}
 }
