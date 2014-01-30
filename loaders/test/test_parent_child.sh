@@ -37,9 +37,7 @@ echo "Waiting for bulk indexing... (1s)"
 sleep 1
 
 echo "Indexing each attachment"
-file=$(openssl base64 -in sample/attachments/test.rtf)
-json="{\"_name\" : \"test.rtf\", \"content\" : \"${file}\"}"
-echo $json | curl -i -XPOST 'http://localhost:9200/fbopen_test/opp_attachment?parent=FBO:PRESOL:14-0004' -d @-
+FBOPEN_URI=localhost:9200 FBOPEN_INDEX=fbopen_test ../common/load_attachment.sh sample/attachments/test.rtf "FBO:PRESOL:14-0004"
 
 echo "Waiting for attachment indexing... (5s)"
 sleep 5

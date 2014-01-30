@@ -1,6 +1,6 @@
 // get-attachment-links.js
 //
-// download and ingest into Solr all the attachments linked from the provided listing URL
+// download and ingest into Elasticsearch all the attachments linked from the provided listing URL
 
 var S = require('string');
 // var nodeio = require('node.io');
@@ -256,10 +256,7 @@ function download(attachment) {
 			    }
 			});
 		})
-
-
 	});
-
 }
 
 
