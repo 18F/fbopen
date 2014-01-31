@@ -40,11 +40,6 @@
       if(event.which == 13) { $('#fbopen-search-form').submit(); }
   });
 
-  // clear button in input field
-  $('#q-clear').on('click', function() { 
-    $('#q').val('').focus();
-  });
-
   // hide raw JSOn by default
   $('#results-raw').collapse();
   $('#results-raw').collapse('hide');

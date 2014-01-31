@@ -10,6 +10,7 @@ body {
 #outer-container {
 	min-height: 300px;
 }
+
 #footer {
 	padding-top: 60px;
 	text-align: right;
@@ -30,12 +31,18 @@ body {
 	height: 35px;
 	margin: 10px;
 	display: inline-block;
+  background-position: 0 2px;
+  background-repeat: no-repeat;
 }
+#github-link:hover, #twitter-link:hover {
+  background-position: left bottom;
+}
+
 #github-link {
-	background: url('../images/FBOpen-socialicon-github.png') no-repeat 0 1px;
+	background-image: url('../images/FBOpen-socialicon-github.png');
 }
 #twitter-link {
-	background: url('../images/FBOpen-socialicon-twitter.png') no-repeat 0 1px;
+	background-image: url('../images/FBOpen-socialicon-twitter.png');
 }
 
 
@@ -50,6 +57,13 @@ h1, .logo {
 	font-style: italic;
 }
 
+a {
+	color: #01ABCA;
+}
+a:hover {
+	text-decoration: none;
+}
+
 #fbopen-search-form {
 	margin-top: 20px;
 }
@@ -58,13 +72,6 @@ h1, .logo {
 }
 #naics {
 	width: 100px;
-}
-
-.close {
-	position: relative;
-	right: 15px;
-	top: -35px;
-	float: right;
 }
 
 #fbopen-search-form .form-group label {
@@ -178,13 +185,8 @@ highlight {
 #more-options {
 	margin-left: 5px;
 }
-#q {
-	font-size: 20px;
-	/*width: 560px;*/
-	margin-left: 0;
-}
 #naics, #data_source {
-	width: 250px;
+	/*width: 250px;*/
 	float: right;
 }
 
@@ -213,20 +215,21 @@ highlight {
 }
 
 .brand > span {
-	font-style: italic;
+	font-family: Roboto;
+	font-weight: 100;
 	font-size: 24px;
 	vertical-align: baseline;
 	padding-left: 5px;
-	color: red;
+	color: rgb(11, 189, 212);
 	position: relative;
-	bottom: 9px;
-	left: 5px;
+	bottom: 10px;
+  margin: 0 6px;
 }
 
 .pagination-box {
 	width: 100%;
 	text-align: right;
-	margin-top: 20px;
+	/*margin-top: 20px;*/
 }
 .pagination {
 	margin: 10px 0 0;
@@ -344,18 +347,12 @@ ul.tagit li.tagit-new {
   font-size : 12px;
   color : #6ECBE0;
 }
-#q /* .search-box-text */ {
-  font-family: Roboto;
-  font-size: 20px;
-  color: #666666;
-  font-weight: 100;
-  padding: 10px 35px 10px 15px;
-  height: 45px;
-  margin: 0;
-  border-radius: 0;
-}
+
 #go {
-  margin-top: 10px;
+  margin-top: 25px;
+  color: #ffffff;
+  background-color: #01ABCA;
+  border-color: initial;
 }
 
 .collapsing{
@@ -372,10 +369,10 @@ ul.tagit li.tagit-new {
   line-height: 16px;
   border-radius: 0;
   float: right;
-  margin-right: 6px;
+  margin-right: 3px;
 }
 #form-advanced-label {
-  margin: 30px 0 0;
+  margin: 35px 0 0;
   display: block;
   padding: 5px;
   cursor: pointer;
@@ -392,7 +389,7 @@ ul.tagit li.tagit-new {
 }
 #results-topline {
   width: 100%;
-  margin: 80px 0 0;
+  margin: 74px 0 0;
   padding: 10px 0 0;
 }
 #result-count {
@@ -442,6 +439,9 @@ ul.tagit li.tagit-new {
   line-height : 16.8px;
   color : #FFFFFF;
 }
+.listing-left, .listing-right {
+  margin-top: 20px;
+}
 .agency-name {
   font-family : Enriqueta;
   font-size : 14px;
@@ -450,14 +450,14 @@ ul.tagit li.tagit-new {
 .listing-text {
   border: 0 none;
   margin: 0;
-  padding: 20px 0 30px;
+  padding: 0 0 30px;
   border-bottom: 1px solid #eeeeee;
 }
 .content-snippet {
   font-family : Enriqueta;
   font-size : 13px;
   line-height : 24px;
-  letter-spacing : -0.13px;
+  letter-spacing : 0px;
   color : #4D4D4D; 
 }
 .listing-quoted-body {
@@ -537,9 +537,17 @@ ul.tagit li.tagit-new {
 .topic-tag {
   background : #9EDCEB;
 }
-#q /* .Search-box */ {
+#q /* .search-box-text */ {
+  font-family: Roboto;
+  font-size: 20px;
+  color: #666666;
+  font-weight: 100;
+  padding: 10px 30px 10px 15px;
+  height: 45px;
+  margin: 0;
   width: 100%;
   background : #FFFFFF;
+  border-radius: 0;
   border-style : Solid;
   border-color : #E6E6E6;
   border-width : 1px;
@@ -552,7 +560,30 @@ ul.tagit li.tagit-new {
 #q.intro::-moz-placeholder {  /* Firefox 19+ */ text-align:center; }
 #q.intro:-ms-input-placeholder { text-align:center; }
 #q.intro {
-	text-align: center;
+	text-align: left;
+}
+
+.input-group-q > span {
+	right: 30px;
+}
+#q-search {
+  position: relative;
+  right: 6px;
+  top: -32px;
+  float: right;
+  background: 0 none;
+  color: #666;
+  cursor: pointer;
+  border: 0 none;
+  padding: 0;
+  border-radius: 0;
+}
+#q-search:hover {
+  background: 0 none;
+  color: #333;
+}
+#q-search > .glyphicon {
+  padding: 2px 0 0 5px;
 }
 
 .active-filter {
@@ -595,6 +626,16 @@ ul.tagit li.tagit-new {
 
 .landing-copy > small {
 	font-size: 75%;
+}
+
+@media (min-width: 1600px) {
+  #sidebar { position: fixed; width: 520px; }
+}
+@media (min-width: 1200px) and (max-width: 1599px) {
+  #sidebar { position: fixed; width: 390px; }
+}
+@media (min-width: 992px) and (max-width: 1199px) {
+  #sidebar { position: fixed; width: 315px; } 
 }
 
 @media (max-width: 992px) {

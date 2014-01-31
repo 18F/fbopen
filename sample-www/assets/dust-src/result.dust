@@ -97,7 +97,7 @@
 	
 	<div class="row listing-bottom">
 
-		<div class="listing-dates col-md-7 col-sm-7 row">
+		<div class="listing-dates col-md-8 col-sm-8 row">
 			<div class="listing-due-box col-md-6 col-sm-6">
 				<span class="glyphicon glyphicon-calendar"></span>
 				Due: <span class="listing-due-date">{@formatDate value="{close_dt}"/}</span>
@@ -108,7 +108,7 @@
 			</div>
 		</div>
 
-		<div class="listing-actions col-md-5 col-sm-5">
+		<div class="listing-actions col-md-4 col-sm-4">
 			<a class="listing-save"><span class="glyphicon glyphicon-star-empty"></span>Save</a>
 			<a class="listing-more"><span class="glyphicon glyphicon-plus"></span>More detail</a>
 		</div>

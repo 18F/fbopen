@@ -45,7 +45,7 @@
 
     <div id="main" class="row">
 
-      <div class="col-sm-4">
+      <div id="sidebar" class="col-sm-4 col-md-4">
 
         <div class="container brand">
           <a href="/" style="color: #333;"><h1>fbopen</h1></a>
@@ -53,14 +53,17 @@
         </div>
 
         <form name="fbopen-search-form" id="fbopen-search-form" role="form" class="form" method="get" action="">
+
           <div class="form-group">
             <input id="q" name="q" type="search" class="form-control" />
-            <a id="q-clear" class="close">&times;</a>
+            <button type="submit" id="q-search"><span class="glyphicon glyphicon-search"></span></button>
           </div>
+
           <a id="form-advanced-label" data-toggle="collapse" data-target="#form-advanced-options">
             <span class="filter-category-title advanced">ADVANCED</span>
             <button id="advanced-toggle" type="button" class="btn">+</button>
           </a>
+
           <div id="form-advanced-options" class="collapse">
 
             <div class="checkbox">
@@ -79,7 +82,6 @@
               <select id="data_source" name="data_source" type="search" class="form-control">
                 <option value="">All</option>
                 <option value="FBO">FedBizOpps (fbo.gov)</option>
-                <!-- <option value="SBIR">SBIR</option> -->
                 <option value="grants.gov">grants.gov</option>
               </select>
 
@@ -109,7 +111,7 @@
 
       </div>
 
-      <div class="col-sm-8">
+      <div class="col-sm-8 col-sm-offset-4 col-md-8 col-md-offset-4">
 
         <div id="results-container">
 
