@@ -1,3 +1,4 @@
+#!/bin/bash
 #
 # grants-nightly.sh
 
