@@ -263,6 +263,9 @@ highlight {
 	text-align: right;
 	margin-top: 24px;
 }
+.score-dots, .score-text {
+  color: #BBBBBB;
+}
 .score-dots {
 	font-size: 20px;
 	line-height: 20px;
