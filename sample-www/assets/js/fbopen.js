@@ -191,13 +191,33 @@
 
   // DUST TEMPLATE HELPERS
 
-  dust.helpers.view_listing_url = function(chunk, context, bodies, params) {
+  dust.helpers.doc_url = function(chunk, context, bodies, params) {
+    
+    var attachment_url = context.get('attachment_url') || '';
+    if (attachment_url) {
+      return chunk.write(attachment_url);
+    }
+
     var listing_url = context.get('listing_url') || '';
     if (listing_url) {
       return chunk.write(listing_url);
     }
 
-    // get parent url
+  }
+
+  dust.helpers.parent_listing_url = function(chunk, context, bodies, params) {
+    
+    var parent_url = context.get('parent_link_t') || '';
+    if (parent_url) {
+      return chunk.write(parent_url);
+    }
+
+    var listing_url = context.get('listing_url') || '';
+    if (listing_url) {
+      return chunk.write(listing_url);
+    }
+
+    // get parent url ?
     var solnbr = context.get('solnbr');
     var data_source = context.get('data_source');
     return chunk.write('')
@@ -393,11 +413,11 @@
     } else if (doc.summary) {
       content_snippet = opening_ellipsis(doc.summary) + S(doc.summary).stripTags().s;
     } else if (doc.highlights.description) {
-      content_snippet = opening_ellipsis(doc.highlights.description[0]) + S(doc.highlights.description.join(ELLIPSIS + '</div><div class="content-snippet">')).truncate(CONTENT_MAX_LENGTH).s;
+      content_snippet = opening_ellipsis(doc.highlights.description[0]) + S(doc.highlights.description.join(ELLIPSIS + '</div><div class="content-snippet">')).s;
     } else if (doc.description) {
       content_snippet = opening_ellipsis(doc.description) + S(doc.description).stripTags().truncate(CONTENT_MAX_LENGTH).s;
     } else if (doc.highlights.content) {
-      content_snippet = opening_ellipsis(doc.highlights.content[0]) + S(doc.highlights.content.join(ELLIPSIS + '</div><div class="content-snippet">')).truncate(CONTENT_MAX_LENGTH).s;
+      content_snippet = opening_ellipsis(doc.highlights.content[0]) + S(doc.highlights.content.join(ELLIPSIS + '</div><div class="content-snippet">')).s;
     } else if (doc.content) {
       content_snippet = opening_ellipsis(doc.content) + S(doc.content).stripTags().truncate(CONTENT_MAX_LENGTH).s;
     } else {

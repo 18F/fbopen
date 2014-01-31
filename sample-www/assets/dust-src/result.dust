@@ -15,7 +15,7 @@
 	<div class="row listing-top">
 		<div class="listing-top-left col-md-10 col-sm-10">
 			<h3 class="title">
-				<a href="{@view_listing_url /}" target="_blank">
+				<a href="{@doc_url /}" target="_blank">
 					{?parent_title_t}
 						{parent_title_t|s}
 					{:else}
@@ -85,7 +85,7 @@
 					<span class="listing-data">{@data_source_link data_source="{data_source}" /}</span>
 				</div>
 				<div class="view-listing-box listing-data-box">
-					<a class="listing-data view-listing" href="{@view_listing_url /}" target="_blank">
+					<a class="listing-data view-listing" href="{@parent_listing_url /}" target="_blank">
 						<span class="glyphicon glyphicon-arrow-right"></span>
 						<span>View listing</span>
 					</a>
