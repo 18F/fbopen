@@ -22,7 +22,8 @@ var attachment_download_path = config.attachment_download_path || 'fbo-attachmen
 , log_file = config.log_file || 'fbo-attachment-downloads.log' // also used in process-listing-links.sh ; that script should pass this filename to stay consistent
 , err_file = config.err_file || 'fbo-attachment-downloads.err'
 , fbo_base_url = config.fbo_base_url || 'https://www.fbo.gov/'
-, solr_server_url = config.solr_server_url || 'http://localhost:8983/solr/';
+, elasticsearch_server_url = config.elasticsearch_server_url || 'http://localhost:9200'
+, elasticsearch_index = config.elasticsearch_index || 'fbopen';
 
 var links_filep = fs.openSync(links_filename, 'w');
 
@@ -226,33 +227,39 @@ function download(attachment) {
 		}
 
 		// load into Solr
-		curl_cmd = 'curl "' 
-		+ solr_server_url 
-		+ 'update/extract'
-		+ '?literal.id=' + literal_id
-		+ '&literal.data_type=opp' 
-		+ '&literal.data_source=FBO' 
-		+ '&literal.solnbr=' + solnbr
-		+ '&literal.attachment_url=' + attachment_url
-		+ '&literal.title=' + encodeURIComponent(content_filename)
-		+ '&literal.parent_title_t=' + encodeURIComponent(parent_title)
-		+ '&literal.parent_link_t=' + encodeURIComponent(parent_link)
-		+ '&literal.description=' + encodeURIComponent(desc)
-		+ '&commit=true'
-		+ '&lowernames=false'
-		+ '" '
-		+ '-F "myfile=@' + full_path + content_filename + '"';
+		+ elasticsearch_server_url 
+
+        var json = {
+            '_id': literal_id,
+            // 'data_source': 'FBO',
+            // 'solnbr': solnbr,
+            // 'attachment_url':  attachment_url,
+            // 'title':  content_filename,
+            // 'parent_title_t':  parent_title,
+            // 'parent_link_t':  parent_link,
+            'description':  desc
+        };
+
+        var fbopen_env = {
+            'FBOPEN_URI': elasticsearch_server_url,
+            'FBOPEN_INDEX': elasticsearch_index
+        };
 
 		// console.log('CURL will be: ' + curl_cmd);
 
 		fs.rename(full_path + actual_filename, full_path + content_filename, function() {
 			// console.log('in ' + full_path + ', renamed ' + old_filename + ' to ' + new_filename + '.');
 
-			var child = exec(curl_cmd, function (error, stdout, stderr) {
-			    if (error !== null) {
-			    	log_download('ERROR on: ' + curl_cmd);
+            var load_cmd = path.join(path.resolve(process.env['FBOPEN_ROOT']), 'loaders/common/load_attachment.sh');
+            var file_path = path.resolve(path.join(full_path, content_filename));
+            var cmd_plus_args = [load_cmd, file_path, solnbr, '\'' + JSON.stringify(json, undefined, 2) + '\''].join(' ');
+            console.log('command to run: ' + cmd_plus_args);
+
+			var child = exec(cmd_plus_args, {'env': fbopen_env}, function (error, stdout, stderr) {
+			    if (error) {
+			    	log_download('ERROR on: ' + load_cmd);
 			    } else {
-					log_download('COMPLETED: ' + curl_cmd);   	
+					log_download('COMPLETED: ' + load_cmd);   	
 			    }
 			});
 		})
