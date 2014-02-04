@@ -67,6 +67,4 @@ cat $prepped_json_notices_file | node ../common/format-bulk.js -a > $bulk_notice
 curl -s -XPOST "$ELASTICSEARCH_URI/$ELASTICSEARCH_INDEX/_bulk" --data-binary @$bulk_notices_file; echo
 
 # download and ingest attachments
-# (To do: detect whether this is already done, too)
-#cat $nightly_links_file | ./process-listing-links.sh | tee fbo-attachment-downloads.log
-
+cat $nightly_links_file | ./process-listing-links.sh | tee fbo-attachment-downloads.log

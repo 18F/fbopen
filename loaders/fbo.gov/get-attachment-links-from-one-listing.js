@@ -11,16 +11,16 @@ var request = require('request');
 var url = require('url');
 var path = require('path');
 // var Lazy = require('lazy');
-var exec = require('child_process').exec;
+var execFile = require('child_process').execFile;
 var cheerio = require('cheerio'); // faster/simpler than jsdom (but see below)
 var date_format_lite = require('date-format-lite');
+var util = require('util');
 
 var config = require('./fbopen-loader-config.js');
 
 var attachment_download_path = config.attachment_download_path || 'fbo-attachments/'
 , links_filename = config.links_filename || 'fbo-attachment-link-idx.txt'
 , log_file = config.log_file || 'fbo-attachment-downloads.log' // also used in process-listing-links.sh ; that script should pass this filename to stay consistent
-, err_file = config.err_file || 'fbo-attachment-downloads.err'
 , fbo_base_url = config.fbo_base_url || 'https://www.fbo.gov/'
 , elasticsearch_server_url = config.elasticsearch_server_url || 'http://localhost:9200'
 , elasticsearch_index = config.elasticsearch_index || 'fbopen';
@@ -34,15 +34,26 @@ var total = 0;
 
 var notice_url = '';
 
+if (!process.env['FBOPEN_ROOT']) {
+    console.log("You must define FBOPEN_ROOT");
+    process.exit(1);
+}
+
+var environment = process.env;
+environment.FBOPEN_URI = elasticsearch_server_url;
+environment.FBOPEN_INDEX = elasticsearch_index;
+
 process.argv.forEach(function(val, idx, array) {
 	// first two args are "node" and this file
 	if (idx == 2) notice_url = process.argv[2];
 	if (idx == 3) naics_code = process.argv[3];
 });
 
-if (notice_url == '') {
+if (S(notice_url).isEmpty()) {
 	console.log('Error: no URL supplied.');
 	process.exit(1);
+} else {
+    log_download('------------- Starting: ' + notice_url + ' -----------------');
 }
 
 // process each URL:
@@ -52,13 +63,6 @@ if (notice_url == '') {
 // console.log('notice_url = [' + notice_url + ']');
 
 request(notice_url, function(err, resp, body) {
-
-	if (notice_url == undefined || notice_url == '') {
-		log_download('notice_url is empty or undefined; skipping');
-		return;
-	}
-	// wait:
-
 	if (err) {
 		console.log('err = ' + err);
 		log_download('err = ' + err);
@@ -85,14 +89,15 @@ request(notice_url, function(err, resp, body) {
 
 	// get rid of link types we don't want
 	$('a.difflink, a.viewers-tips, a[href^="mailto"]').remove();
-	$anchors = $('div.form a');
-	if (!$anchors || $anchors.length == 0) {
+	var anchors = $('div.form a');
+	if (!anchors || anchors.length == 0) {
 		log_download('NO LINKS');
+        log_download(util.inspect(anchors));
 		return;
 	}
 
 	var attachments = new Array();
-	$anchors.each(function(i, el) {
+	anchors.each(function(i, el) {
 
 		anchor_href = $(this).attr('href') || '';
 
@@ -152,24 +157,30 @@ function download(attachment) {
 	// TO-DO: GO GET THE SOLICITATION ON THE RESULTING PAGE
     if (S(download_url).contains('www.dibbs.bsm.dla.mil')) {
         var j = request.jar();
-        console.log(S(download_url));
+        console.log(S(download_url).s);
         var cookie = request.cookie('DIBBSDoDWarning=AGREE; path=/;');
-        j.setCookie(cookie, S(download_url));
+        j.setCookie(cookie, S(download_url).s);
 	}
 
 	// Skip these (generic) links
 	// TO DO: make (and read from) a static file list of links that should always be skipped
 	// TO DO: always skip links where the entire URL is the domain name? (like "www.adobe.com")
-	if (
+    if (S(download_url).startsWith('ftp')) {
+		log_download('Skipping URL due to unsupported protocol: ' + download_url);
+        return;
+    }
+    else if (
 		download_url == 'https://www.neco.navy.mil/navicp.aspx'
 		|| download_url == 'https://www.dibbs.bsm.dla.mil/RFP'
 		|| download_url == 'https://www.dibbs.bsm.dla.mil/'
 		|| download_url == 'https://www.sam.gov/'
 		|| download_url == 'http://www.adobe.com/'
 	) {
-		log_download('Skipping ' + download_url);
+		log_download('Skipping: ' + download_url);
 		return;
-	}
+	} else {
+		log_download('Continuing: ' + download_url);
+    }
 
 	// TO-DO: FEDBID.COM
 	// - special handling for fedbid.com: follow all non-_target="blank" anchors and download them all
@@ -220,17 +231,17 @@ function download(attachment) {
 
 		// don't load nameless/failed files
 		if (content_filename == undefined || content_filename == 'undefined' || content_filename == '') {
-			log_download('Did not load file into Solr: no content_filename for ' + literal_id);
+			log_download('Did not load file into Elasticsearch: no content_filename for ' + literal_id);
 			return;
 		} else {
-			log_download('loading file into Solr: ' + literal_id);
+			log_download('loading file into Elasticsearch: ' + literal_id);
 		}
 
-		// load into Solr
+		// load into Elasticsearch
 		+ elasticsearch_server_url 
 
         var json = {
-            '_id': literal_id,
+            // '_id': literal_id, // the literal_id will be supplied in the URL
             // 'data_source': 'FBO',
             // 'solnbr': solnbr,
             // 'attachment_url':  attachment_url,
@@ -240,26 +251,22 @@ function download(attachment) {
             'description':  desc
         };
 
-        var fbopen_env = {
-            'FBOPEN_URI': elasticsearch_server_url,
-            'FBOPEN_INDEX': elasticsearch_index
-        };
-
 		// console.log('CURL will be: ' + curl_cmd);
 
 		fs.rename(full_path + actual_filename, full_path + content_filename, function() {
 			// console.log('in ' + full_path + ', renamed ' + old_filename + ' to ' + new_filename + '.');
 
-            var load_cmd = path.join(path.resolve(process.env['FBOPEN_ROOT']), 'loaders/common/load_attachment.sh');
+            var load_cmd = path.resolve(path.join(process.env['FBOPEN_ROOT'], 'loaders/common/load_attachment.sh'));
             var file_path = path.resolve(path.join(full_path, content_filename));
-            var cmd_plus_args = [load_cmd, file_path, solnbr, '\'' + JSON.stringify(json, undefined, 2) + '\''].join(' ');
-            console.log('command to run: ' + cmd_plus_args);
+            var args = [file_path, literal_id, solnbr, JSON.stringify(json, undefined, 2)];
 
-			var child = exec(cmd_plus_args, {'env': fbopen_env}, function (error, stdout, stderr) {
-			    if (error) {
+			var child = execFile(load_cmd, args, {'env': environment}, function (error, stdout, stderr) {
+			    if (error || stderr) {
 			    	log_download('ERROR on: ' + load_cmd);
+			    	log_download(stderr);
 			    } else {
 					log_download('COMPLETED: ' + load_cmd);   	
+                    log_download(stdout);
 			    }
 			});
 		})
