@@ -9,7 +9,6 @@
 * load AWARD and other notices types
 * survey FBO listing archetypes to determine the algorithms for retrieving the relevant attachments for various types of notices, and implement that logic in the crawler/loader
 * better failure handling for the metadata loader, attachment crawler, and attachment loader
-* script to automatically run the nightly update
 
 ## To install the loader
 * Install Elasticsearch. On OS X, this is as easy as `brew install elasticsearch`.
@@ -27,7 +26,12 @@ After install, first load a full set of data using the one-time/weekly loader. T
 
 	Downloads the full, weekly FBO XML file from ftp://ftp.fbo.gov.
 	From the fbo.gov weekly XML data dump, creates and loads a set of Elasticsearch bulk load files.
+    Finally, it visits each listing, scrapes the attachment URLs, downloads the attachment files, and loads them into Elasticsearch as child records.
 	
+    Required ENV vars:
+    
+    `$FBOPEN_ROOT` = the absolute path to your fbopen checkout
+
 	Optional ENV vars:
 	
 	`$FBO_WEEKLY_XML_FILE` = where to save the downloaded file; default = *./workfiles/FBOFullXML.xml*
@@ -52,10 +56,19 @@ After install, first load a full set of data using the one-time/weekly loader. T
 ### Nightly updates
 All at once: **`fbo-nightly.sh [YYYYMMDD]`** (defaults to yesterday)
 
-Or, if you want to do it in steps:
+	Downloads the nightly FBO XML file from ftp://ftp.fbo.gov.
+	From the fbo.gov nightly XML data dump, creates and loads a set of Elasticsearch bulk load files.
+    Finally, it visits each listing, scrapes the attachment URLs, downloads the attachment files, and loads them into Elasticsearch as child records.
 
-* To download the nightly data file: `node nightly-fbo-parser.js -o [-d YYYYMMDD]` (defaults to yesterday)
-* To load the nightly data into FBOpen: `node nightly-fbo-parser.js [-d YYYYMMDD]` (defaults to yesterday)
-* To collect and load listings' attachments into FBOpen: `process-listing-links.sh < links-YYYYMMDD.txt`
+    Required ENV vars:
+    
+    `$FBOPEN_ROOT` = the absolute path to your fbopen checkout
 
-The parser in the nightly code -- that is, the hard part -- is borrowed wholesale from our predecessor [Adam Becker's](https://github.com/adamjacobbecker/) [fbo-parser](https://github.com/presidential-innovation-fellows/fbo-parser). Thanks Adam!
+	Optional ENV vars:
+	
+	`$ELASTICSEARCH_URI` = the URI of your Elasticsearch instance; default = *localhost:9200*
+	`$ELASTICSEARCH_INDEX` = the name of the ES index to load into; default = *fbopen*
+	
+If you want to do it in steps, consult `fbo-nightly.sh` for the proper commands.
+
+The parser in the nightly code -- that is, the hard part -- is mostly the work of our predecessor [Adam Becker's](https://github.com/adamjacobbecker/) [fbo-parser](https://github.com/presidential-innovation-fellows/fbo-parser). Thanks Adam!
