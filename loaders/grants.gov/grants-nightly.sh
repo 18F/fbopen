@@ -1,4 +1,5 @@
-
+#!/bin/bash
+#
 # grants-nightly.sh
 
 # download the nightly file
