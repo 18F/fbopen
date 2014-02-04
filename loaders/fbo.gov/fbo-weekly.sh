@@ -56,5 +56,11 @@ cat $json_output_file | node ../common/format-bulk.js -a | split -l 10000 - noti
 echo "Loading into Elasticsearch..."
 find workfiles/ -name "notices.bulk.*" -print -exec curl -XPOST "$ELASTICSEARCH_URI/$ELASTICSEARCH_INDEX/_bulk" --data-binary @"{}" \;
 
-echo "Done."
+echo "Done loading into Elasticsearch."
+
+# download and ingest attachments
+echo "Scraping, downloading and ingesting attachments..."
+cat $links_output_file | ./process-listing-links.sh | tee fbo-attachment-downloads.log
+
+echo "FBO-Weekly Done."
 
