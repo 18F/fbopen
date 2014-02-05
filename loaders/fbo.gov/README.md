@@ -12,11 +12,15 @@
 
 ## To install the loader
 * Install Elasticsearch. On OS X, this is as easy as `brew install elasticsearch`.
-* Create an index on your Elasticsearch cluster:
-    * `curl -XPUT localhost:9200/fbopen`
+* Install the attachment mapper plugin. See directions here: https://github.com/elasticsearch/elasticsearch-mapper-attachments 
+* Restart Elasticsearch
+* Create an index on your Elasticsearch cluster with the proper field mappings (relative path to mapping given from the FBOpen root):
+    * `curl -XPUT localhost:9200/fbopen --data-binary @loaders/common/mappings.json`
 * In the loaders/fbo.gov/ directory:
 	* `sudo npm install`
         * (note: `sudo` is required so that the json package can be installed globally.)
+* In the loaders/common/ directory:
+    * `npm install`
 
 ## To import FedBizOpps data
 After install, first load a full set of data using the one-time/weekly loader. Then you can simply run nightly updates.
