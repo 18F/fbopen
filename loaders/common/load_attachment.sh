@@ -16,11 +16,11 @@ json="{\"_name\" : \"${name}\", \"content\" : \"${file}\"}"
 
 tmpfile=$(mktemp)
 
-if [[ $# -eq 3 ]]; then
+if [[ $# -eq 4 ]]; then
     echo $json > $tmpfile
-    echo $3 >> $tmpfile
+    echo $4 >> $tmpfile
     echo "Merging the JSON..."
-    full_json="$(cat tmpjson | json --merge)"
+    full_json="$(cat $tmpfile | json --merge)"
     echo "Done."
     rm $tmpfile
 else

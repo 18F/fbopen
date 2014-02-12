@@ -37,7 +37,7 @@ echo "Waiting for bulk indexing... (1s)"
 sleep 1
 
 echo "Indexing each attachment"
-FBOPEN_URI=localhost:9200 FBOPEN_INDEX=fbopen_test ../common/load_attachment.sh sample/attachments/test.rtf "FBO:PRESOL:14-0004"
+FBOPEN_URI=localhost:9200 FBOPEN_INDEX=fbopen_test $FBOPEN_ROOT/loaders/common/load_attachment.sh $FBOPEN_ROOT/loaders/test/sample/attachments/test.rtf "FBO:PRESOL:14-0004__attachment_0" "FBO:PRESOL:14-0004"
 
 echo "Waiting for attachment indexing... (5s)"
 sleep 5
@@ -46,21 +46,13 @@ echo "Querying the ES API for what we just indexed"
 curl 'localhost:9200/fbopen_test/opp/_search' -d '{
     "query" : {
         "bool" : {
-            "should" : {
-                "match" : {
-                    "_all" : "john"
-                }
-            },
-            "should" : {
-                "has_child" : {
+            "should" : [
+                { "match" : { "_all" : "john" } },
+                { "has_child" : {
                     "type" : "opp_attachment",
-                    "query" : {
-                        "term" : {
-                            "_all" : "john"
-                        }
-                    }
-                }
-            }
+                    "query" : { "term" : { "_all" : "john" } }
+                } }
+            ]
         }
     }
 }'
