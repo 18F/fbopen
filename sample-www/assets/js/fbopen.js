@@ -29,7 +29,13 @@
 
   // always call current version of the API (currently v0)
   $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
-    options.url = fbopen_config.API_SERVER + '/v0' + options.url;
+    console.log('API_SERVER_SSL == ' + fbopen_config.API_SERVER_SSL);
+    console.log('protocol == ' + location.protocol);
+    if (location.protocol == 'https:' && fbopen_config.API_SERVER_SSL) {
+      options.url = fbopen_config.API_SERVER_SSL + '/v0' + options.url;
+    } else {
+      options.url = fbopen_config.API_SERVER + '/v0' + options.url;
+    }
   });
 
   // disable ajax caching in IE
@@ -164,10 +170,19 @@
         console.log('api returned: ');
         console.dir(results);
 
+        dust.isDebug = true;
         dust.render('result', results, function(err, out) {
 
-          // display the results
-          $('#results-list').html(out);
+          if (err) {
+            console.log('Error: ' + err);
+            $('#results-list').html('<h4>Sorry, that search didn\'t work.');
+          } else {
+            // display the results
+            $('#results-list').html(out);
+          }
+
+          console.log('showing the results ...');
+
           $('#results-container').show();
 
           // also make the raw API response viewable
@@ -199,8 +214,20 @@
     }
 
     var listing_url = context.get('listing_url') || '';
-    if (listing_url) {
+    if (listing_url != undefined) {
       return chunk.write(listing_url);
+    } else {
+      return chunk.write('');
+    }
+
+  }
+
+  dust.helpers.get_attachment_url = function(chunk, context, bodies, params) {
+    var attachment_url = context.get('attachment_url') || '';
+    if (attachment_url) {
+      return chunk.write(attachment_url);
+    } else {
+      return chunk.write('');
     }
 
   }
@@ -213,7 +240,7 @@
     }
 
     var listing_url = context.get('listing_url') || '';
-    if (listing_url) {
+    if (listing_url != undefined) {
       return chunk.write(listing_url);
     }
 

@@ -11,7 +11,7 @@
 	<ul class="pagination">{@pager /}</ul>
 </div>
 {#docs}
-<div class="result-item" data-solr-id="{solr_id}" data-attachment-url="{attachment_url}">
+<div class="result-item" data-solr-id="{id}" data-attachment-url="{@get_attachment_url /}">
 	<div class="row listing-top">
 		<div class="listing-top-left col-md-10 col-sm-10">
 			<h3 class="title">
