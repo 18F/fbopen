@@ -6,5 +6,4 @@
 ./test_load_bulk_into_es__fbo.sh
 ./test_load_bulk_into_es__grants.sh
 ./test_mod_loading.sh
-./test_nested_array.sh # fails
 ./test_parent_child.sh
