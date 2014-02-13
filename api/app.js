@@ -17,6 +17,7 @@ var express = require('express')
 	, http = require('http')
 	, https = require('https')
 	, path = require('path')
+	, http_auth = require('http-auth')
 
 	// other useful stuff
 	, request = require('request')
@@ -30,6 +31,12 @@ var express = require('express')
 var config = require('./config');
 
 var app = express();
+
+// http basic auth, if required in config
+if (config.app.require_http_basic_auth) {
+	var basic = http_auth.basic(config.app.http_basic_auth);
+	app.use(http_auth.connect(basic));
+}
 
 // Create Solr client
 var solr_client = solr.createClient();

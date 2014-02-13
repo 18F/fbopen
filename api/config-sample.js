@@ -9,6 +9,13 @@ config.app = {};
 // allow or prohibit write operations (POST, PUT, DELETE)?
 config.app.read_only = true;
 
+// require basic authentication
+config.app.require_http_basic_auth = true;
+config.app.http_basic_auth = {
+	realm: 'fbopen'
+	, file: '/path/to/htpasswd_file' // username/password file created using htpasswd
+};
+
 // http
 config.app.listen_http = true;
 config.app.port = process.env.FBOPEN_API_PORT || 3000;
