@@ -170,7 +170,7 @@
         console.log('api returned: ');
         console.dir(results);
 
-        dust.isDebug = true;
+        // dust.isDebug = true;
         dust.render('result', results, function(err, out) {
 
           if (err) {
