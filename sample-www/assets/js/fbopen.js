@@ -29,8 +29,6 @@
 
   // always call current version of the API (currently v0)
   $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
-    console.log('API_SERVER_SSL == ' + fbopen_config.API_SERVER_SSL);
-    console.log('protocol == ' + location.protocol);
     if (location.protocol == 'https:' && fbopen_config.API_SERVER_SSL) {
       options.url = fbopen_config.API_SERVER_SSL + '/v0' + options.url;
     } else {
@@ -97,8 +95,8 @@
       var that = this;
       var opps = new Opps();
       
-      console.log('searching using params: ');
-      console.dir(search_params);
+      // console.log('searching using params: ');
+      // console.dir(search_params);
 
       // show advanced options UI if any of them were used in the last query
       var data_source = $('#data_source option:selected').val();
@@ -167,21 +165,19 @@
         // we're not using any models (yet), so it's simpler to just access the JSON directly for now
         var results = opps.models[0].attributes;
 
-        console.log('api returned: ');
-        console.dir(results);
+        // console.log('api returned: ');
+        // console.dir(results);
 
         // dust.isDebug = true;
         dust.render('result', results, function(err, out) {
 
           if (err) {
-            console.log('Error: ' + err);
+            // console.log('Error: ' + err);
             $('#results-list').html('<h4>Sorry, that search didn\'t work.');
           } else {
             // display the results
             $('#results-list').html(out);
           }
-
-          console.log('showing the results ...');
 
           $('#results-container').show();
 
