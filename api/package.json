@@ -12,6 +12,7 @@
 		"request": "*",
 		"solr-client": "*",
 		"moment": "*",
-		"string": "*"
+		"string": "*",
+		"http-auth": "*"
   }
 }

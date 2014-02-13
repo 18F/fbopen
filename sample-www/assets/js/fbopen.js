@@ -29,7 +29,11 @@
 
   // always call current version of the API (currently v0)
   $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
-    options.url = fbopen_config.API_SERVER + '/v0' + options.url;
+    if (location.protocol == 'https:' && fbopen_config.API_SERVER_SSL) {
+      options.url = fbopen_config.API_SERVER_SSL + '/v0' + options.url;
+    } else {
+      options.url = fbopen_config.API_SERVER + '/v0' + options.url;
+    }
   });
 
   // disable ajax caching in IE
@@ -91,8 +95,8 @@
       var that = this;
       var opps = new Opps();
       
-      console.log('searching using params: ');
-      console.dir(search_params);
+      // console.log('searching using params: ');
+      // console.dir(search_params);
 
       // show advanced options UI if any of them were used in the last query
       var data_source = $('#data_source option:selected').val();
@@ -161,13 +165,20 @@
         // we're not using any models (yet), so it's simpler to just access the JSON directly for now
         var results = opps.models[0].attributes;
 
-        console.log('api returned: ');
-        console.dir(results);
+        // console.log('api returned: ');
+        // console.dir(results);
 
+        // dust.isDebug = true;
         dust.render('result', results, function(err, out) {
 
-          // display the results
-          $('#results-list').html(out);
+          if (err) {
+            // console.log('Error: ' + err);
+            $('#results-list').html('<h4>Sorry, that search didn\'t work.');
+          } else {
+            // display the results
+            $('#results-list').html(out);
+          }
+
           $('#results-container').show();
 
           // also make the raw API response viewable
@@ -199,8 +210,20 @@
     }
 
     var listing_url = context.get('listing_url') || '';
-    if (listing_url) {
+    if (listing_url != undefined) {
       return chunk.write(listing_url);
+    } else {
+      return chunk.write('');
+    }
+
+  }
+
+  dust.helpers.get_attachment_url = function(chunk, context, bodies, params) {
+    var attachment_url = context.get('attachment_url') || '';
+    if (attachment_url) {
+      return chunk.write(attachment_url);
+    } else {
+      return chunk.write('');
     }
 
   }
@@ -213,7 +236,7 @@
     }
 
     var listing_url = context.get('listing_url') || '';
-    if (listing_url) {
+    if (listing_url != undefined) {
       return chunk.write(listing_url);
     }
 
