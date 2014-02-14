@@ -73,9 +73,6 @@ request(notice_url, function(err, resp, body) {
 	// get solnbr
 	var solnbr = S($('#dnf_class_values_procurement_notice__solicitation_number__widget').text()).trim().s;
 
-	// get title
-	var parent_title = S($('.agency-header > h2').text()).trim().s;
-
 	// console.log('solnbr = ' + solnbr);
 
 	if (!fs.existsSync(attachment_download_path + solnbr)) {
@@ -120,11 +117,8 @@ request(notice_url, function(err, resp, body) {
 		}
 
 		attachments[i] = {
-			'parent_link': notice_url
-			, 'parent_title': parent_title
 			, 'idx': i
 			, 'url': attachment_url
-			// , 'basename': attachment_basename
 			, 'solnbr': solnbr
 			, 'desc': attachment_desc
 		};
@@ -188,7 +182,6 @@ function download(attachment) {
 
 	// TO-DO: NASA.GOV has their own attachment system
 
-
 	idx_str = attachment_idx.toString();
 	var ws = fs.createWriteStream(attachment_download_path + solnbr + '/' + idx_str);
 
@@ -223,7 +216,6 @@ function download(attachment) {
 		content_filename = g_new_filenames[attachment_idx];
 		desc = attachment['desc'];
 		parent_title = attachment['parent_title'];
-		parent_link = attachment['parent_link'];
 		attachment_url = attachment['url'];
 
 		// create a unique ID
@@ -245,9 +237,6 @@ function download(attachment) {
             // 'data_source': 'FBO',
             // 'solnbr': solnbr,
             // 'attachment_url':  attachment_url,
-            // 'title':  content_filename,
-            // 'parent_title_t':  parent_title,
-            // 'parent_link_t':  parent_link,
             'description':  desc
         };
 
