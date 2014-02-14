@@ -10,8 +10,9 @@
     "jade": "*",
     "less-middleware": "*",
 		"request": "*",
-		"solr-client": "*",
+		"elasticsearch": "*",
 		"moment": "*",
-		"string": "*"
+		"string": "*",
+		"http-auth": "*"
   }
 }

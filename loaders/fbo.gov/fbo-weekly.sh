@@ -50,7 +50,10 @@ cat $json_output_file | json -ga listing_url > $links_output_file
 echo "Converting JSON to Elasticsearch bulk format..."
 # Note the need to split the file into chunks. Else ES will fail with either a
 # "connection reset by peer" or "broken pipe" error.
-cat $json_output_file | node ../common/format-bulk.js -a | split -l 10000 - notices.bulk.
+cat $json_output_file | node ../common/format-bulk.js -a > $bulk_output_file
+
+echo "Splitting bulk file into chunks Elasticsearch can ingest..."
+cat $bulk_output_file | split -l 10000 - workfiles/notices.bulk.
 
 # load into Elasticsearch
 echo "Loading into Elasticsearch..."
