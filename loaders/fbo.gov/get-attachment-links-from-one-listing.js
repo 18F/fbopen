@@ -117,7 +117,7 @@ request(notice_url, function(err, resp, body) {
 		}
 
 		attachments[i] = {
-			, 'idx': i
+			'idx': i
 			, 'url': attachment_url
 			, 'solnbr': solnbr
 			, 'desc': attachment_desc
