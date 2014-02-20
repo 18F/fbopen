@@ -11,6 +11,7 @@ fbo-attachments/*
 nightly-downloads/*
 workfiles/*
 api/config.js
+sample-www/config.js
 *.log
 *.out
 *.urls
