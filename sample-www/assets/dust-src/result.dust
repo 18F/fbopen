@@ -16,11 +16,7 @@
 		<div class="listing-top-left col-md-10 col-sm-10">
 			<h3 class="title">
 				<a href="{@doc_url /}" target="_blank">
-					{?parent_title_t}
-						{parent_title_t|s}
-					{:else}
-						{title|s}
-					{/parent_title_t}
+                    {title|s}
 				</a>
 			</h3>
 			<div class="agency-name">{agency}</div>
