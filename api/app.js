@@ -22,11 +22,13 @@ var express = require('express')
 	// other useful stuff
 	, request = require('request')
 	, qs = require('querystring')
-	, es = require('elasticsearch')
+    , ejs = require('elastic.js')
+    , nc = require('elastic.js/elastic-node-client')
 	, url = require('url')
 	, moment = require('moment') // momentjs.com
 	, S = require('string') // stringjs.com
     , util = require('util')
+    , _u = require('underscore')
 	;
 
 var config = require('./config');
@@ -39,11 +41,10 @@ if (config.app.require_http_basic_auth) {
 	app.use(http_auth.connect(basic));
 }
 
-// Create Solr client
-var client = es.Client({
-    host: 'localhost:9200',
-    log: 'trace'
-});
+// Create Elasticsearch client
+var client = nc.NodeClient('localhost', '9200');
+ejs.client = client;
+
 
 // all environments
 // (express.js standard scaffolding -- see http://expressjs.com/guide.html#executable )
@@ -102,12 +103,13 @@ app.get('/v0/hello', function(req, res){
 });
 
 
-
 // Queries
 app.get('/v0/opps', function(req, res) {
 
-	// execute the Elasticsearch query and return results
+    res.set('Access-Control-Allow-Origin', '*');
+    res.set('Content-Type', 'application/json;charset=utf-8');
 
+	// execute the Elasticsearch query and return results
 	var url_parts = url.parse(req.url, true);
 
 	var q_param = '';
@@ -119,16 +121,21 @@ app.get('/v0/opps', function(req, res) {
 	// allow adding fq params
 	var fq_param = '';
 	var fq = url_parts.query['fq'];
-	if (fq && fq != '') fq_param = '&fq=' + fq;
 
 	// //
 	// // special fields
 	// //
 
     // // omit or include non-competed listings
-	// if (!url_parts.query['show_noncompeted'] || url_parts.query['show_noncompeted'] != 'true') {
-	// 	q_param += ' -"single source" -"sole source" -"other than full and open competition"';
-	// }
+	if (!url_parts.query['show_noncompeted'] || url_parts.query['show_noncompeted'] != 'true') {
+        var non_competed_flt = ejs.NotFilter(
+            ejs.QueryFilter(ejs.BoolQuery().should([
+                ejs.MatchQuery('_all', 'single source'), 
+                ejs.MatchQuery('_all', 'sole source'), 
+                ejs.MatchQuery('_all', 'other than full and open competition')
+            ]))
+        );
+	}
 
 	// // omit or include closed listings
     // if (!url_parts.query['show_closed'] || url_parts.query['show_closed'] != 'true') {
@@ -158,8 +165,8 @@ app.get('/v0/opps', function(req, res) {
 	// }
 
 	// // pagination
-	// if (url_parts.query['start']) {
-	// 	misc_params += '&start=' + url_parts.query['start'];
+	// if (url_parts.query['from']) {
+    //     search_settings.body.from = url_parts.query['from'];
 	// }
 
 	// // let caller trim down which fields are returned
@@ -185,23 +192,50 @@ app.get('/v0/opps', function(req, res) {
 	// 	+ misc_params;
 	// }
 
-	// console.log('solr_url = ' + solr_url);
+    var results_callback = function (body) {
+        // massage results into the format we want
+        var results_out = {};
+        results_out.numFound = body.hits.total;
+        results_out.facets = body.aggregations;
 
-    var search = {};
+        // map facet_fields from [label1, value1, label2, value2 ...]
+        // to label1: value1, label2: value2, etc.
+        //var facet;
+        //for (facet_field_name in results_in.facet_counts.facet_fields) {
+        //    facet = results_in.facet_counts.facet_fields[facet_field_name];
+        //    results_out.facets[facet_field_name] = flat_list_to_json(facet);
+        //}
 
-    //if (fq) {
-    //    var filter = {
-    //        query : {
-    //            match : { _all : fq }
-    //        }
-    //    }
-    //}
+        // map highlights to into docs, instead of separate data,
+        // and do a few other cleanup manipulations
+        results_out['docs'] = _u.map(body.hits.hits, function (doc) {
+            var doc_out = _u.omit(doc, '_id', '_source');
+            doc_out.id = doc._id;
+            _u.extend(doc_out, doc._source);
 
-    client.search({
+            // adjust score to 0-100
+            doc_out.score = Math.min(Math.round(doc_out.score * 100), 100);
+
+            // clean up fields
+            doc_out.data_source = doc_out.data_source || '';
+            if (doc_out.FBO_SETASIDE == 'N/A') doc_out.FBO_SETASIDE = '';
+
+            // type-specific changes, until we've normalized the data import
+            if (doc_out.FBO_CONTACT != '') doc_out.contact = doc_out.FBO_CONTACT;
+            if (doc_out.AgencyContact_t != '') doc_out.contact = doc_out.AgencyContact_t;
+
+            return doc_out;
+        });
+
+        res.json(results_out);
+    }
+
+
+    var search_settings = {
         index: 'fbopen',
         type: 'opp',
         body: {
-            highlight : {
+            highlight: {
                 pre_tags: ["<highlight>"],
                 post_tags: ["</highlight>"],
                 fields : {
@@ -209,29 +243,7 @@ app.get('/v0/opps', function(req, res) {
                     "FBO_OFFADD" : {}
                 }
             },
-            query: { 
-                filtered : {
-                    query: {
-                        bool: {
-                            should : [
-                                { match : { "_all" : q } },
-                                { has_child : { 
-                                    type : "opp_attachment", 
-                                    query : { 
-                                        term : { _all : q } 
-                                    } 
-                                } }
-                            ]
-                        }
-                    }
-                },
-                filter : {
-                    query : {
-                        match : { _all : fq }
-                    }
-                }
-            },
-            aggs : {
+            aggs: {
                 naics_code : {
                     terms : { field : "FBO_NAICS" }
                 },
@@ -240,66 +252,38 @@ app.get('/v0/opps', function(req, res) {
                 }
             }
         }
-    }, function (err, body) {
-        if (err) {
-            res.send(err);
-            return;
-        }
+    };
 
-        res.set('Access-Control-Allow-Origin', '*');
-        res.set('Content-Type', 'application/json;charset=utf-8');
+    var query = undefined;
 
-        if (!err && res.statusCode == 200) {
+    var bool_query = ejs.BoolQuery().should([
+        ejs.MatchQuery("_all", q),
+        ejs.HasChildQuery(
+            ejs.MatchQuery("_all", q),
+            "opp_attachment"
+        )
+    ]);
 
-            //res.send(body);
-            //return;
+    if (fq) {
+        query = ejs.FilteredQuery(
+            bool_query,
+            ejs.QueryFilter(ejs.MatchQuery("_all", fq))
+        );
+    } else {
+        query = bool_query;
+    }
 
-            // massage results into the format we want
-            var results_out = {};
-            results_out.docs = [];
+    var highlight = ejs.Highlight(['description', 'FBO_OFFADD'])
+        .preTags('<highlight>')
+        .postTags('</highlight>');
 
-            console.log(util.inspect(body));
-            results_out.facets = body.aggregations;
-            console.log(util.inspect(results_out.facets));
-            // console.dir(results_out.facets);
-
-            // map facet_fields from [label1, value1, label2, value2 ...]
-            // to label1: value1, label2: value2, etc.
-            //var facet;
-            //for (facet_field_name in results_in.facet_counts.facet_fields) {
-            //    facet = results_in.facet_counts.facet_fields[facet_field_name];
-            //    results_out.facets[facet_field_name] = flat_list_to_json(facet);
-            //}
-
-            // map highlights to into docs, instead of separate data,
-            // and do a few other cleanup manipulations
-            var doc_out, doc_id;
-            for (doc_idx in body.hits.hits) {
-                // console.log(util.inspect(doc));
-
-                doc_out = body.hits.hits[doc_idx];
-                doc_id = doc_out.id;
-
-                // adjust score to 0-100
-                doc_out.score = Math.min(Math.round(doc_out.score * 100), 100);
-
-                // clean up fields
-                doc_out.data_source = doc_out.data_source || '';
-                if (doc_out.FBO_SETASIDE == 'N/A') doc_out.FBO_SETASIDE = '';
-
-                // type-specific changes, until we've normalized the data import
-                if (doc_out.FBO_CONTACT != '') doc_out.contact = doc_out.FBO_CONTACT;
-                if (doc_out.AgencyContact_t != '') doc_out.contact = doc_out.AgencyContact_t;
-                results_out['docs'].push(doc_out);
-            }
-
-            res.json(200, results_out);
-            // res.json(200, JSON.parse(body));
-            // res.send(body);
-        } else {
-            res.json(res.statusCode, { error: err });
-        }
-    });
+    var request = ejs.Request()
+        .indices(["fbopen"])
+        .types(["opp", "opp_attachment"])
+        .highlight(highlight)
+        .query(query);
+    
+    request.doSearch(results_callback);
 });
 
 
