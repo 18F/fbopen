@@ -7,8 +7,8 @@
 		<span class="selected">Relevance</span>
 	</div>
 </div>
-<div class="pagination-box">
-	<ul class="pagination">{@pager /}</ul>
+<div>
+{@contextDump}
 </div>
 {#docs}
 <div class="result-item" data-solr-id="{id}" data-attachment-url="{@get_attachment_url /}">
@@ -112,6 +112,3 @@
 	</div>
 </div>
 {/docs}
-<div class="pagination-box">
-	<ul class="pagination">{@pager /}</ul>
-</div>
