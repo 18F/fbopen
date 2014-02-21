@@ -58,16 +58,16 @@
   // re-fill query terms
   if (location.search != '') {
 
-    form_params = ['q', 'parent_only', 'p', 'naics', 'data_source'];
+    form_params = ['q', 'p', 'naics', 'data_source'];
     for (i in form_params) {
-      $('#' + form_params[i]).val(getParameterByName(form_params[i]));
-      search_params[form_params[i]] = getParameterByName(form_params[i]);
+      $('#' + form_params[i]).val(getQueryVariable(form_params[i]));
+      search_params[form_params[i]] = getQueryVariable(form_params[i]);
     }
 
     // checkboxen:
     form_checkboxes = ['show_closed', 'show_noncompeted'];
     for (i in form_checkboxes) {
-      if (getParameterByName(form_checkboxes[i])) {
+      if (getQueryVariable(form_checkboxes[i])) {
         $('#' + form_checkboxes[i]).prop('checked', true);
         search_params[form_checkboxes[i]] = true;
       } else {
@@ -155,7 +155,7 @@
     }
 
     if (search_params['p']) { // api server numbers results, not pages
-      search_params['start'] = (search_params['p'] - 1) * PAGESIZE;
+      search_params['from'] = (search_params['p'] - 1) * PAGESIZE;
     }
 
     opps.fetch({
@@ -168,7 +168,7 @@
         // console.log('api returned: ');
         // console.dir(results);
 
-        // dust.isDebug = true;
+        dust.debugLevel = 'INFO';
         dust.render('result', results, function(err, out) {
 
           if (err) {
@@ -209,7 +209,7 @@
       return chunk.write(attachment_url);
     }
 
-    var listing_url = context.get('listing_url') || '';
+    var listing_url = context.get('listing_url');
     if (listing_url != undefined) {
       return chunk.write(listing_url);
     } else {
@@ -336,49 +336,51 @@
 
   // pagination
 
-  dust.helpers.pager = function(chunk, context, bodies, params) {
+  // dust.helpers.pager = function(chunk, context, bodies, params) {
 
-    var numPages = Math.floor(context.get('numFound') / PAGESIZE) + 1;
-    var currentPage = parseInt(context.get('start')) / PAGESIZE + 1;
+  //   var numPages = Math.floor(context.get('numFound') / PAGESIZE) + 1;
+  //   // TODO: put this back! When you figure out how to do it w/ Elasticsearch
+  //   //var currentPage = parseInt(context.get('start')) / PAGESIZE + 1;
+  //   var currentPage = 1;
 
-    var pager_str = '';
+  //   var pager_str = '';
 
-    var button_disabled = (currentPage > 1 ? '' : ' class="disabled"');
-    // pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, 1) + '">&lt;&lt;</a></li>'; // first page
-    pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, Math.max(currentPage - 1, 1)) + '">&lt;</a></li>'; // previous page
+  //   var button_disabled = (currentPage > 1 ? '' : ' class="disabled"');
+  //   // pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, 1) + '">&lt;&lt;</a></li>'; // first page
+  //   pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, Math.max(currentPage - 1, 1)) + '">&lt;</a></li>'; // previous page
 
-    // numbered page links
-    var this_page;
-    var begin_page = Math.max(1, currentPage - 3);
-    var end_page = Math.min(begin_page + 7, numPages);
-    for (this_page = begin_page; this_page <= end_page; this_page++) {
-      button_disabled = (currentPage != this_page ? '' : ' class="disabled"');
-      if (button_disabled) {
-        pager_str += '<li class="current"><span>' + this_page + '</span></li>';
-      } else {
-        pager_str += '<li><span><a href="' + pager_link(currentPage, this_page) + '">' + this_page + '</a></span></li>';
-      }
-    }
-    // pager_str += '<li class="disabled"><span>page ' + currentPage + ' of ' + numPages + '</span></li>';
+  //   // numbered page links
+  //   var this_page;
+  //   var begin_page = Math.max(1, currentPage - 3);
+  //   var end_page = Math.min(begin_page + 7, numPages);
+  //   for (this_page = begin_page; this_page <= end_page; this_page++) {
+  //     button_disabled = (currentPage != this_page ? '' : ' class="disabled"');
+  //     if (button_disabled) {
+  //       pager_str += '<li class="current"><span>' + this_page + '</span></li>';
+  //     } else {
+  //       pager_str += '<li><span><a href="' + pager_link(currentPage, this_page) + '">' + this_page + '</a></span></li>';
+  //     }
+  //   }
+  //   // pager_str += '<li class="disabled"><span>page ' + currentPage + ' of ' + numPages + '</span></li>';
 
-    button_disabled = (currentPage < numPages ? '' : ' class="disabled"');
-    pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, Math.min(currentPage + 1, numPages)) + '">&gt;</a></li>'; // next page
-    // pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, numPages) + '">&gt;&gt;</a></li>'; // last page
+  //   button_disabled = (currentPage < numPages ? '' : ' class="disabled"');
+  //   pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, Math.min(currentPage + 1, numPages)) + '">&gt;</a></li>'; // next page
+  //   // pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, numPages) + '">&gt;&gt;</a></li>'; // last page
 
-    return chunk.write(pager_str);
-  }
+  //   return chunk.write(pager_str);
+  // }
 
-  function pager_link(currentPage, i) {
-    
-    current_url = location.href;
-    page_str = '&p=' + i;
-    if (current_url.match(/&p=[0-9]*/)) {
-      out_url = current_url.replace(/&p=[0-9]*/, page_str);
-    } else {
-      out_url = current_url + page_str;
-    }
-    return out_url;
-  }
+  //function pager_link(currentPage, i) {
+  //  
+  //  current_url = location.href;
+  //  page_str = '&p=' + i;
+  //  if (current_url.match(/&p=[0-9]*/)) {
+  //    out_url = current_url.replace(/&p=[0-9]*/, page_str);
+  //  } else {
+  //    out_url = current_url + page_str;
+  //  }
+  //  return out_url;
+  //}
 
 
   // date formatting
@@ -412,7 +414,7 @@
 
   ELLIPSIS = '&hellip;';
   function opening_ellipsis(str) {
-    if ((/^[A-Z]/).test(str[0])) {
+    if (typeof(str) !== 'undefined' && (/^[A-Z]/).test(str[0])) {
       return '';
     } else {
       return ELLIPSIS;
@@ -422,26 +424,27 @@
   dust.helpers.content_short = function(chunk, context, bodies, params) {
 
     var doc = {};
-    doc.summary = context.get('summary');
+    //doc.summary = context.get('summary');
     doc.content = context.get('content');
     doc.description = context.get('description');
-    doc.highlights = context.get('highlights');
+    doc.highlights = context.get('highlight') || {};
 
     content_snippet = '';
 
     CONTENT_MAX_LENGTH = 300;
 
-    if (doc.highlights.summary) {
-      content_snippet = opening_ellipsis(doc.highlights.summary[0]) + doc.highlights.summary.join(ELLIPSIS + '</div><div class="content-snippet">');
-    } else if (doc.summary) {
+    //if (doc.highlights.summary) {
+    //  content_snippet = opening_ellipsis(doc.highlights.summary[0]) + doc.highlights.summary.join(ELLIPSIS + '</div><div class="content-snippet">');
+    //} else 
+    if (doc.summary) {
       content_snippet = opening_ellipsis(doc.summary) + S(doc.summary).stripTags().s;
-    } else if (doc.highlights.description) {
+    } else if (doc.highlights.hasOwnProperty('description') && typeof(doc.highlights.hasOwnProperty('description')) == 'array') {
       content_snippet = opening_ellipsis(doc.highlights.description[0]) + S(doc.highlights.description.join(ELLIPSIS + '</div><div class="content-snippet">')).s;
-    } else if (doc.description) {
+    } else if (doc.hasOwnProperty('description') && ! S(doc.description).isEmpty()) {
       content_snippet = opening_ellipsis(doc.description) + S(doc.description).stripTags().truncate(CONTENT_MAX_LENGTH).s;
-    } else if (doc.highlights.content) {
+    } else if (doc.highlights.hasOwnProperty('content') && _u.isArray(doc.highlights.hasOwnProperty('content'))) {
       content_snippet = opening_ellipsis(doc.highlights.content[0]) + S(doc.highlights.content.join(ELLIPSIS + '</div><div class="content-snippet">')).s;
-    } else if (doc.content) {
+    } else if (doc.hasOwnProperty('content') & ! S(doc.content).isEmpty()) {
       content_snippet = opening_ellipsis(doc.content) + S(doc.content).stripTags().truncate(CONTENT_MAX_LENGTH).s;
     } else {
       content_snippet = '<em>No description is available.</em>'
@@ -490,13 +493,17 @@
     if (ie) { $.ajaxSetup({ cache: false }); };
   } 
 
-  // http://stackoverflow.com/a/901144
-  function getParameterByName(name) {
-      name = name.replace(/[\[]/, "\\\[").replace(/[\]]/, "\\\]");
-      var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-          results = regex.exec(location.search);
-      return results == null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-  }
+// http://css-tricks.com/snippets/javascript/get-url-variables/
+function getQueryVariable(variable)
+{
+       var query = window.location.search.substring(1);
+       var vars = query.split("&");
+       for (var i=0;i<vars.length;i++) {
+               var pair = vars[i].split("=");
+               if(pair[0] == variable){return pair[1];}
+       }
+       return(false);
+}
 
   function htmlEncode(value){
     return $('<div/>').text(value).html();
