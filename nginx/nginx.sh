@@ -171,18 +171,22 @@ exit 0
 
 #### NGINX ####
 
+
+### Nginx Build ###
+
 # Since we are compiling nginx, we should not build modules we don't need to reduce the attack surface. ref: http://wiki.nginx.org/Modules 
 
 ./configure --without-http_empty_gif_module --without-http_geo_module --without-http_gzip_module --without-http_limit_conn_module --without-http_map_module --without-http_ssi_module --without-http_split_clients_module --without-http_scgi_module --without-http_rewrite_module --without-http_proxy_module --without-http_referer_module --without-http_userid_module
 
 ## Note to self: shoud split above and better categorize. Also make inquiry re: proxy and IP filtering using access module
 
+### Nginx Configuration ###
 
-### Buffer overflow attack prevention ###
+# Edit nginx.conf:
 
 vi /usr/local/nginx/conf/nginx.conf
  
-## Size Limits & Buffer Overflows ##
+## Size Limits & Buffer Overflows prevention ##
 
 client_body_buffer_size  1K;
 client_header_buffer_size 1k;
@@ -196,27 +200,33 @@ client_header_timeout 10;
 keepalive_timeout     5 5;
 send_timeout          10;
 
-#### Control Simultaneous Connections ####  
-
-# Edit nginx.conf:
+### Control Simultaneous Connections #### 
 
 limit_zone slimits $binary_remote_addr 5m;
- 
+
 # Control maximum number of simultaneous connections for one session i.e.
 
 limit_conn slimits 5;
 
-#### Limit domain access ####  
-
-# Only requests to our Host are allowed 
+# Limit domain access and mehods
 
 server {
-(...)
-	 if ($host !~ ^(INSERT OUR HOST HERE)$ ) {
-	 return 444;
+
+if ($host !~ ^(INSERT OUR HOST HERE)$ ) {return 444
 }
 
-# Restricting HTTP Methods?
+if ($request_method !~ ^(GET|HEAD|POST)$ ) {return 444;}
+}
 
-Insert here if needed
 
+## Block download agents do we want to prevent scraping? ##
+
+if ($http_user_agent ~* LWP::Simple|BBBike|wget) {return 403;
+}
+
+Block robots called msnbot and scrapbot:
+
+## Block some robots ##
+     if ($http_user_agent ~* msnbot|scrapbot) {
+            return 403;
+     }
