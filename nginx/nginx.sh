@@ -200,33 +200,40 @@ client_header_timeout 10;
 keepalive_timeout     5 5;
 send_timeout          10;
 
-### Control Simultaneous Connections #### 
-
-limit_zone slimits $binary_remote_addr 5m;
-
 # Control maximum number of simultaneous connections for one session i.e.
 
+limit_zone slimits $binary_remote_addr 5m;
 limit_conn slimits 5;
 
-# Limit domain access and mehods
+## START Server context changes
 
 server {
 
-if ($host !~ ^(INSERT OUR HOST HERE)$ ) {return 444
+# Domain access
+
+	if ($host !~ ^(INSERT OUR HOST HERE)$ ) {return 444
+	}
+
+# Methods
+
+	if ($request_method !~ ^(GET|HEAD|POST)$ ) {return 444;}
+	}
+
+# Terminal access - do we want to block?
+
+	if ($http_user_agent ~* LWP::Simple|BBBike|wget) {return 403;
+	}
 }
 
-if ($request_method !~ ^(GET|HEAD|POST)$ ) {return 444;}
+## END Server context changes
+
+## START Location context changes
+
+# Prevent image hotlinking - ref http://nginx.org/en/docs/http/ngx_http_referer_module.html
+
+location ~ .(gif|png|jpe?g)$ {
+	valid_referers none blocked; 
+	if ($invalid_referer) {
+	return   403;
+	}
 }
-
-
-## Block download agents do we want to prevent scraping? ##
-
-if ($http_user_agent ~* LWP::Simple|BBBike|wget) {return 403;
-}
-
-Block robots called msnbot and scrapbot:
-
-## Block some robots ##
-     if ($http_user_agent ~* msnbot|scrapbot) {
-            return 403;
-     }
