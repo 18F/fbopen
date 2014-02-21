@@ -15,7 +15,7 @@ Then someone realized we didn't have to limit this server to FBO data. There's a
 * Get the API server up and running. See the README.md in `/api`.
 * Load data into the search index using the import tools in `/loaders` -- or roll your own, ~~or use the API's POST `/v0/opp` to post opportunities one at a time~~ (POST functionality is temporarily disabled).
 * To run a simple query web page, try the sample app in `/sample-www`.
-** A quick and easy way to access this page at localhost, provided you have Python installed, is to `cd` to the `/sample-www` directory and run: `python -m SimpleHTTPServer`. By default, you'll then be able to access the client at http://localhost:8000
+  * A quick and easy way to access this page at localhost, provided you have Python installed, is to `cd` to the `/sample-www` directory and run: `python -m SimpleHTTPServer`. By default, you'll then be able to access the client at http://localhost:8000
 
 ### Examples
 * The BusinessUSA PIF team coded up a sample form specifically geared toward submitting or tweaking SBIR solicitations in FBOpen. The relevant code can be found here: [https://github.com/GSA-OCSIT/hyabusa](https://github.com/GSA-OCSIT/hyabusa). Hyabusa is a test-bed Rails 4 app, and includes several other mini-applications, so look for the SbirSolicitationsController and [related views](https://github.com/GSA-OCSIT/hyabusa/tree/master/app/views/sbir_solicitations).
