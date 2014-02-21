@@ -4,6 +4,35 @@
 
 #### Security Enhanced Linux (SELinux setup) ####
 
+# Install SELinux
+
+yum install policycoreutils setroubleshoot
+vi /etc/selinux/config
+
+# Update SELinux config
+
+vi /etc/selinux/config
+SELINUX=permissive
+SELINUXTYPE=targeted
+
+# Reboot. Check for errors:
+
+grep "SELinux is preventing" /var/log/messages
+
+# If none...
+
+vi /etc/selinux/config
+SELINUX=enforcing
+SELINUXTYPE=targeted
+
+# Make sure Grub is not turning SELinux off
+
+egrep -i 'selinux=0|enforcing=0' /boot/grub/grub.conf
+
+# Quick check to make sure it's running
+
+sestatus
+
 # By default SELinux will not protect the nginx web server. However, you can install and compile protection as follows. Assumes SELinux is already installed and in enforcing mode:
 
 yum -y install selinux-policy-targeted selinux-policy-devel
