@@ -16,7 +16,7 @@ As of 2014-03-12, we're live at https://fbopen.gsa.gov .
 * Get the API server up and running. See the README.md in `/api`.
 * Load data into the search index using the import tools in `/loaders` -- or roll your own, ~~or use the API's POST `/v0/opp` to post opportunities one at a time~~ (POST functionality is temporarily disabled).
 * To run a simple query web page, try the sample app in `/sample-www`.
-** A quick and easy way to access this page at localhost, provided you have Python installed, is to `cd` to the `/sample-www` directory and run: `python -m SimpleHTTPServer`. By default, you'll then be able to access the client at http://localhost:8000
+  * A quick and easy way to access this page at localhost, provided you have Python installed, is to `cd` to the `/sample-www` directory and run: `python -m SimpleHTTPServer`. By default, you'll then be able to access the client at http://localhost:8000
 
 ### Examples
 * You can add an FBOpen query to any HTML page by just copying and pasting a snippet of JavaScript with our [FBOpen Widget Maker](http://18f.github.io/fbopen-widget/).
