@@ -11,7 +11,9 @@ Then someone realized we didn't have to limit this server to FBO data. There's a
 
 
 ### How to get started
-* Start by installing Elasticsearch. FBOpen requires at least version 1.0.0.
+* Clone this repo.
+* This repo has an external dependency on another git repo, which needs to be populated at first, so `cd` to the repo and run: `git submodule update --init --recursive`.
+* Then install Elasticsearch. FBOpen requires at least version 1.0.0.
 * Get the API server up and running. See the README.md in `/api`.
 * Load data into the search index using the import tools in `/loaders` -- or roll your own, ~~or use the API's POST `/v0/opp` to post opportunities one at a time~~ (POST functionality is temporarily disabled).
 * To run a simple query web page, try the sample app in `/sample-www`.
