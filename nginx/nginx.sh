@@ -1,4 +1,4 @@
-#### !!! WORK IN PROGRESS !!! ####
+##### **!!! WORK IN PROGRESS !!!** #####
 
 #!/bin/bash
 
@@ -15,11 +15,11 @@ vi /etc/selinux/config
 SELINUX=permissive
 SELINUXTYPE=targeted
 
-# Reboot. Check for errors:
+# Reboot. Check for errors.
 
 grep "SELinux is preventing" /var/log/messages
 
-# If none...
+# If none:
 
 vi /etc/selinux/config
 SELINUX=enforcing
@@ -162,10 +162,6 @@ $IPT -A INPUT -i ${PUB_IF} -p udp --sport 123 -m state --state ESTABLISHED -j AC
 $IPT -A OUTPUT -o ${PUB_IF} -p tcp --dport 25 -m state --state NEW,ESTABLISHED -j ACCEPT
 $IPT -A INPUT -i ${PUB_IF} -p tcp --sport 25 -m state --state ESTABLISHED -j ACCEPT
  
-### add other rules here ####
- 
-#######################
-
 # drop and log everything else
 $IPT -A INPUT -m limit --limit 5/m --limit-burst 7 -j LOG --log-prefix " DEFAULT DROP "
 $IPT -A INPUT -j DROP
@@ -173,7 +169,16 @@ $IPT -A INPUT -j DROP
 exit 0
 
 
-#### Buffer overflow attack prevention ####
+#### NGINX ####
+
+# Since we are compiling nginx, we should not build modules we don't need to reduce the attack surface. ref: http://wiki.nginx.org/Modules 
+
+./configure --without-http_empty_gif_module --without-http_geo_module --without-http_gzip_module --without-http_limit_conn_module --without-http_map_module --without-http_ssi_module --without-http_split_clients_module --without-http_scgi_module --without-http_rewrite_module --without-http_proxy_module --without-http_referer_module --without-http_userid_module
+
+## Note to self: shoud split above and better categorize. Also make inquiry re: proxy and IP filtering using access module
+
+
+### Buffer overflow attack prevention ###
 
 vi /usr/local/nginx/conf/nginx.conf
  
