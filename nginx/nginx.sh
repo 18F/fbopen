@@ -166,11 +166,14 @@ $IPT -A INPUT -i ${PUB_IF} -p tcp --sport 25 -m state --state ESTABLISHED -j ACC
 $IPT -A INPUT -m limit --limit 5/m --limit-burst 7 -j LOG --log-prefix " DEFAULT DROP "
 $IPT -A INPUT -j DROP
  
+# Drop IPs that make > 15 connections in < 60 secs 
+
+$IPT -A INPUT -p tcp --dport 80 -i eth0 -m state --state NEW -m recent --set
+$IPT -A INPUT -p tcp --dport 80 -i eth0 -m state --state NEW -m recent --update --seconds 60  --hitcount 15 -j DROP service iptables save
+
 exit 0
 
-
 #### NGINX ####
-
 
 ### Nginx Build ###
 
