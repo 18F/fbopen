@@ -42,9 +42,6 @@ if (config.app.require_http_basic_auth) {
 var solr_client = solr.createClient();
 solr_client.autoCommit = true; // Switch on "auto commit"
 
-// Require Helmet middleware for security headers
-var helmet = require('helmet');
-
 // all environments
 // (express.js standard scaffolding -- see http://expressjs.com/guide.html#executable )
 // some of this is unused/overkill at the moment
@@ -57,7 +54,6 @@ app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.cookieParser('your secret here'));
 app.use(express.session());
-app.use(helmet.xframe('deny'));
 app.use(app.router);
 app.use(require('less-middleware')({ src: __dirname + '/public' }));
 app.use(express.static(path.join(__dirname, 'public')));
