@@ -11,38 +11,50 @@ Since we are compiling nginx, we should not build modules we don't need to reduc
 
 ## HTTP Context
 
-Edit nginx.conf:
+Within: 
 
-    vi /usr/local/nginx/conf/nginx.conf
+	http {
+	(...)
+	}
+
+Add the following.
  
 ### Size Limits & Buffer Overflows prevention
 
-'''
-client_body_buffer_size  1K;
-client_header_buffer_size 1k;
-client_max_body_size 1k;
-large_client_header_buffers 2 1k;
-'''
+
+	client_body_buffer_size  1K;
+	client_header_buffer_size 1k;
+	client_max_body_size 1k;
+	large_client_header_buffers 2 1k;
+
 
 ### Timeouts
 
-'''
-client_body_timeout   10;
-client_header_timeout 10;
-keepalive_timeout     5 5;
-send_timeout          10;
-'''
+
+	client_body_timeout   10;
+	client_header_timeout 10;
+	keepalive_timeout     5 5;
+	send_timeout          10;
+
 
 ### Control maximum number of simultaneous connections for one session i.e.
 
-'''
-limit_zone slimits $binary_remote_addr 5m;
-limit_conn slimits 5;
-'''
+
+	limit_zone slimits $binary_remote_addr 5m;
+	limit_conn slimits 5;
+
 
 ## Server context changes
 
-server {
+Within:
+
+
+	server {
+	(...)
+	}
+
+
+Add the following.
 
 ### Domain access
 
@@ -64,9 +76,9 @@ server {
 
 Prevent image hotlinking - ref: http://nginx.org/en/docs/http/ngx_http_referer_module.html
 
-location ~ .(gif|png|jpe?g)$ {
-	valid_referers none blocked; 
-	if ($invalid_referer) {
-	return   403;
+	location ~ .(gif|png|jpe?g)$ {
+		valid_referers none blocked; 
+		if ($invalid_referer) {
+		return   403;
+		}
 	}
-}
