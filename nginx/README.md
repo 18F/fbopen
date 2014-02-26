@@ -45,6 +45,9 @@ Add the following.
 	limit_zone slimits $binary_remote_addr 5m;
 	limit_conn slimits 5;
 
+### Prevent framing
+
+	add_header X-Frame-Options DENY;
 
 ## Server context changes
 
