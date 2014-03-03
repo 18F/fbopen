@@ -142,9 +142,6 @@
   
   Backbone.history.start();
 
-
-
-
   function do_search(opps, search_params) {
 
     // tweak params for API call
@@ -157,6 +154,14 @@
     if (search_params['p']) { // api server numbers results, not pages
       search_params['start'] = (search_params['p'] - 1) * PAGESIZE;
     }
+
+    var render_error = function (err) {
+      dust.render('error', {}, function (err, out) {
+        // console.log(err);
+        $('#results-list').html(out);
+        $('#results-container').show();
+      });
+    };
 
     opps.fetch({
       data: $.param(search_params),
@@ -172,8 +177,7 @@
         dust.render('result', results, function(err, out) {
 
           if (err) {
-            // console.log('Error: ' + err);
-            $('#results-list').html('<h4>Sorry, that search didn\'t work.');
+              render_error(err);
           } else {
             // display the results
             $('#results-list').html(out);
@@ -193,11 +197,12 @@
           });
 
         });
-      }
+      },
+      // NOTE: this call to render_error will catch issues with accessing the API
+      error: render_error
     });
 
   } // do_search()
-
 
 
   // DUST TEMPLATE HELPERS
