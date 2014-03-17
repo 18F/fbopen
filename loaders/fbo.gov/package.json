@@ -16,5 +16,6 @@
 		, "moment": "*"
     , "solr-client": "*"
     , "event-stream": "*"
+    , "date-format-lite": "*"
   }
 }
