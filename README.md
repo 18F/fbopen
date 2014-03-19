@@ -9,6 +9,7 @@ Underneath the Google-style query page (`/sample-www`), we built a simple REST A
 
 Then someone realized we didn't have to limit this server to FBO data. There's a second sample data loader that can be used to load data nightly from [grants.gov](http://www.grants.gov), and the API allows you to post opportunities, too.
 
+As of 2014-03-12, we're live at https://fbopen.gsa.gov .
 
 ### How to get started
 * Clone this repo.
@@ -25,6 +26,9 @@ Then someone realized we didn't have to limit this server to FBO data. There's a
 
 ### Caveat
 This project is brand new and very incomplete. No guarantees of data completeness or functionality are implied or should be assumed. There is lots to do!
+
+### Who
+FBopen is a joint project of [18F](https://18f.gsa.gov), the [Presidential Innovation Fellowship](http://whitehouse.gov/innovationfellows), and the [GSA](http://www.gsa.gov) [Integrated Award Environment](http://www.gsa.gov/iae).
 
 ### License
 This project constitutes an original work of the United States Government. This is free and unencumbered software released into the public domain. See the LICENSE file for more.

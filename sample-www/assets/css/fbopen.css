@@ -26,7 +26,7 @@ body {
 	margin: 1em;
 }
 
-#github-link, #twitter-link {
+#github-link, #twitter-link, #email-link {
 	width: 33px;
 	height: 35px;
 	margin: 10px;
@@ -34,7 +34,7 @@ body {
   background-position: 0 2px;
   background-repeat: no-repeat;
 }
-#github-link:hover, #twitter-link:hover {
+#github-link:hover, #twitter-link:hover, #email-link:hover {
   background-position: left bottom;
 }
 
@@ -44,7 +44,9 @@ body {
 #twitter-link {
 	background-image: url('../images/FBOpen-socialicon-twitter.png');
 }
-
+#email-link {
+  background-image: url('../images/FBOpen-socialicon-email.png');
+}
 
 
 h1, .logo {
