@@ -6,6 +6,8 @@ var config = {};
 
 config.app = {};
 
+config.app.max_rows = 1000;
+
 // allow or prohibit write operations (POST, PUT, DELETE)?
 config.app.read_only = true;
 

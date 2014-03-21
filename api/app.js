@@ -154,6 +154,15 @@ app.get('/v0/opps', function(req, res) {
 		misc_params += '&start=' + url_parts.query['start'];
 	}
 
+	if (url_parts.query['limit']) {
+        if (parseInt(url_parts.query['limit']) <= config.app.max_rows) {
+            misc_params += '&rows=' + url_parts.query['limit'];
+            // AKR NOTE: I'd prefer not to silently drop the param if it's over the max limit,
+            // but without some rearchitecting, we don't have a way to return an error message
+            // to the client based on this
+        }
+    }
+
 	// let caller trim down which fields are returned
 	// (TO DO: allow for other (all?) non-default params)
 	var fieldlist;
