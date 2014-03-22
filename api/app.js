@@ -142,6 +142,16 @@ app.get('/v0/opps', function(req, res) {
 		}
 	}
 
+	// filter by agency
+	var agency = url_parts.query['agency'];
+	if (agency != undefined && agency != '') {
+		if (q_param != '') {
+			fq_param = fq_param + '&fq=agency:' + agency;
+		} else {
+			q_param = '&q=agency:' + agency;
+		}
+	}
+
 	var misc_params = '';
 	// special case: request only the parent of a specific document
 	// (for quickly pulling information about an attachment's parent solicitation)
