@@ -1,6 +1,9 @@
 #!/bin/bash
 
-# takes three arguments:
+# immediately fail with error code if there is a problem
+set -e
+
+# takes three arguments, plus an optional fourth:
 #   the path to the file to index,
 #   the id for the attachment
 #   the parent solnbr
@@ -9,6 +12,8 @@
 fbopen_root=${FBOPEN_ROOT:?"You must define FBOPEN_ROOT to point to your root FBOpen directory."}
 fbopen_uri=${FBOPEN_URI:?"You must define FBOPEN_URI to point to your Elasticsearch instance."}
 fbopen_index=${FBOPEN_INDEX:?"You must define FBOPEN_INDEX to point to your Elasticsearch index."}
+
+echo "Starting the attachment loader..."
 
 file=$(openssl base64 -in $1)
 name=$(basename $1)
@@ -21,7 +26,6 @@ if [[ $# -eq 4 ]]; then
     echo $4 >> $tmpfile
     echo "Merging the JSON..."
     full_json="$(cat $tmpfile | json --merge)"
-    echo "Done."
     rm $tmpfile
 else
     full_json=$json
