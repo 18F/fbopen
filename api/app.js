@@ -142,6 +142,16 @@ app.get('/v0/opps', function(req, res) {
 		}
 	}
 
+	// filter by agency
+	var agency = url_parts.query['agency'];
+	if (agency != undefined && agency != '') {
+		if (q_param != '') {
+			fq_param = fq_param + '&fq=agency:' + agency;
+		} else {
+			q_param = '&q=agency:' + agency;
+		}
+	}
+
 	var misc_params = '';
 	// special case: request only the parent of a specific document
 	// (for quickly pulling information about an attachment's parent solicitation)
@@ -264,7 +274,30 @@ function flat_list_to_json(flat_list) {
 	return list_out;
 }
 
+// generate an iCalendar file on the fly
+app.get('/v0/ics', function(req, res, next){
 
+	var url_parts = url.parse(req.url, true);
+	res.writeHead(200, {'Content-Type': 'text/calendar'});
+
+	var ics_content = "BEGIN:VCALENDAR\
+\nVERSION:2.0\
+\nPRODID:-//FBOpen//GSA//EN\
+\nX-WR-TIMEZONE:America/New_York\
+\nBEGIN:VEVENT\
+\nUID:"+url_parts.query['uid']+"@"+config.solr.base_url+"\
+\nDTSTART;VALUE=DATE:"+url_parts.query['start']+"\
+\nDTEND;VALUE=DATE:"+url_parts.query['end']+"\
+\nSUMMARY:"+url_parts.query['title']+"\
+\nDESCRIPTION:"+url_parts.query['description']+"\
+\nLOCATION:"+url_parts.query['location']+"\
+\nEND:VEVENT\
+\nEND:VCALENDAR"
+		
+	res.write(ics_content)
+	res.end()
+
+})
 
 // Allow POST operations only according to configuration
 app.post('*', function(req, res, next) {
