@@ -157,9 +157,9 @@ app.get('/v0/opps', function(req, res) {
 	if (url_parts.query['limit']) {
         if (parseInt(url_parts.query['limit']) <= config.app.max_rows) {
             misc_params += '&rows=' + url_parts.query['limit'];
-            // AKR NOTE: I'd prefer not to silently drop the param if it's over the max limit,
-            // but without some rearchitecting, we don't have a way to return an error message
-            // to the client based on this
+        } else {
+			res.json(400, { error: 'Sorry, param "limit" must be <= ' + config.app.max_rows });
+            return;
         }
     }
 
