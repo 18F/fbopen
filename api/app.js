@@ -169,6 +169,15 @@ app.get('/v0/opps', function(req, res) {
     //     search_settings.body.from = url_parts.query['from'];
 	// }
 
+	// if (url_parts.query['limit']) {
+    //     if (parseInt(url_parts.query['limit']) <= config.app.max_rows) {
+    //         misc_params += '&rows=' + url_parts.query['limit'];
+    //     } else {
+	// 		res.json(400, { error: 'Sorry, param "limit" must be <= ' + config.app.max_rows });
+    //         return;
+    //     }
+    // }
+
 	// // let caller trim down which fields are returned
 	// // (TO DO: allow for other (all?) non-default params)
 	// var fieldlist;
