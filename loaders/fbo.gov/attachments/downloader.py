@@ -7,7 +7,7 @@ import scrapelib
 import shelve
 
 
-class AttachmentDownloader(object):
+class AttachmentDownloader(AttachmentsBase):
 
     def __init__(self, *args, **kwargs):
         self.curr_shelf_file = kwargs.get('shelf', 'attach_dl_queue')
@@ -44,11 +44,7 @@ class AttachmentDownloader(object):
 
     def create_dir_by_solnbr(self, solnbr):
         sol_dir = self.dir_for_solnbr(solnbr)
-        if not os.path.isdir(sol_dir):
-            self.log.info("Creating directory for {} as it doesn't exist already".format(solnbr))
-            os.makedirs(sol_dir)
-        else:
-            self.log.info("Directory for {} already existed".format(solnbr))
+        self.create_dir(soldir)
 
     def dir_for_solnbr(self, solnbr):
         return os.path.join(self.dl_dir, solnbr)
