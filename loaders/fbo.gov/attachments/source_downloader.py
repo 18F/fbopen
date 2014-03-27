@@ -4,7 +4,7 @@ import scrapelib
 import sys
 
 
-class OpportunityDownloader(object):
+class SourceDownloader(object):
     '''
     This class downloads the opportunity source HTML to support later steps
     of link extraction and download.
@@ -16,7 +16,7 @@ class OpportunityDownloader(object):
         self.urls = kwargs.get('url')
         self.urls_file = kwargs.get('file')
 
-        self.log = log.set_up_logger('opportunity_downloader')
+        self.log = log.set_up_logger('source_downloader')
 
     def run(self):
         self.log.info("Starting...")
@@ -43,8 +43,5 @@ class OpportunityDownloader(object):
         
 
 if __name__ == '__main__':
-    #parser = argparse.ArgumentParser(description='Get the attachment URLs from a source URL (opportunity)')
-    #parser.add_argument('-u', '--url', nargs=1, action= 'store', 
-    #parser.parse_args()
-    retriever = OpportunityDownloader(file=sys.argv[1])
+    retriever = SourceDownloader(file=sys.argv[1])
     retriever.run()
