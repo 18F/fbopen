@@ -35,16 +35,16 @@ class SourceDownloader(AttachmentsBase):
         # this should eventually move up the pike
         self.import_dir = self.create_import_dir()
 
-        for url in self.urls:
-            self.get_source(url)
+        self.get_sources()
 
-    def get_source(self, url):
+    def get_sources(self):
+
         s = scrapelib.Scraper(requests_per_minute=30, follow_robots=True)
 
-        # TODO: this should end up in a predictable spot
-        filename, response = s.urlretrieve(url)
-        print(filename)
-        print(response)
+        for url in self.urls:
+            filename, response = s.urlretrieve(url, dir=self.import_dir)
+            print(filename)
+            print(response)
         
 
 if __name__ == '__main__':
