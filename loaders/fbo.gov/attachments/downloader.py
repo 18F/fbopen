@@ -8,10 +8,13 @@ import shelve
 
 
 class AttachmentDownloader(AttachmentsBase):
+    '''
+    This class downloads the attachment files. Requires a shelf file populated
+    with URLs from link_extractor.py.
+    '''
 
     def __init__(self, *args, **kwargs):
-        self.curr_shelf_file = kwargs.get('shelf', 'attach_dl_queue')
-        self.next_shelf_file = 'loader_queue'
+        self.shelf_file = kwargs.get('shelf', 'attach_meta')
         self.dl_dir = kwargs.get('dl_dir', 'py_dls')
 
         self.log = log.set_up_logger('downloader')
