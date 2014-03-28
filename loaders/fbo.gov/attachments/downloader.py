@@ -30,20 +30,19 @@ class AttachmentDownloader(AttachmentsBase):
     def download_files(self):
         s = scrapelib.Scraper(requests_per_minute=120, follow_robots=False)
 
-        with closing(shelve.open(self.curr_shelf_file)) as attach_dl_queue:
-            with closing(shelve.open(self.next_shelf_file)) as loader_queue:
-                for key in attach_dl_queue:
-                    self.create_dir_by_solnbr(key)
+        with closing(shelve.open(self.shelf_file)) as db:
+            for key in db:
+                self.create_dir_by_solnbr(key)
 
-                    data = attach_dl_queue[key]
+                data = db[key]
 
-                    for attachment in data:
-                        self.log.info("Downloading file for {}: {}".format(attachment['filename'], attachment['desc']))
-                        filename, response = s.urlretrieve(attachment['url'], os.path.join(self.dir_for_solnbr(key), attachment['filename']))
-                        attachment['local_file_path'] = filename
+                for attachment in data:
+                    self.log.info("Downloading file for {}: {}".format(attachment['filename'], attachment['desc']))
+                    filename, response = s.urlretrieve(attachment['url'], os.path.join(self.dir_for_solnbr(key), attachment['filename']))
+                    attachment['local_file_path'] = filename
 
-                    loader_queue[key] = data
-                    del attach_dl_queue[key]
+                db[key]['dl_complete'] = True
+                db[key]['num_dl'] = len(attachment)
 
     def create_dir_by_solnbr(self, solnbr):
         sol_dir = self.dir_for_solnbr(solnbr)
