@@ -10,10 +10,16 @@ import sys
 
 
 class LinkExtractor(object):
+    '''
+    This class traverses a directory of opportunity source HTML and extracts
+    the attachment link URLs from each file.
+
+    It also instantiates a shelf file with metadata on the attachments.
+    '''
 
     def __init__(self, filepath, *args, **kwargs):
         self.filepath = filepath
-        self.shelf_file = 'attach_urls'
+        self.shelf_file = kwargs.get('shelf', 'attach_meta')
 
         self.doc = pq(filename=self.filepath)
         self.log = log.set_up_logger('link_extractor')

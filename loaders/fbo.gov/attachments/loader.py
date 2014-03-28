@@ -8,9 +8,15 @@ import shelve
 
 
 class AttachmentLoader(object):
+    '''
+    This class loads the attachment files, which have already
+    been downloaded by downloader.py, into Elasticsearch.
+
+    It requires a shelf file bearing attachment metadata.
+    '''
 
     def __init__(self, *args, **kwargs):
-        self.shelf = kwargs.get('shelf', 'loader_queue')
+        self.shelf = kwargs.get('shelf', 'attach_meta')
 
         self.log = log.set_up_logger('loader')
 
