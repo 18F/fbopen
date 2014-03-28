@@ -1,10 +1,12 @@
+from base import AttachmentsBase 
+
 import log
 import os
 import scrapelib
 import sys
 
 
-class SourceDownloader(object):
+class SourceDownloader(AttachmentsBase):
     '''
     This class downloads the opportunity source HTML to support later steps
     of link extraction and download.
@@ -29,6 +31,9 @@ class SourceDownloader(object):
             except IOError:
                 self.log.error("Could not open URLs file at path given. Exiting.")
                 exit()
+       
+        # this should eventually move up the pike
+        self.import_dir = self.create_import_dir()
 
         for url in self.urls:
             self.get_source(url)
