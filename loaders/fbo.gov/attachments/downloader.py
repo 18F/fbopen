@@ -1,7 +1,7 @@
 from base import AttachmentsBase
 from contextlib import closing
 
-import logging
+import log
 import os
 import os.path
 import scrapelib
@@ -18,7 +18,7 @@ class AttachmentDownloader(AttachmentsBase):
         self.shelf_file = kwargs.get('shelf', 'attach_meta')
         self.dl_dir = kwargs.get('dl_dir', 'py_dls')
 
-        self.log = log.set_up_logger('downloader')
+        self.log = log.set_up_logger('fbo_attch_imp.downloader')
 
     def run(self):
         self.log.info("Starting...")

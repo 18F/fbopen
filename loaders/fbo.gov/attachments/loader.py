@@ -18,7 +18,7 @@ class AttachmentLoader(object):
     def __init__(self, *args, **kwargs):
         self.shelf = kwargs.get('shelf', 'attach_meta')
 
-        self.log = log.set_up_logger('loader')
+        self.log = log.set_up_logger('fbo_attch_imp.loader')
 
     def run(self):
         self.log.info("Starting...")

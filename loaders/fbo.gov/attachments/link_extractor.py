@@ -18,12 +18,14 @@ class LinkExtractor(object):
     '''
 
     def __init__(self, filepath, *args, **kwargs):
+        self.fbo_base_url = 'https://www.fbo.gov'
+
         self.filepath = filepath
+        self.doc = pq(filename=self.filepath)
+
         self.shelf_file = kwargs.get('shelf', 'attach_meta')
 
-        self.doc = pq(filename=self.filepath)
-        self.log = log.set_up_logger('link_extractor')
-        self.fbo_base_url = 'https://www.fbo.gov'
+        self.log = log.set_up_logger('fbo_attch_imp.link_extractor')
 
     def run(self):
         self.log.info("Starting...")
@@ -69,5 +71,5 @@ class LinkExtractor(object):
 
 
 if __name__ == '__main__':
-    retriever = LinkExtractor(sys.argv[1])
-    retriever.run()
+    extractor = LinkExtractor(sys.argv[1])
+    extractor.run()
