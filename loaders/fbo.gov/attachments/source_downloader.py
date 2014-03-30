@@ -18,7 +18,7 @@ class SourceDownloader(AttachmentsBase):
         self.urls = kwargs.get('url')
         self.urls_file = kwargs.get('file')
 
-        self.log = log.set_up_logger('source_downloader')
+        self.log = log.set_up_logger('fbo_attch_imp.source_downloader')
 
     def run(self):
         self.log.info("Starting...")
@@ -43,8 +43,7 @@ class SourceDownloader(AttachmentsBase):
 
         for url in self.urls:
             filename, response = s.urlretrieve(url, dir=self.import_dir)
-            print(filename)
-            print(response)
+            self.log.debug("filename: {}, response: {}".format(filename, response))
         
 
 if __name__ == '__main__':
