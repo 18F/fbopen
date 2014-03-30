@@ -1,3 +1,4 @@
+from base import AttachmentsBase
 from contextlib import closing
 
 import logging
