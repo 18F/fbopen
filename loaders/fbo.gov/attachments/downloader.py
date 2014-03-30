@@ -47,7 +47,7 @@ class AttachmentDownloader(AttachmentsBase):
 
     def create_dir_by_solnbr(self, solnbr):
         sol_dir = self.dir_for_solnbr(solnbr)
-        self.create_dir(soldir)
+        self.create_dir(sol_dir)
 
     def dir_for_solnbr(self, solnbr):
         return os.path.join(self.dl_dir, solnbr)
