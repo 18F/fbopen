@@ -35,15 +35,17 @@ class AttachmentDownloader(AttachmentsBase):
             for key in db:
                 self.create_dir_by_solnbr(key)
 
-                data = db[key]
+                attachments = db[key]['attachments']
 
-                for attachment in data:
+                for (i,attachment) in enumerate(attachments):
                     self.log.info("Downloading file for {}: {}".format(attachment['filename'], attachment['desc']))
                     filename, response = s.urlretrieve(attachment['url'], os.path.join(self.dir_for_solnbr(key), attachment['filename']))
-                    attachment['local_file_path'] = filename
 
-                db[key]['dl_complete'] = True
-                db[key]['num_dl'] = len(attachment)
+                    attachment['local_file_path'] = filename
+                    # reassign attachment with the new local file path to the shelf
+                    db[key]['attachments'][i] = attachment
+
+                db[key]['meta'] = {'dl_complete': True, 'num_dl': len(attachment)}
 
     def create_dir_by_solnbr(self, solnbr):
         sol_dir = self.dir_for_solnbr(solnbr)

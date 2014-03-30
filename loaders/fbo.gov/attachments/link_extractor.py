@@ -43,7 +43,8 @@ class LinkExtractor(object):
         # set up shelf for resumability
         with closing(shelve.open(self.shelf_file)) as db:
 
-            db[self.solnbr] = self.collect_link_attrs()
+            db[self.solnbr] = {}
+            db[self.solnbr]['attachments'] = self.collect_link_attrs()
 
     def collect_link_attrs(self):
         '''
