@@ -15,28 +15,32 @@ class SourceDownloader(AttachmentsBase):
     '''
 
     def __init__(self, *args, **kwargs):
+        # TODO: note that until proper args are put in place,
+        # only passing in a file will work (see if __name___... part)
         self.urls = kwargs.get('url')
         self.urls_file = kwargs.get('file')
 
         self.log = log.set_up_logger('fbo_attch_imp.source_downloader')
 
-    def run(self):
-        self.log.info("Starting...")
+        self.import_dir = kwargs.get('dir', self.create_import_dir())
 
+    def run(self):
+        self.log.info("Starting: Source Downloader")
+
+        self.grab_urls_from_file()
+
+        self.get_sources()
+
+    def grab_urls_from_file(self):
         if self.urls_file:
             self.log.info("Getting URLs from file {}".format(self.urls_file))
             try:
-                with open(self.urls_file) as f:
+                with open(self.urls_file, 'r') as f:
                     self.urls = f.readlines()
             except IOError:
                 self.log.error("Could not open URLs file at path given. Exiting.")
                 exit()
        
-        # this should eventually move up the pike
-        self.import_dir = self.create_import_dir()
-
-        self.get_sources()
-
     def get_sources(self):
 
         s = scrapelib.Scraper(requests_per_minute=30, follow_robots=True)
