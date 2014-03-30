@@ -54,8 +54,5 @@ class AttachmentDownloader(AttachmentsBase):
 
 
 if __name__ == '__main__':
-    #parser = argparse.ArgumentParser(description='Get the attachment URLs from a source URL (opportunity)')
-    #parser.add_argument('-u', '--url', nargs=1, action= 'store', 
-    #parser.parse_args()
     retriever = AttachmentDownloader()
     retriever.run()
