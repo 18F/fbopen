@@ -1,6 +1,5 @@
 argh==0.24.1
 cssselect==0.9.1
-distribute==0.6.24
 invoke==0.7.0
 ipython==1.2.1
 lxml==3.3.3
