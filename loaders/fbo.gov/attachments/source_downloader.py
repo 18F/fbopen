@@ -13,16 +13,16 @@ class SourceDownloader(AttachmentsBase):
 
     Accepts either a single URL, or a file containing one URL per line.
     '''
+    module_name = 'fbo_attach_import.source_downloader'
 
     def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
         # TODO: note that until proper args are put in place,
         # only passing in a file will work (see if __name___... part)
         self.urls = kwargs.get('url')
         self.urls_file = kwargs.get('file')
 
-        self.log = log.set_up_logger('fbo_attch_imp.source_downloader')
-
-        self.import_dir = kwargs.get('dir', self.create_import_dir())
 
     def run(self):
         self.log.info("Starting: Source Downloader")
@@ -40,6 +40,9 @@ class SourceDownloader(AttachmentsBase):
             except IOError:
                 self.log.error("Could not open URLs file at path given. Exiting.")
                 exit()
+
+        else:
+            self.log.fatal("URLs file was not provided.")
        
     def get_sources(self):
 
@@ -51,5 +54,5 @@ class SourceDownloader(AttachmentsBase):
         
 
 if __name__ == '__main__':
-    retriever = SourceDownloader(file=sys.argv[1])
+    retriever = SourceDownloader(file=sys.argv[1], dir=sys.argv[2])
     retriever.run()
