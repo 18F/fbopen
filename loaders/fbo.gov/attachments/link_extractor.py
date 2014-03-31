@@ -1,3 +1,4 @@
+from base import AttachmentsBase
 from contextlib import closing
 from pyquery import PyQuery as pq
 from urllib.parse import urljoin
@@ -9,7 +10,7 @@ import shelve
 import sys
 
 
-class LinkExtractor(object):
+class LinkExtractor(AttachmentsBase):
     '''
     This class traverses a directory of opportunity source HTML and extracts
     the attachment link URLs from each file.
@@ -17,36 +18,41 @@ class LinkExtractor(object):
     It also instantiates a shelf file with metadata on the attachments.
     '''
 
-    def __init__(self, filepath, *args, **kwargs):
+    module_name = 'fbo_attach_importer.link_extractor'
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+
         self.fbo_base_url = 'https://www.fbo.gov'
-
-        self.filepath = filepath
-        self.doc = pq(filename=self.filepath)
-
-        self.shelf_file = kwargs.get('shelf', 'attach_meta')
-
-        self.log = log.set_up_logger('fbo_attch_imp.link_extractor')
 
     def run(self):
         self.log.info("Starting...")
 
-        self.log.info("Getting solicitation number (solnbr)")
-        self.solnbr = self.get_opp_solnbr()
+        for filename in os.listdir(self.import_dir):
+            self.log.info("Found {}, parsing with pyquery...".format(filename))
+            doc = pq(filename=os.path.join(self.import_dir, filename))
 
-        self.log.info("Extracting and saving the attachment URLs and metadata")
-        self.get_links()
+            solnbr = self.get_opp_solnbr(doc)
+            self.log.info("Pulled solicitation number (solnbr) {}".format(solnbr))
 
-    def get_opp_solnbr(self):
-        return self.doc('#dnf_class_values_procurement_notice__solicitation_number__widget').text().strip()
+            num_links = self.get_links(doc, solnbr)
+            self.log.info("Extracting and saving the attachment URLs and metadata. Found {}.".format(num_links))
 
-    def get_links(self):
-        # set up shelf for resumability
-        with closing(shelve.open(self.shelf_file)) as db:
+    def get_opp_solnbr(self, doc):
+        return doc('#dnf_class_values_procurement_notice__solicitation_number__widget').text().strip()
 
-            db[self.solnbr] = {}
-            db[self.solnbr]['attachments'] = self.collect_link_attrs()
+    def get_links(self, doc, solnbr):
+        '''
+        Parses the links from a doc. Returns the number of links found.
+        '''
+        with closing(shelve.open(os.path.join(self.import_dir, self.shelf_file))) as db:
+            db[solnbr] = {}
+            links = self.collect_link_attrs(doc)
+            db[solnbr] = {'attachments': links}
 
-    def collect_link_attrs(self):
+        return len(links)
+
+    def collect_link_attrs(self, doc):
         '''
         This would be the method to override if scraping a different site.
         It must return a list of dicts containing keys 'filename', 'url', and 'description'. Ala:
@@ -57,10 +63,12 @@ class LinkExtractor(object):
         '''
 
         attachments = []
-        for div in self.doc('div.notice_attachment_ro'):
+        for div in doc('div.notice_attachment_ro'):
             a = {}
             d = pq(div)
-            link_tag = d.find('div.file')('a')
+
+            # only in cases where it's a file upload to FBO, then there's a '.file' div
+            link_tag = d.find('div.file')('a') or d.find('div')('a')
 
             a['filename'] = link_tag.text().strip()
             a['url'] = urljoin(self.fbo_base_url, link_tag.attr('href'))
