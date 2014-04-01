@@ -46,7 +46,7 @@ class SourceDownloader(AttachmentsBase):
        
     def get_sources(self):
 
-        s = scrapelib.Scraper(requests_per_minute=30, follow_robots=True)
+        s = scrapelib.Scraper(requests_per_minute=120, follow_robots=True)
 
         for url in self.urls:
             filename, response = s.urlretrieve(url, dir=self.import_dir)
