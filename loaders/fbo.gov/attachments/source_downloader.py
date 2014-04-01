@@ -18,10 +18,10 @@ class SourceDownloader(AttachmentsBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        # TODO: note that until proper args are put in place,
-        # only passing in a file will work (see if __name___... part)
-        self.urls = kwargs.get('url')
         self.urls_file = kwargs.get('file')
+        self.resume_url = kwargs.get('resume_url')
+
+        self.req_per_min = 0 # 0 for unlimited
 
 
     def run(self):
@@ -38,23 +38,43 @@ class SourceDownloader(AttachmentsBase):
                 with open(self.urls_file, 'r') as f:
                     self.urls = f.readlines()
             except IOError:
-                self.log.error("Could not open URLs file at path given. Exiting.")
-                exit()
+                self.log.fatal("Could not open URLs file at path given. Exiting.")
+                sys.exit(1)
 
         else:
             self.log.fatal("URLs file was not provided.")
+            sys.exit(1)
        
     def get_sources(self):
 
-        s = scrapelib.Scraper(requests_per_minute=120, follow_robots=True)
+        s = scrapelib.Scraper(requests_per_minute=self.req_per_min, follow_robots=True)
+
+        at_resume_point = False
+        skipped = 0
 
         for url in self.urls:
+            url = url.strip()
+            if (not at_resume_point) and self.resume_url and self.resume_url.strip():
+                if url != self.resume_url.strip():
+                    skipped += 1
+                    continue
+                else:
+                    at_resume_point = True
+                    self.log.info("Resuming. Skipped {} URLs.".format(skipped))
+
             try:
                 filename, response = s.urlretrieve(url, dir=self.import_dir)
-                self.log.debug("filename: {}, response: {}".format(filename, response))
+                self.log.debug("{} stored at {}".format(url, os.path.basename(filename)))
+            except KeyboardInterrupt:
+                self._log_resume_info(url)
+            except SystemExit:
+                self._log_resume_info(url)
             except:
                 self.log.exception("Source couldn't be retrieved for {}".format(url))
                 continue
+
+    def _log_resume_info(self, url):
+        self.log.info("Resume download by adding --resume (-r) flag with last URL logged")
         
 
 if __name__ == '__main__':

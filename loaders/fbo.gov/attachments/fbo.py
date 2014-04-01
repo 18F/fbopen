@@ -23,6 +23,7 @@ class FBOAttachmentsImporter(AttachmentsBase):
         super().__init__(*args, **kwargs)
 
         self.urls_file = kwargs.get('file')
+        self.resume_url = kwargs.get('resume_url')
 
     def run(self, *args, **kwargs):
         self.log.info("Starting: FBO Attachments Importer")
@@ -38,7 +39,7 @@ class FBOAttachmentsImporter(AttachmentsBase):
         self.log.info("Done: FBO Attachments Importer")
 
     def source(self):
-        SourceDownloader(file=self.urls_file, dir=self.import_dir).run()
+        SourceDownloader(file=self.urls_file, dir=self.import_dir, resume_url=self.resume_url).run()
 
     def extract(self):
         LinkExtractor(dir=self.import_dir).run()
@@ -77,6 +78,7 @@ if __name__ == '__main__':
 
     parser_source = subparsers.add_parser('source', parents=[init_parser], help='download the solicitations\' source')
     parser_source.add_argument('-f', '--file', help='the file containing the links (one per line) to source files to download')
+    parser_source.add_argument('-r', '--resume-url', help='provide the downloader a URL to resume from')
 
     parser_extract = subparsers.add_parser('extract', parents=[init_parser], help='pull the links and metadata from the sources')
 
@@ -86,5 +88,5 @@ if __name__ == '__main__':
 
     args = vars(parser.parse_args())
 
-    importer = FBOAttachmentsImporter(file=args.get('file'), dir=args.get('dir'))
+    importer = FBOAttachmentsImporter(file=args.get('file'), dir=args.get('dir'), resume_url=args.get('resume_url'))
     getattr(importer, args.get('command'))()
