@@ -47,7 +47,7 @@ class SourceDownloader(AttachmentsBase):
        
     def get_sources(self):
 
-        s = scrapelib.Scraper(requests_per_minute=self.req_per_min, follow_robots=True)
+        s = scrapelib.Scraper(requests_per_minute=self.req_per_min, follow_robots=False)
 
         at_resume_point = False
         skipped = 0
