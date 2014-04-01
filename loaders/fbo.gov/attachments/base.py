@@ -14,6 +14,8 @@ class AttachmentsBase(object):
 
         if not self.import_dir:
             self.import_dir = self.create_import_dir()
+        else:
+            self.log.debug('Using pre-existing import dir: {}'.format(self.import_dir))
 
         self.shelf_file = kwargs.get('shelf', 'attach_meta')
 

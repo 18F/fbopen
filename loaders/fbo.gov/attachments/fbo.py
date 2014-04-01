@@ -5,8 +5,9 @@ from source_downloader import SourceDownloader
 from base import AttachmentsBase
 from log import set_up_logger
 
-from argh import ArghParser, arg
+import argparse
 import os
+import shutil
 import sys
 
 
@@ -21,58 +22,69 @@ class FBOAttachmentsImporter(AttachmentsBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        #self.urls = kwargs.get('url')
-        #self.urls_file = kwargs.get('file')
+        self.urls_file = kwargs.get('file')
 
-    def __iter__(self):
-        '''
-        Returns the class's available commands for ArghParser
-        '''
-        for i in ['run', 'load']: # add more methods here later
-            yield getattr(self, i)
-
-    @arg('--file', dest='urls_file', required=True, help='The file containing the links (one per line) to source files to download')
-    @arg('--dir', dest='import_dir')
-    @arg('-S', dest='get_source', action='store_false', help='Skip source download step.')
-    def run(self, urls_file=None, import_dir=None, get_source=True):
-        if import_dir:
-            self.import_dir = import_dir
-
+    def run(self, *args, **kwargs):
         self.log.info("Starting: FBO Attachments Importer")
 
-        # dl source
-        if get_source:
-            retriever = SourceDownloader(file=urls_file, dir=self.import_dir)
-            retriever.run()
+        self.source()
 
-        # extract links
-        extractor = LinkExtractor(dir=self.import_dir)
-        extractor.run()
+        self.extract()
 
-        # dl attachments
+        self.download()
+
         self.load()
-
-        # load
         
         self.log.info("Done: FBO Attachments Importer")
 
-    @arg('--dir', dest='import_dir')
-    def load(self, import_dir=None):
-        if import_dir:
-            self.import_dir = import_dir
+    def source(self):
+        SourceDownloader(file=self.urls_file, dir=self.import_dir).run()
 
+    def extract(self):
+        LinkExtractor(dir=self.import_dir).run()
+
+    def download(self):
+        AttachmentDownloader(dir=self.import_dir).run()
+
+    def load(self):
         AttachmentLoader(dir=self.import_dir).run()
 
-    # TODO: extract other bits into their own commands
-    # TODO: add cleanup command
     # TODO: pull all into a base class so we can reuse for other datasets
 
+    # TODO: keep this disabled until it's made a bit more safe
+    #@arg('--last-n', default=5, help="The number of the most recent import dirs to leave in place")
+    #def clean(self, *args, **kwargs):
+    #    attach_dirs = [ x for x in os.listdir('.') if x.startswith('attach_') ]
+    #    attach_dirs2 = sorted(attach_dirs, key=os.path.getmtime, reverse=True)
 
-parser = ArghParser()
-parser.add_commands(FBOAttachmentsImporter())
+    #    # add a print and stdin confirmation here
+    #    for dir in attach_dirs2[kwargs.get('last_n'):]:
+    #        self.log.info("Removing directory {}".format(dir))
+    #        shutil.rmtree(dir)
+
 
 
 if __name__ == '__main__':
-    parser.dispatch()
-    #importer = FBOAttachmentsImporter(file=sys.argv[1], dir=sys.argv[2])
-    #importer.run()
+    init_parser = argparse.ArgumentParser(add_help=False)
+    init_parser.add_argument('-d', '--dir', help='an existing import directory path to use-- good for resuming attachment retrieval')
+
+    parser = argparse.ArgumentParser(description='Run the FBO attachment import commands.')
+
+    subparsers = parser.add_subparsers(dest='command',  help='sub-command help')
+    
+    parser_run = subparsers.add_parser('run', parents=[init_parser], help='run all the commands')
+    parser_run.add_argument('-f', '--file', help='the file containing the links (one per line) to source files to download')
+
+    parser_source = subparsers.add_parser('source', parents=[init_parser], help='download the solicitations\' source')
+    parser_source.add_argument('-f', '--file', help='the file containing the links (one per line) to source files to download')
+
+    parser_extract = subparsers.add_parser('extract', parents=[init_parser], help='pull the links and metadata from the sources')
+
+    parser_dl = subparsers.add_parser('download', parents=[init_parser], help='download the attachment links')
+
+    parser_load = subparsers.add_parser('load', parents=[init_parser], help='load the attachments into Elasticsearch')
+
+    args = vars(parser.parse_args())
+
+    importer = FBOAttachmentsImporter(file=args.get('file'), dir=args.get('dir'))
+    getattr(importer, args.get('command'))()

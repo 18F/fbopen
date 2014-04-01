@@ -1,6 +1,7 @@
 import logging
 import logging.handlers
 import os.path
+import os
 
 
 class EncodingFormatter(logging.Formatter):
@@ -16,19 +17,23 @@ class EncodingFormatter(logging.Formatter):
         return result
 
 def set_up_logger(name):
-    # create logger
+    if not os.getenv('FBOPEN_LOGDIR'):
+        raise Exception("You must set FBOPEN_LOGDIR to the path to log to.")
+
     log = logging.getLogger(name)
     log.setLevel(logging.DEBUG)
     log.propagate = False
     formatter = logging.Formatter("%(asctime)s - %(name)s - %(levelname)s - %(message)s")
 
-    # create console handler and set level to debug
-    #ch = logging.FileHandler(os.path.join(log_path, name + '.log'))
-    if not log.handlers:
-        ch = logging.StreamHandler()
-        ch.setLevel(logging.DEBUG)
-        ch.setFormatter(formatter)
-        log.addHandler(ch)
+    ch = logging.StreamHandler()
+    ch.setLevel(logging.DEBUG)
+    ch.setFormatter(formatter)
+    log.addHandler(ch)
+
+    fh = logging.FileHandler(os.path.join(os.getenv('FBOPEN_LOGDIR'), 'fbo_attach.log'))
+    fh.setLevel(logging.DEBUG)
+    fh.setFormatter(formatter)
+    log.addHandler(fh)
 
     # # create email handler and set level to warn
     # if settings.LOGGING_EMAIL:
