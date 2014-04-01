@@ -22,6 +22,7 @@ class SourceDownloader(AttachmentsBase):
         self.resume_url = kwargs.get('resume_url')
 
         self.req_per_min = 0 # 0 for unlimited
+        self.chunk_max = 8
 
 
     def run(self):
@@ -47,11 +48,9 @@ class SourceDownloader(AttachmentsBase):
        
     def get_sources(self):
 
-        s = scrapelib.Scraper(requests_per_minute=self.req_per_min, follow_robots=False)
-
         at_resume_point = False
         skipped = 0
-
+        chunk_count = 0
         for url in self.urls:
             url = url.strip()
             if (not at_resume_point) and self.resume_url and self.resume_url.strip():
@@ -61,6 +60,12 @@ class SourceDownloader(AttachmentsBase):
                 else:
                     at_resume_point = True
                     self.log.info("Resuming. Skipped {} URLs.".format(skipped))
+
+
+            if not chunk_count % self.chunk_max:
+                s = self._new_scrape_session()
+
+            chunk_count += 1
 
             try:
                 filename, response = s.urlretrieve(url, dir=self.import_dir)
@@ -75,6 +80,9 @@ class SourceDownloader(AttachmentsBase):
 
     def _log_resume_info(self, url):
         self.log.info("Resume download by adding --resume (-r) flag with last URL logged")
+
+    def _new_scrape_session(self):
+        return scrapelib.Scraper(requests_per_minute=self.req_per_min, follow_robots=False)
         
 
 if __name__ == '__main__':
