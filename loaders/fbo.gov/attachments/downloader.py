@@ -47,7 +47,7 @@ class AttachmentDownloader(AttachmentsBase):
                         attachment.update({'local_file_path': filename})
                         attachments[i] = attachment
                     except:
-                        self.log.exception("Attachment couldn't be retrieved for unknown reasons. Continuing.")
+                        self.log.exception("Attachment couldn't be retrieved for unknown reasons. URL: {} Continuing.".format(attachment['url']))
                         continue
 
                 meta = {'dl_complete': True, 'num_dl': len(attachments)}
