@@ -68,6 +68,7 @@ class FBOAttachmentsImporter(AttachmentsBase):
 if __name__ == '__main__':
     init_parser = argparse.ArgumentParser(add_help=False)
     init_parser.add_argument('-d', '--dir', help='an existing import directory path to use-- good for resuming attachment retrieval')
+    init_parser.add_argument('-r', '--resume-url', help='provide the downloader a URL to resume from')
 
     parser = argparse.ArgumentParser(description='Run the FBO attachment import commands.')
 
@@ -77,13 +78,8 @@ if __name__ == '__main__':
     parser_run.add_argument('-f', '--file', help='the file containing the links (one per line) to source files to download')
 
     parser_source = subparsers.add_parser('source', parents=[init_parser], help='download the solicitations\' source')
-    parser_source.add_argument('-f', '--file', help='the file containing the links (one per line) to source files to download')
-    parser_source.add_argument('-r', '--resume-url', help='provide the downloader a URL to resume from')
-
     parser_extract = subparsers.add_parser('extract', parents=[init_parser], help='pull the links and metadata from the sources')
-
     parser_dl = subparsers.add_parser('download', parents=[init_parser], help='download the attachment links')
-
     parser_load = subparsers.add_parser('load', parents=[init_parser], help='load the attachments into Elasticsearch')
 
     args = vars(parser.parse_args())
