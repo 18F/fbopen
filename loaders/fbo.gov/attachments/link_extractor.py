@@ -29,14 +29,16 @@ class LinkExtractor(AttachmentsBase):
         self.log.info("Starting...")
 
         for filename in os.listdir(self.import_dir):
-            self.log.info("Found {}, parsing with pyquery...".format(filename))
-            doc = pq(filename=os.path.join(self.import_dir, filename))
+            # don't try to parse the shelf file!
+            if filename != '{}.db'.format(self.shelf_file):
+                self.log.info("Found {}, parsing with pyquery...".format(filename))
+                doc = pq(filename=os.path.join(self.import_dir, filename))
 
-            solnbr = self.get_opp_solnbr(doc)
-            self.log.info("Pulled solicitation number (solnbr) {}".format(solnbr))
+                solnbr = self.get_opp_solnbr(doc)
+                self.log.info("Pulled solicitation number (solnbr) {}".format(solnbr))
 
-            num_links = self.get_links(doc, solnbr)
-            self.log.info("Extracting and saving the attachment URLs and metadata. Found {}.".format(num_links))
+                num_links = self.get_links(doc, solnbr)
+                self.log.info("Extracting and saving the attachment URLs and metadata. Found {}.".format(num_links))
 
     def get_opp_solnbr(self, doc):
         return doc('#dnf_class_values_procurement_notice__solicitation_number__widget').text().strip()
