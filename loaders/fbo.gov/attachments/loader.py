@@ -49,6 +49,11 @@ class AttachmentLoader(AttachmentsBase):
                 self.log.info("Pulled solnbr {}".format(key))
                 record = db[key]
                 for (i,a) in enumerate(record['attachments']):
+
+                    # skip the ones that weren't successful downloads
+                    if (not a.get('local_file_path')) or a.get('exception'):
+                        continue
+
                     n += 1
                     attach_id = self.get_attachment_id(key, i)
 

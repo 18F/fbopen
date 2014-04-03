@@ -62,6 +62,8 @@ class LinkExtractor(AttachmentsBase):
             { 'filename': 'example1.txt', 'url': 'http://example.com/example1.txt', 'description': 'Just some file' },
             { 'filename': 'example2.doc', 'url': 'http://example.com/example2.doc', 'description': 'Some word doc' },
         ]
+        'filename' can be left as None, but it should be defined. This will help indicate that we have some
+        more special processing to do, later down the line, than to just download a URL.
         '''
 
         attachments = []
@@ -72,11 +74,24 @@ class LinkExtractor(AttachmentsBase):
             # only in cases where it's a file upload to FBO, then there's a '.file' div
             link_tag = d.find('div.file')('a') or d.find('div')('a')
 
-            a['filename'] = link_tag.text().strip()
-            a['url'] = urljoin(self.fbo_base_url, link_tag.attr('href'))
-            a['desc'] = d.find('span.label').closest('div').remove('span').text().strip()
+            a = {
+                'filename': link_tag.text().strip(),
+                'url': urljoin(self.fbo_base_url, link_tag.attr('href')),
+                'desc': d.find('span.label').closest('div').remove('span').text().strip(),
+            }
 
             attachments.append(a)
+
+        if not attachments: # keep looking
+            addl_info_link = doc('div#dnf_class_values_procurement_notice__additional_info_link__widget')('a')
+            if addl_info_link:
+                a = {
+                    'filename': None,
+                    'url': addl_info_link.attr('href'),
+                    'desc': addl_info_link.text().strip(),
+                }
+
+                attachments.append(a)
 
         return attachments
 
