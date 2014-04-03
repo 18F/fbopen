@@ -30,7 +30,7 @@ class LinkExtractor(AttachmentsBase):
 
         for filename in os.listdir(self.import_dir):
             # don't try to parse the shelf file!
-            if filename != '{}.db'.format(self.shelf_file):
+            if filename != '{}.db'.format(self.shelf_file) and not os.path.isdir(filename):
                 self.log.info("Found {}, parsing with pyquery...".format(filename))
                 doc = pq(filename=os.path.join(self.import_dir, filename))
 
