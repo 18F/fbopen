@@ -1,5 +1,7 @@
 from base import AttachmentsBase
 from contextlib import closing
+from urllib.parse import urlparse
+from sites import downloaders
 
 import log
 import os
@@ -19,6 +21,8 @@ class AttachmentDownloader(AttachmentsBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
+        self.req_per_min = 0 # 0 for unlimited
+
     def run(self):
         self.log.info("Starting...")
 
@@ -28,34 +32,38 @@ class AttachmentDownloader(AttachmentsBase):
         self.log.info("Done.")
 
     def download_files(self):
-        s = scrapelib.Scraper(requests_per_minute=120, follow_robots=False)
+        s = scrapelib.Scraper(requests_per_minute=self.req_per_min, follow_robots=False, retry_attempts=2)
 
         with closing(shelve.open(os.path.join(self.import_dir, self.shelf_file))) as db:
             for key in db.keys():
-                self.create_dir_by_solnbr(key)
+                dir_for_solnbr = self.create_dir_by_solnbr(key)
 
                 attachments = db[key]['attachments']
 
-                for (i,attachment) in enumerate(attachments):
-                    self.log.info("Downloading file ({}: {}) from {}".format(attachment['filename'], attachment['desc'], attachment['url']))
+                for (i,a) in enumerate(attachments):
+                    self.log.info("Downloading file ({}: {}) from {}".format(a['filename'], a['desc'], a['url']))
+
+                    # parse URL into components
+                    u = urlparse(a['url'])
+
+                    # match main portion to dict of special cases, get function to use
+                    downloader_func = downloaders.func_map.get(u.netloc, downloaders.default)
+
                     try:
-                        filename, response = s.urlretrieve(
-                            attachment['url'], 
-                            filename=os.path.basename(attachment['filename']),
-                            dir=self.dir_for_solnbr(key)
-                        )
-                        attachment.update({'local_file_path': filename})
-                        attachments[i] = attachment
+                        local_file_path = downloader_func(s, a['url'], dir_for_solnbr, solnbr=key)
+                        a.update({'local_file_path': local_file_path})
                     except:
-                        self.log.exception("Attachment couldn't be retrieved for unknown reasons. URL: {} Continuing.".format(attachment['url']))
+                        self.log.exception("Attachment couldn't be retrieved for unknown reasons. URL: {} Continuing.".format(a['url']))
+                        a.update({'exception': 1})
                         continue
+                    finally:
+                        attachments[i] = a
 
                 meta = {'dl_complete': True, 'num_dl': len(attachments)}
                 db[key] = {'attachments': attachments, 'meta': meta}
 
     def create_dir_by_solnbr(self, solnbr):
-        sol_dir = self.dir_for_solnbr(solnbr)
-        self.create_dir(sol_dir)
+        return self.create_dir(self.dir_for_solnbr(solnbr))
 
     def dir_for_solnbr(self, solnbr):
         return os.path.join(self.import_dir, solnbr)

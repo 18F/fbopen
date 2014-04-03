@@ -22,8 +22,7 @@ class SourceDownloader(AttachmentsBase):
         self.resume_url = kwargs.get('resume_url')
 
         self.req_per_min = 0 # 0 for unlimited
-        self.chunk_max = 8
-
+        self.chunk_max = 8 # how often (# of dls) to refresh the scrape session
 
     def run(self):
         self.log.info("Starting: Source Downloader")

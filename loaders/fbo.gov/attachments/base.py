@@ -43,6 +43,8 @@ class AttachmentsBase(object):
         else:
             self.log.info("Checking directory... {} exists.".format(dirname))
 
+        return dirname
+
     def current_import_dirname(self):
         now_str = datetime.now().strftime('%Y%m%d_%H%M')
         return "{}_{}".format('attach', now_str)
