@@ -60,7 +60,7 @@ class AttachmentLoader(AttachmentsBase):
                     self.log.info("Loading attachment {} with data: {}".format(attach_id, a))
 
                     script_output = call([
-                        '../../common/load_attachment.sh', 
+                        '../common/load_attachment.sh', 
                         a['local_file_path'], 
                         attach_id,
                         key,
