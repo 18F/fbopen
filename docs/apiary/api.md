@@ -1,10 +1,10 @@
 FORMAT: 1A
-HOST: http://api.data.gov
+HOST: https://api.data.gov
 
 # FBOpen API
 
 <p>FBOpen is an API to a search index containing opportunities to do business with the U.S. Federal Government.
-<p>The API is hosted through [api.data.gov](http://api.data.gov). To use it, you'll need to [get an API key](http://api.data.gov/signup).
+<p>The API is hosted through [api.data.gov](https://api.data.gov). To use it, you'll need to [get an API key](https://api.data.gov/signup).
 <p>You can see our live front-end, built on this API, at [fbopen.gsa.gov](https://fbopen.gsa.gov).
 
 # All Opportunities [/gsa/fbopen/v0/opps{?q,api_key,data_source,limit,start,show_noncompeted,show_closed}]
@@ -19,11 +19,11 @@ Here are a couple examples to get started:
 
 To query for the first page (i.e., the first ten results, numbers 0 through 9) of opportunities that mention software development:
 
-http://api.data.gov/gsa/fbopen/v0/opps?q=software+development&api_key=YOUR_API_KEY
+https://api.data.gov/gsa/fbopen/v0/opps?q=software+development&api_key=YOUR_API_KEY
 
 To query the third page of grants that mention bioinformatics, including opportunities that have already closed (i..e, the due date has already passed):
 
-http://api.data.gov/gsa/fbopen/v0/opps?q=bioinformatics&data_source=grants.gov&start=20&show_closed=true&api_key=YOUR_API_KEY
+https://api.data.gov/gsa/fbopen/v0/opps?q=bioinformatics&data_source=grants.gov&start=20&show_closed=true&api_key=YOUR_API_KEY
 
 + Parameters
     + q (string) ... the keyword(s) or phrase you want to search for
