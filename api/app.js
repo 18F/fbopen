@@ -119,7 +119,10 @@ app.get('/v0/opps', function(req, res) {
 
     // omit or include non-competed listings
 	if (!url_parts.query['show_noncompeted'] || url_parts.query['show_noncompeted'] != 'true') {
-		q_param += ' -"single source" -"sole source" -"other than full and open competition"';
+        if (q_param == '') {
+            q_param += '&q=';
+        }
+        q_param += ' -"single source" -"sole source" -"other than full and open competition"';
 	}
 
 	// omit or include closed listings
