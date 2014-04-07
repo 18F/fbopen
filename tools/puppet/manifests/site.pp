@@ -1,7 +1,3 @@
-#import "fbopen_nodejs"
-#import "fbopen_postgres"
-#import "fbopen_config"
-
 user {'fbopen':
   groups => ['sudo'],
   ensure => present,
@@ -60,6 +56,9 @@ package {'forever':
 }
 
 #Install and configure elasticsearch
+exec {"install_key":
+  command         => 'wget -O - http://packages.elasticsearch.org/GPG-KEY-elasticsearch | apt-key add -',
+}->
 apt::source { 'elasticsearch_1.0stable':
   location          => 'http://packages.elasticsearch.org/elasticsearch/1.0/debian',
   release           => 'stable',
@@ -70,9 +69,9 @@ package {'elasticsearch':
   ensure    => 'installed',
 }
 
-#exec { 'start':
-#  command   => "forever start app.js",
-#  cwd       => "/vagrant/api",
-#  require   => Exec['npm_fbopen_install'],
-#  unless    => "ps -ef | grep '[f]orever'"
-#}
+exec { 'start':
+  command   => "forever start app.js",
+  cwd       => "/vagrant/api",
+  require   => Exec['npm_fbopen_install'],
+  unless    => "ps -ef | grep '[f]orever'"
+}
