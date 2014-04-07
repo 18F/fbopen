@@ -10,5 +10,5 @@ mod "puppetlabs/postgresql"
 mod "puppetlabs/apt"
 mod "saz/timezone"
 mod "stankevich/python"
-mod "elasticsearch/elasticsearch",
+mod "elasticsearch/puppet-elasticsearch",
     :git => "git://github.com/elasticsearch/puppet-elasticsearch.git"
