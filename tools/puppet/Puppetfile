@@ -9,5 +9,6 @@ mod "maestrodev/puppet-wget",
 mod "puppetlabs/postgresql"
 mod "puppetlabs/apt"
 mod "saz/timezone"
-mod "example42/solr",
-    :git => "git://github.com/example42/puppet-solr.git"
+mod "stankevich/python"
+mod "elasticsearch/elasticsearch",
+    :git => "git://github.com/elasticsearch/puppet-elasticsearch.git"

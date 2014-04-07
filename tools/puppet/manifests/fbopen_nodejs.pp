@@ -1,5 +1,3 @@
-import "fbopen_sails"
-
 class fbopen_nodejs {
 
   #Install Node and NPM. may want make install to be true in future

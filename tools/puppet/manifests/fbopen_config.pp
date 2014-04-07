@@ -1,5 +1,4 @@
 class fbopen_config {
-  require fbopen_sails
 
   # Copy the main settings files and edit them
   file { "/vagrant/config/local.js":
