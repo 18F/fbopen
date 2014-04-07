@@ -1,4 +1,4 @@
-import "fbopen_nodejs"
+#import "fbopen_nodejs"
 #import "fbopen_postgres"
 #import "fbopen_config"
 
@@ -29,8 +29,46 @@ class { "timezone":
   timezone => 'UTC',
 }
 
-include fbopen_nodejs
-#include fbopen_postgres
+
+
+#Install and configure the python environment
+#  $packages = []
+
+apt::ppa { 'ppa:fkrull/deadsnakes': }
+
+#->
+#package {'python3.r':}
+
+#class { 'python':
+#  version    => '3.3',
+#  pip        => true,
+#  dev        => true,
+#  virtualenv => false,
+#  gunicorn   => false,
+#}
+
+#Install Node and NPM. may want make install to be true in future
+#class { 'nodejs':
+#    version => 'v0.10.25',
+#    make_install => false,
+#}
+#
+#exec { 'npm_fbopen_install':
+#  command   => "npm install",
+#  cwd       => "/vagrant/api",
+#  require  => Class['nodejs'],
+#}
+#
+#package {'grunt-cli':
+#  provider    => 'npm',
+#  require  => Class['nodejs'],
+#}
+#
+#package {'forever':
+#  provider  => 'npm',
+#  require  => Class['nodejs'],
+#}
+
 #include fbopen_config
 
 #class { "solr": }
@@ -45,9 +83,25 @@ include fbopen_nodejs
 #  # url_pattern         => "...",
 #  }
 
-exec { 'start':
-  command   => "forever start app.js",
-  cwd       => "/vagrant/api",
-  require   => Class['npm_fbopen_install'],
-  unless    => "ps -ef | grep '[f]orever'"
-}
+#Install and configure elasticsearch
+#class{"elasticsearch":
+#   config                   => {
+#     'node'                 => {
+#       'name'               => 'elasticsearch001'
+#     },
+#     'index'                => {
+#       'number_of_replicas' => '0',
+#       'number_of_shards'   => '5'
+#     },
+#     'network'              => {
+#       'host'               => $::ipaddress
+#     }
+#   }
+#}
+#
+#exec { 'start':
+#  command   => "forever start app.js",
+#  cwd       => "/vagrant/api",
+#  require   => Exec['npm_fbopen_install'],
+#  unless    => "ps -ef | grep '[f]orever'"
+#}
