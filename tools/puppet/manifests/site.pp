@@ -15,12 +15,6 @@ Exec {
 
 class { 'apt':
   always_apt_update    => true,
-  disable_keys         => undef,
-  proxy_host           => false,
-  proxy_port           => '8080',
-  purge_sources_list   => false,
-  purge_sources_list_d => false,
-  purge_preferences_d  => false,
   update_timeout       => undef
 }
 
@@ -29,76 +23,53 @@ class { "timezone":
   timezone => 'UTC',
 }
 
-
+package { [
+    'curl',
+    'wget',
+    'python-software-properties'
+  ]:
+  ensure  => 'installed',
+}
 
 #Install and configure the python environment
-#  $packages = []
+apt::ppa { 'ppa:fkrull/deadsnakes': }->
+package {['python3.4', 'python3.4-dev']:
+  ensure  => 'installed',
+}
 
-apt::ppa { 'ppa:fkrull/deadsnakes': }
+#Install Node and NPM
+class { 'nodejs':
+    version => 'v0.10.25',
+    make_install => false,
+}
 
-#->
-#package {'python3.r':}
+exec { 'npm_fbopen_install':
+  command   => "npm install",
+  cwd       => "/vagrant/api",
+  require  => Class['nodejs'],
+}
 
-#class { 'python':
-#  version    => '3.3',
-#  pip        => true,
-#  dev        => true,
-#  virtualenv => false,
-#  gunicorn   => false,
-#}
+package {'grunt-cli':
+  provider    => 'npm',
+  require  => Class['nodejs'],
+}
 
-#Install Node and NPM. may want make install to be true in future
-#class { 'nodejs':
-#    version => 'v0.10.25',
-#    make_install => false,
-#}
-#
-#exec { 'npm_fbopen_install':
-#  command   => "npm install",
-#  cwd       => "/vagrant/api",
-#  require  => Class['nodejs'],
-#}
-#
-#package {'grunt-cli':
-#  provider    => 'npm',
-#  require  => Class['nodejs'],
-#}
-#
-#package {'forever':
-#  provider  => 'npm',
-#  require  => Class['nodejs'],
-#}
-
-#include fbopen_config
-
-#class { "solr": }
-
-#class { "solr":
-#  install             => "source",
-#  install_source      => "http://apache.claz.org/lucene/solr/4.7.1/solr-4.7.1.tgz",
-#  install_destination => "/opt/apps/",
-#  # install_precommand  => "...",
-#  # install_postcommand => "...",
-#  # url_check           => "...",
-#  # url_pattern         => "...",
-#  }
+package {'forever':
+  provider  => 'npm',
+  require  => Class['nodejs'],
+}
 
 #Install and configure elasticsearch
-#class{"elasticsearch":
-#   config                   => {
-#     'node'                 => {
-#       'name'               => 'elasticsearch001'
-#     },
-#     'index'                => {
-#       'number_of_replicas' => '0',
-#       'number_of_shards'   => '5'
-#     },
-#     'network'              => {
-#       'host'               => $::ipaddress
-#     }
-#   }
-#}
-#
+apt::source { 'elasticsearch_1.0stable':
+  location          => 'http://packages.elasticsearch.org/elasticsearch/1.0/debian',
+  release           => 'stable',
+  repos             => 'main',
+  include_src       => false,
+}->
+package {'elasticsearch':
+  ensure    => 'installed',
+}
+
 #exec { 'start':
 #  command   => "forever start app.js",
 #  cwd       => "/vagrant/api",
