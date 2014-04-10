@@ -1,0 +1,124 @@
+FORMAT: 1A
+HOST: https://api.data.gov
+
+# FBOpen API
+
+<p>FBOpen is an API to a search index containing opportunities to do business with the U.S. Federal Government.
+<p>The API is hosted through [api.data.gov](https://api.data.gov). <b>To use it, you'll need to [get a free API key](https://api.data.gov/signup).</b>
+<p>You can see our live front-end, built on this API, at [fbopen.gsa.gov](https://fbopen.gsa.gov).
+
+# All Opportunities [/gsa/fbopen/v0/opps{?q,api_key,data_source,limit,start,show_noncompeted,show_closed}]
+
+The index contains opportunities from FBO.gov and grants.gov (at present). The records and their attachments are searchable in full-text via our API.
+
+## Search [GET]
+
+Search for opportunities matching the query string (q). Supports [Lucene query syntax](http://lucene.apache.org/core/2_9_4/queryparsersyntax.html).
+
+##### Here are a couple examples to get started:
+
+To query for the first page (i.e., the first ten results, numbers 0 through 9) of opportunities that mention software development:
+
+    https://api.data.gov/gsa/fbopen/v0/opps?q=software+development&api_key=YOUR_API_KEY
+
+To query the third page of grants that mention bioinformatics, including opportunities that have already closed (i..e, the due date has already passed):
+
+    https://api.data.gov/gsa/fbopen/v0/opps?q=bioinformatics&data_source=grants.gov&start=20&show_closed=true&api_key=YOUR_API_KEY
+
+
+<br />
+
+
++ Parameters
+    + q (string) ... the keyword(s) or phrase you want to search for. Supports [Lucene query syntax](http://lucene.apache.org/core/2_9_4/queryparsersyntax.html).
+    + api_key (string) ... your api.data.gov API key ([sign up](https://api.data.gov/signup))
+    + data_source = `all` (string, optional) ... get results only from a particular data source. As of 2014-04-10, the available sources are 'FBO' and 'grants.gov'. Case sensitive.
+    + limit = `10` (integer, optional) ... number of results to return per request
+    + start = `0` (integer, optional) ... get the next [limit] results starting with this number (zero-indexed)
+    + show_noncompeted = `false` (true/false, optional) ... include sole-sourced or otherwise non-competed opportunities in the results
+    + show_closed = `false` (true/false, optional) ... include opportunities with deadlines that have already passed in the results
+
++ Response 200 (application/json)
+    + Body
+
+            {
+                "numFound": 34,
+                "start": 0,
+                "maxScore": 0.876,
+                "docs": [
+                    {
+                        "score": 0.625 -- on a scale of 0 to 1, how closely this document matched the query --
+                        "data_source": "FBO", -- the source of this opportunity --
+                        "solnbr": "ABC-1234567", -- opportunity's unique identifier within the data source --
+                        "id": "FBO:COMBINE:ABC-1234567", -- this document's unique identifier in the FBOpen search index --
+                        "title": "Super-Duper Mobile App",
+                        "listing_url": "https://www.fbo.gov/spg/ODA/DARPA/CMO/DARPA-BAA-14-05/listing.html", -- link to the listing-of-record for this opportunity --
+                        "close_dt": "2013-12-01T17:00:00Z", -- date/time when applications are due --
+                        "posted_dt": "2013-11-06T00:00:00Z", -- date/time when this opportunity was made public --
+                        "open_dt": "2013-11-09T00:00:00Z", -- first date/time when applicaions may be submitted --
+                        "agency": "General Services Administration",
+                        "office": "Presidential Innovation Fellows",
+                        "location": "1800 F Street, Washington, DC",
+                        "zipcode": "20008",
+                        "summary": "A short executive summary of the opportunity goes here.",
+                        "description": "More details about the opportunity might be included here",
+                        -- 
+                        NOTE: Other optional fields may also appear. These will generally be prefixed with the data source.
+                        E.g., for listings imported from FBO, these may include:
+                        FBO_CLASSCOD, FBO_NAICS, FBO_OFFADD, FBO_CONTACT, FBO_SETASIDE, FBO_RECOVERY_ACT,
+                        FBO_ARCHDATE_dt, FBO_POPCOUNTRY, FBO_POPADDRESS, FBO_EMAIL_ADDRESS, FBO_EMAIL_DESC, and/or other fields.
+                        --
+                        "highlights": {
+                            "summary|description|content": [
+                                "This chunk of text from the summary, description, or content field will include at least one <highlight>highlighted</highlight> term."
+                                ]
+                        }
+                    }
+                ],
+                "facets": {
+                    "FBO_NAICS": { -- each key/value pair is a NAICS code paired with the # of results matching that NAICS code --
+                      "111110": 0,
+                      "111422": 0,
+                      -- etc.
+                    },
+                    "data_source": { -- each key/valuepair is a data_source paired with the # of results matching that data_source --
+                      "grants.gov": 610,
+                      "FBO": 339
+                    }
+                }
+            }
+
+
+# An Opportunity [/gsa/fbopen/v0/opp]
+
+Individual opportunities can be modified if POST functionality is enabled in the API.
+<br />
+<strong>In the current version of FBOpen, POST is disabled.</strong>
+
+## Add or Update [POST]
+
+Add or update an opportunity in the search index. Required fields are *data_source*, *solnbr*, *title*, *listing_url*, and *close_dt*.
+(Expand to view example request for sample values.)
+
+You may also add any optional fields. "Core" fields are listed in the GET description above.
+Custom fields may be added, as long as they have a "_t" suffix, e.g., *mynewfield_t*.
+
++ Request (application/json)
+
+            { 
+                "data_source": "SBIR",
+                "solnbr": "ABC-98765",
+                "title": "Super-Duper Mobile App",
+                "listing_url": "https://www.fbo.gov/spg/ODA/DARPA/CMO/DARPA-BAA-14-05/listing.html",
+                "close_dt": "2013-12-01T17:00:00Z"
+            }
+
++ Response 200 (application/json)
+
+            { 
+                "status": "success|fail", 
+                "message": "some message here",
+                "data": { -- only if status == "success" --
+                    "id": "[the newly generated unique ID for this document will appear here if successful]"
+                }
+            }
