@@ -1,15 +1,14 @@
-from base import AttachmentsBase
+from base.importer import AttachmentsImporter
 from contextlib import closing
 from subprocess import call
 
-import log
 import os
 import os.path
 import requests
 import shelve
 
 
-class AttachmentLoader(AttachmentsBase):
+class AttachmentLoader(AttachmentsImporter):
     '''
     This class loads the attachment files, which have already
     been downloaded by downloader.py, into Elasticsearch.
@@ -38,7 +37,8 @@ class AttachmentLoader(AttachmentsBase):
         post_count = self.get_count()
 
         if post_count < pre_count + load_count:
-            self.log.warn("Not all attachments were loaded, as post_count differed from pre_count + load_count by {}".format(abs((pre_count + load_count) - post_count)))
+            msg = "Not all attachments were loaded, as post_count differed from pre_count + load_count by {}"
+            self.log.warn(msg.format(abs((pre_count + load_count) - post_count)))
 
         self.log.info("Done.")
 
@@ -48,7 +48,7 @@ class AttachmentLoader(AttachmentsBase):
             for key in db:
                 self.log.info("Pulled solnbr {}".format(key))
                 record = db[key]
-                for (i,a) in enumerate(record['attachments']):
+                for (i, a) in enumerate(record['attachments']):
 
                     # skip the ones that weren't successful downloads
                     if (not a.get('local_file_path')) or a.get('exception'):
@@ -60,8 +60,8 @@ class AttachmentLoader(AttachmentsBase):
                     self.log.info("Loading attachment {} with data: {}".format(attach_id, a))
 
                     script_output = call([
-                        '../common/load_attachment.sh', 
-                        a['local_file_path'], 
+                        '../common/load_attachment.sh',
+                        a['local_file_path'],
                         attach_id,
                         key,
                     ])
@@ -84,4 +84,3 @@ class AttachmentLoader(AttachmentsBase):
 if __name__ == '__main__':
     loader = AttachmentLoader()
     loader.run()
-

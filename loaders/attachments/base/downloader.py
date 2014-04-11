@@ -1,16 +1,15 @@
-from base import AttachmentsBase
+from base.importer import AttachmentsImporter
 from contextlib import closing
 from urllib.parse import urlparse
 from sites import downloaders
 
-import log
 import os
 import os.path
 import scrapelib
 import shelve
 
 
-class AttachmentDownloader(AttachmentsBase):
+class AttachmentDownloader(AttachmentsImporter):
     '''
     This class downloads the attachment files. Requires a shelf file populated
     with URLs from link_extractor.py.
@@ -21,7 +20,7 @@ class AttachmentDownloader(AttachmentsBase):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
-        self.req_per_min = 0 # 0 for unlimited
+        self.req_per_min = 0  # 0 for unlimited
 
     def run(self):
         self.log.info("Starting...")
@@ -40,7 +39,7 @@ class AttachmentDownloader(AttachmentsBase):
 
                 attachments = db[key]['attachments']
 
-                for (i,a) in enumerate(attachments):
+                for (i, a) in enumerate(attachments):
                     self.log.info("Downloading file ({}: {}) from {}".format(a['filename'], a['desc'], a['url']))
 
                     # parse URL into components

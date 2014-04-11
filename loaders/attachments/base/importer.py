@@ -2,10 +2,9 @@ from datetime import datetime
 from log import set_up_logger
 
 import os
-import scrapelib
 
 
-class AttachmentsBase(object):
+class AttachmentsImporter(object):
 
     def __init__(self, *args, **kwargs):
         self.log = set_up_logger(self.module_name)
@@ -27,6 +26,7 @@ class AttachmentsBase(object):
 
         if not dirname:
             dirname = self.current_import_dirname()
+            self.log.debug(dirname)
 
         self.create_dir(dirname)
 
@@ -47,14 +47,14 @@ class AttachmentsBase(object):
 
     def current_import_dirname(self):
         now_str = datetime.now().strftime('%Y%m%d_%H%M')
-        return "{}_{}".format('attach', now_str)
+        return os.path.abspath("{}_{}".format('attach', now_str))
 
-    #def compose_module_name(self):
-    #    if hasattr(self, 'base_module_name'):
-    #        if hasattr(self, 'module_name'):
-    #            return '.'.join([self.base_module_name, self.module_name])
+    # def compose_module_name(self):
+    #     if hasattr(self, 'base_module_name'):
+    #         if hasattr(self, 'module_name'):
+    #             return '.'.join([self.base_module_name, self.module_name])
 
-    #        return self.base_module_name
+    #         return self.base_module_name
 
-    #    elif hasattr(self, 'module_name'):
-    #        return self.module_name
+    #     elif hasattr(self, 'module_name'):
+    #         return self.module_name

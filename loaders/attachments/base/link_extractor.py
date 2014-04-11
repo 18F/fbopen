@@ -1,16 +1,15 @@
-from base import AttachmentsBase
+from base.importer import AttachmentsImporter
 from contextlib import closing
 from pyquery import PyQuery as pq
 from urllib.parse import urljoin
 
-import log
 import os
 import os.path
 import shelve
 import sys
 
 
-class LinkExtractor(AttachmentsBase):
+class LinkExtractor(AttachmentsImporter):
     '''
     This class traverses a directory of opportunity source HTML and extracts
     the attachment link URLs from each file.
@@ -30,27 +29,30 @@ class LinkExtractor(AttachmentsBase):
 
         for filename in os.listdir(self.import_dir):
             # don't try to parse the shelf file!
-            if filename != '{}.db'.format(self.shelf_file) and not os.path.isdir(filename):
-                self.log.info("Found {}, parsing with pyquery...".format(filename))
-                doc = pq(filename=os.path.join(self.import_dir, filename))
+            if not (filename == '{}.db'.format(self.shelf_file) or os.path.isdir(os.path.join(self.import_dir, filename))):
+                with closing(shelve.open(os.path.join(self.import_dir, self.shelf_file))) as db:
+                    self.extract_for_file(filename, db)
 
-                solnbr = self.get_opp_solnbr(doc)
-                self.log.info("Pulled solicitation number (solnbr) {}".format(solnbr))
+    def extract_for_file(self, filename, shelf):
+        self.log.info("Found {}, parsing with pyquery...".format(filename))
+        doc = pq(filename=os.path.join(self.import_dir, filename))
 
-                num_links = self.get_links(doc, solnbr)
-                self.log.info("Extracting and saving the attachment URLs and metadata. Found {}.".format(num_links))
+        solnbr = self.get_opp_solnbr(doc)
+        self.log.info("Pulled solicitation number (solnbr) {}".format(solnbr))
+
+        num_links = self.get_links(doc, solnbr, shelf)
+        self.log.info("Extracting and saving the attachment URLs and metadata. Found {}.".format(num_links))
 
     def get_opp_solnbr(self, doc):
         return doc('#dnf_class_values_procurement_notice__solicitation_number__widget').text().strip()
 
-    def get_links(self, doc, solnbr):
+    def get_links(self, doc, solnbr, shelf):
         '''
         Parses the links from a doc. Returns the number of links found.
         '''
-        with closing(shelve.open(os.path.join(self.import_dir, self.shelf_file))) as db:
-            db[solnbr] = {}
-            links = self.collect_link_attrs(doc)
-            db[solnbr] = {'attachments': links}
+        shelf[solnbr] = {}
+        links = self.collect_link_attrs(doc)
+        shelf[solnbr] = {'attachments': links}
 
         return len(links)
 
@@ -82,7 +84,7 @@ class LinkExtractor(AttachmentsBase):
 
             attachments.append(a)
 
-        if not attachments: # keep looking
+        if not attachments:  # keep looking
             addl_info_link = doc('div#dnf_class_values_procurement_notice__additional_info_link__widget')('a')
             if addl_info_link:
                 a = {
