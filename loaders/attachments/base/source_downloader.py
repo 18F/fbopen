@@ -1,12 +1,11 @@
-from base import AttachmentsBase 
+from base.importer import AttachmentsImporter
 
-import log
 import os
 import scrapelib
 import sys
 
 
-class SourceDownloader(AttachmentsBase):
+class SourceDownloader(AttachmentsImporter):
     '''
     This class downloads the opportunity source HTML to support later steps
     of link extraction and download.
@@ -21,8 +20,8 @@ class SourceDownloader(AttachmentsBase):
         self.urls_file = kwargs.get('file')
         self.resume_url = kwargs.get('resume_url')
 
-        self.req_per_min = 0 # 0 for unlimited
-        self.chunk_max = 8 # how often (# of dls) to refresh the scrape session
+        self.req_per_min = 0  # 0 for unlimited
+        self.chunk_max = 8  # how often (# of dls) to refresh the scrape session
 
     def run(self):
         self.log.info("Starting: Source Downloader")
@@ -44,7 +43,7 @@ class SourceDownloader(AttachmentsBase):
         else:
             self.log.fatal("URLs file was not provided.")
             sys.exit(1)
-       
+
     def get_sources(self):
 
         at_resume_point = False
@@ -59,7 +58,6 @@ class SourceDownloader(AttachmentsBase):
                 else:
                     at_resume_point = True
                     self.log.info("Resuming. Skipped {} URLs.".format(skipped))
-
 
             if not chunk_count % self.chunk_max:
                 s = self._new_scrape_session()
@@ -82,7 +80,7 @@ class SourceDownloader(AttachmentsBase):
 
     def _new_scrape_session(self):
         return scrapelib.Scraper(requests_per_minute=self.req_per_min, follow_robots=False)
-        
+
 
 if __name__ == '__main__':
     retriever = SourceDownloader(file=sys.argv[1], dir=sys.argv[2])
