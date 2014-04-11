@@ -58,7 +58,7 @@
   // re-fill query terms
   if (location.search != '') {
 
-    form_params = ['q', 'p', 'naics', 'data_source'];
+    form_params = ['q', 'fq', 'parent_only', 'p', 'naics', 'data_source'];
     for (i in form_params) {
       $('#' + form_params[i]).val(getQueryVariable(form_params[i]));
       search_params[form_params[i]] = getQueryVariable(form_params[i]);

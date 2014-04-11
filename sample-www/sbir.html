@@ -15,8 +15,6 @@
   <link href="bootstrap/css/navbar-fixed-top.css" rel="stylesheet">
 
   <link href="assets/css/fbopen.css" rel="stylesheet">
-
-  <link rel="icon" type="image/png" href="assets/images/favicon.png">
   
   <!--[if lte IE 9]>
     <style>#outer-container { display: none !important; }</style>
@@ -25,33 +23,34 @@
     </script>
   <![endif]-->
 </head>
-<body>
+<body class="sbir">
 
   <div class="container" id="outer-container">
 
     <div id="intro">
 
-      <div class="container brand">
-        <a href="/" style="color: #333;"><span class="logo">fbopen</span></a>
-        <span>pilot</span>
+      <div class="container brand brand-sbir">
+        <a href="/sbir.html" style="color: #333;"><span class="logo">SBIR Opportunities</span></a>
+        <span>Opportunities</span>
       </div>
 
       <p class="landing-copy">
-        FBOpen helps small businesses search for opportunities to work with the U.S. government.
+        SBIR/STTR Opportunities helps small businesses search for innovative research and technology transfer opportunities with the U.S. government.
       </p>
+<!-- 
       <p class="landing-copy">
       <small>Developers, learn more at our <a href="https://github.com/18f/fbopen">github repo</a> and our <a href="http://docs.fbopen.apiary.io/">API documentation</a>.</small>
       </p>
-
+ -->
     </div>
 
     <div id="main" class="row">
 
       <div id="sidebar" class="col-sm-4 col-md-4">
 
-        <div class="container brand">
-          <a href="/" style="color: #333;"><h1>fbopen</h1></a>
-          <span>pilot</span>
+        <div class="container brand brand-sbir">
+          <a href="/sbir.html" style="color: #333;"><h1>SBIR Opportunities</h1></a>
+          <span>search</span>
         </div>
 
         <form name="fbopen-search-form" id="fbopen-search-form" role="form" class="form" method="get" action="">
@@ -99,7 +98,10 @@
 
           </div>
 
+          <input id="parent_only" name="parent_only" type="hidden" value="" />
           <input id="p" name="p" type="hidden" value="" />
+
+          <input id="fq" name="fq" type="hidden" value="sbir" />
         </form>
 
         
@@ -152,7 +154,7 @@
   <script src="assets/js/underscore-1.5.2.min.js"></script>
   <script src="assets/js/backbone-1.1.0.min.js"></script>
 
-  <script src="assets/js/dust-full-2.3.3.js"></script>
+  <script src="assets/js/dust-full-2.1.0.js"></script>
   <script src="assets/js/dust-helpers-1.1.2.js"></script>
 
   <!-- load after dust-full and dust-helpers -->

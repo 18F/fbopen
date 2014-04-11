@@ -7,7 +7,7 @@ The project began as an attempt to make it easier to search the content of [FBO.
 
 Underneath the Google-style query page (`/sample-www`), we built a simple REST API (really a thin layer over Elasticsearc's API) so you can build your own query tools.
 
-Then someone realized we didn't have to limit this server to FBO data. There's a second sample data loader that can be used to load data nightly from [grants.gov](http://www.grants.gov), and the API allows you to post opportunities, too.
+Then someone realized we didn't have to limit this server to FBO data. There's a second sample data loader that can be used to load data nightly from [grants.gov](http://www.grants.gov), and the API allows you to post opportunities, too. Many more data loaders are on their way.
 
 As of 2014-03-12, we're live at https://fbopen.gsa.gov .
 
@@ -21,6 +21,7 @@ As of 2014-03-12, we're live at https://fbopen.gsa.gov .
   * A quick and easy way to access this page at localhost, provided you have Python installed, is to `cd` to the `/sample-www` directory and run: `python -m SimpleHTTPServer`. By default, you'll then be able to access the client at http://localhost:8000
 
 ### Examples
+* You can add an FBOpen query to any HTML page by just copying and pasting a snippet of JavaScript with our [FBOpen Widget Maker](http://18f.github.io/fbopen-widget/).
 * The BusinessUSA PIF team coded up a sample form specifically geared toward submitting or tweaking SBIR solicitations in FBOpen. The relevant code can be found here: [https://github.com/GSA-OCSIT/hyabusa](https://github.com/GSA-OCSIT/hyabusa). Hyabusa is a test-bed Rails 4 app, and includes several other mini-applications, so look for the SbirSolicitationsController and [related views](https://github.com/GSA-OCSIT/hyabusa/tree/master/app/views/sbir_solicitations).
 * One of the BusinessUSA PIF's also coded up a sample site to showcase how SBIR.gov could function if FBOpen were the backend data source for the solicitation listings. That repo, as of this writing very much a work in progress, can be found here: [https://github.com/arowla/sbiropen](https://github.com/arowla/sbiropen). This is a Python app built with the Flask microframework.
 

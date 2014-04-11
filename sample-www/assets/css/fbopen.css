@@ -7,6 +7,9 @@ body {
 	padding: 40px 0;
 	background-color: #F2F2F2;
 }
+body.sbir {
+  background-color: #FFF;
+}
 #outer-container {
 	min-height: 300px;
 }
@@ -100,6 +103,9 @@ a:hover {
 	background-color: #FFF;
 	padding: 10px 20px 30px;
 	margin: 10px 0 30px;
+}
+body.sbir #results-list .result-item {
+  border: 1px solid black;
 }
 .result-item > .row {
 	margin-left: 0;
@@ -201,6 +207,11 @@ highlight {
 }
 .brand a:hover {
 	background-position: left bottom; /* 0% 100%; */
+}
+.brand.brand-sbir a {
+  background: url('../images/sbir-sttr-logo.png') no-repeat 0 1px;
+  width: 239px;
+  height: 62px;
 }
 .brand a h1 {
 	color: gray;
@@ -396,6 +407,9 @@ ul.tagit li.tagit-new {
   width: 100%;
   margin: 74px 0 0;
   padding: 10px 0 0;
+}
+body.sbir #results-topline {
+  margin-top: 90px;
 }
 #result-count {
   font-family: Roboto;

@@ -135,7 +135,12 @@ app.get('/v0/opps', function(req, res) {
                 ejs.MatchQuery('_all', 'other than full and open competition')
             ]))
         );
-	}
+    }
+    //     if (q_param == '') {
+    //         q_param += '&q=';
+    //     }
+    //     q_param += ' -"single source" -"sole source" -"other than full and open competition"';
+	// }
 
 	// // omit or include closed listings
     // if (!url_parts.query['show_closed'] || url_parts.query['show_closed'] != 'true') {
