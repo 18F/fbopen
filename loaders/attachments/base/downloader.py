@@ -15,7 +15,7 @@ class AttachmentDownloader(AttachmentsImporter):
     with URLs from link_extractor.py.
     '''
 
-    module_name = 'fbo_attach_import.downloader'
+    module_name = 'fbo_attach.downloader'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -66,8 +66,3 @@ class AttachmentDownloader(AttachmentsImporter):
 
     def dir_for_solnbr(self, solnbr):
         return os.path.join(self.import_dir, solnbr)
-
-
-if __name__ == '__main__':
-    retriever = AttachmentDownloader()
-    retriever.run()

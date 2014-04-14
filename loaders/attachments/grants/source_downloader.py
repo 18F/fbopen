@@ -12,7 +12,7 @@ class GrantsSourceDownloader(SourceDownloader):
 
     Accepts either a single URL, or a file containing one URL per line.
     '''
-    module_name = 'grants_attach_import.source_downloader'
+    module_name = 'grants_attach.source_downloader'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -75,8 +75,3 @@ class GrantsSourceDownloader(SourceDownloader):
 
     def _log_resume_info(self, url):
         self.log.info("Resume download by adding --resume (-r) flag with last URL logged")
-
-
-if __name__ == '__main__':
-    retriever = GrantsSourceDownloader(file=sys.argv[1], dir=sys.argv[2])
-    retriever.run()

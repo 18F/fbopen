@@ -1,19 +1,19 @@
-from base.downloader import AttachmentDownloader
+from grants.downloader import GrantsAttachmentDownloader
 from grants.link_extractor import GrantsLinkExtractor
-from base.loader import AttachmentLoader
+from grants.loader import GrantsAttachmentLoader
 from grants.source_downloader import GrantsSourceDownloader
-from base.importer import AttachmentsImporter
+from base.runner import AttachmentsRunner
 
 import argparse
 
 
-class GrantsAttachmentsImporter(AttachmentsImporter):
+class GrantsAttachmentsRunner(AttachmentsRunner):
     '''
     This class will run the various grants.gov attachment downloading scripts as a single step.
     It also knows what grants.gov-specific code to use. If writing importers for other datasources,
     these will need to be overridden.
     '''
-    module_name = 'grants_attach_import'
+    module_name = 'grants_attach'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -38,16 +38,16 @@ class GrantsAttachmentsImporter(AttachmentsImporter):
         self.log.info("Done: grants.gov Attachments Importer")
 
     def source(self):
-        GrantsSourceDownloader(file=self.urls_file, dir=self.import_dir, resume_url=self.resume_url).run()
+        GrantsSourceDownloader(log=self.log, file=self.urls_file, dir=self.import_dir, resume_url=self.resume_url).run()
 
     def extract(self):
-        GrantsLinkExtractor(dir=self.import_dir).run()
+        GrantsLinkExtractor(log=self.log, dir=self.import_dir).run()
 
     def download(self):
-        AttachmentDownloader(dir=self.import_dir).run()
+        GrantsAttachmentDownloader(log=self.log, dir=self.import_dir).run()
 
     def load(self):
-        AttachmentLoader(dir=self.import_dir).run()
+        GrantsAttachmentLoader(log=self.log, dir=self.import_dir).run()
 
     # TODO: pull all into a base class so we can reuse for other datasets
 
@@ -68,6 +68,7 @@ if __name__ == '__main__':
     init_parser.add_argument('-d', '--dir', help='an existing import directory path to use-- good for resuming attachment retrieval')
     init_parser.add_argument('-r', '--resume-url', help='provide the downloader a URL to resume from')
     init_parser.add_argument('-f', '--file', help='the file containing the links (one per line) to source files to download')
+    init_parser.add_argument('--log-to-stdout', action='store_true', help='send log output to stdout instead of a file')
 
     parser = argparse.ArgumentParser(description='Run the grants.gov attachment import commands.')
 
@@ -81,5 +82,5 @@ if __name__ == '__main__':
 
     args = vars(parser.parse_args())
 
-    importer = GrantsAttachmentsImporter(file=args.get('file'), dir=args.get('dir'), resume_url=args.get('resume_url'))
-    getattr(importer, args.get('command'))()
+    runner = GrantsAttachmentsRunner(file=args.get('file'), dir=args.get('dir'), resume_url=args.get('resume_url'), stdout=args.get('log_to_stdout'))
+    getattr(runner, args.get('command'))()

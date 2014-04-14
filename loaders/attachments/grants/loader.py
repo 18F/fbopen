@@ -9,9 +9,7 @@ class GrantsAttachmentLoader(AttachmentLoader):
     It requires a shelf file bearing attachment metadata.
     '''
 
-    module_name = 'grants_attach_import.loader'
+    module_name = 'grants_attach.loader'
 
-
-if __name__ == '__main__':
-    loader = GrantsAttachmentLoader()
-    loader.run()
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)

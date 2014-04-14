@@ -6,7 +6,6 @@ from urllib.parse import urljoin
 import os
 import os.path
 import shelve
-import sys
 
 
 class LinkExtractor(AttachmentsImporter):
@@ -17,7 +16,7 @@ class LinkExtractor(AttachmentsImporter):
     It also instantiates a shelf file with metadata on the attachments.
     '''
 
-    module_name = 'fbo_attach_importer.link_extractor'
+    module_name = 'fbo_attach.link_extractor'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -96,8 +95,3 @@ class LinkExtractor(AttachmentsImporter):
                 attachments.append(a)
 
         return attachments
-
-
-if __name__ == '__main__':
-    extractor = LinkExtractor(sys.argv[1])
-    extractor.run()

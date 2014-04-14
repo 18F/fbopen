@@ -16,7 +16,7 @@ class AttachmentLoader(AttachmentsImporter):
     It requires a shelf file bearing attachment metadata.
     '''
 
-    module_name = 'fbo_attach_import.loader'
+    module_name = 'fbo_attach.loader'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -79,8 +79,3 @@ class AttachmentLoader(AttachmentsImporter):
 
     def get_attachment_id(self, solnbr, i):
         return "{}__attach__{}".format(solnbr, i)
-
-
-if __name__ == '__main__':
-    loader = AttachmentLoader()
-    loader.run()

@@ -1,4 +1,4 @@
-from base import AttachmentsBase
+from base.importer import AttachmentsImporter
 from contextlib import closing
 from urllib.parse import urlparse
 from sites import downloaders
@@ -9,13 +9,13 @@ import scrapelib
 import shelve
 
 
-class GrantsAttachmentDownloader(AttachmentsBase):
+class GrantsAttachmentDownloader(AttachmentsImporter):
     '''
     This class downloads the attachment files. Requires a shelf file populated
     with URLs from link_extractor.py.
     '''
 
-    module_name = 'grants_attach_import.downloader'
+    module_name = 'grants_attach.downloader'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -66,8 +66,3 @@ class GrantsAttachmentDownloader(AttachmentsBase):
 
     def dir_for_solnbr(self, solnbr):
         return os.path.join(self.import_dir, solnbr)
-
-
-if __name__ == '__main__':
-    retriever = GrantsAttachmentDownloader()
-    retriever.run()

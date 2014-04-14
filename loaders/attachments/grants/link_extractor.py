@@ -5,7 +5,7 @@ from base.link_extractor import LinkExtractor
 
 
 class GrantsLinkExtractor(LinkExtractor):
-    module_name = 'grants_attach_importer.link_extractor'
+    module_name = 'grants_attach.link_extractor'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -16,7 +16,6 @@ class GrantsLinkExtractor(LinkExtractor):
         self.log.info("Found {}, parsing the JSON...".format(filename))
         with open(os.path.join(self.import_dir, filename), 'r') as f:
             opp = json.load(f)
-            print(json.dumps(opp))
             solnbr = self.get_opp_solnbr(opp)
             self.log.info('Pulled opp id ({}) number ({})'.format(opp['id'], solnbr))
             attachments = []
