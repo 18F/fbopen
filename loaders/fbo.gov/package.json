@@ -11,11 +11,9 @@
     , "moment": "*"
     , "request": "*"
     , "cheerio": "*"
-		, "jsftp": "*"
-		, "optimist": "*"
-		, "moment": "*"
-    , "solr-client": "*"
+    , "optimist": "*"
     , "event-stream": "*"
     , "date-format-lite": "*"
+    , "underscore": "*"
   }
 }
