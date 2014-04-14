@@ -80,8 +80,3 @@ class SourceDownloader(AttachmentsImporter):
 
     def _new_scrape_session(self):
         return scrapelib.Scraper(requests_per_minute=self.req_per_min, follow_robots=False)
-
-
-if __name__ == '__main__':
-    retriever = SourceDownloader(file=sys.argv[1], dir=sys.argv[2])
-    retriever.run()
