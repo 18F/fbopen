@@ -2,24 +2,17 @@
 
 # $1 = filepath/name of weekly FBO XML file "dump"
 # $2 = output filepath/name for the raw JSON conversion
-# TODO: do we need more preprocessing?
-# TODO: bulk conversion
 # $3 = output filepath/name of the list of links to the FBO listings
-# [NOT USED:]
-# $4 = directory into which attachments should be downloaded
 
 # you can specify just the input file, or all four files, or none at all
 
 json_output_file='workfiles/notices.json'
 links_output_file='workfiles/listings-links.txt'
 bulk_output_file='workfiles/notices.bulk'
-# NOT USED
-attachment_download_dir='fbo-attachments/'
 
-if [ $# -eq 2 ]
+if [ $# -eq 1 ]
 then
 	links_output_file=$1
-	attachment_download_dir=$2
 fi
 
 FBO_WEEKLY_XML_FILE=${FBO_WEEKLY_XML_FILE:-"workfiles/FBOFullXML.xml"}
@@ -28,11 +21,10 @@ echo "FBOPEN_URI = $FBOPEN_URI"
 FBOPEN_INDEX=${FBOPEN_INDEX:-"fbopen"}
 echo "FBOPEN_INDEX = $FBOPEN_INDEX"
 
-mkdir -p workfiles #$attachment_download_dir
+mkdir -p workfiles
 
 echo "JSON output file is " $json_output_file
 echo "list of links is " $links_output_file
-#print "[NOT USED] attachments stored in " $attachment_download_dir >> $logfile
 
 echo "Downloading weekly XML dump..."
 wget ftp://ftp.fbo.gov/datagov/FBOFullXML.xml -O $FBO_WEEKLY_XML_FILE
@@ -44,8 +36,6 @@ cat $FBO_WEEKLY_XML_FILE | node fbo-solrize-big.js > $json_output_file
 
 echo "Extracting links..."
 cat $json_output_file | json -ga listing_url > $links_output_file
-
-# echo "Getting attachments..."
 
 echo "Converting JSON to Elasticsearch bulk format..."
 # Note the need to split the file into chunks. Else ES will fail with either a
