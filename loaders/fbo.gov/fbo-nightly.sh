@@ -28,10 +28,10 @@ then
 	fi
 fi
 
-ELASTICSEARCH_URI=${ELASTICSEARCH_URI:-"localhost:9200"}
-echo "ELASTICSEARCH_URI = $ELASTICSEARCH_URI"
-ELASTICSEARCH_INDEX=${ELASTICSEARCH_INDEX:-"fbopen"}
-echo "ELASTICSEARCH_INDEX = $ELASTICSEARCH_INDEX"
+FBOPEN_URI=${FBOPEN_URI:-"localhost:9200"}
+echo "FBOPEN_URI = $FBOPEN_URI"
+FBOPEN_INDEX=${FBOPEN_INDEX:-"fbopen"}
+echo "FBOPEN_INDEX = $FBOPEN_INDEX"
 
 # mkdir -p will ensure the nightly download dir is in place, but won't fail if it already exists
 nightly_dir="nightly-downloads"
@@ -64,7 +64,7 @@ bulk_notices_file=$nightly_dir/notices.$download_date.bulk
 cat $prepped_json_notices_file | node ../common/format-bulk.js -a > $bulk_notices_file
 
 # load into Elasticsearch
-curl -s -XPOST "$ELASTICSEARCH_URI/$ELASTICSEARCH_INDEX/_bulk" --data-binary @$bulk_notices_file; echo
+curl -s -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @$bulk_notices_file; echo
 
 # download and ingest attachments
 cat $nightly_links_file | ./process-listing-links.sh | tee fbo-attachment-downloads.log

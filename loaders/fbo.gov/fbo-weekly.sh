@@ -23,10 +23,10 @@ then
 fi
 
 FBO_WEEKLY_XML_FILE=${FBO_WEEKLY_XML_FILE:-"workfiles/FBOFullXML.xml"}
-ELASTICSEARCH_URI=${ELASTICSEARCH_URI:-"localhost:9200"}
-echo "ELASTICSEARCH_URI = $ELASTICSEARCH_URI"
-ELASTICSEARCH_INDEX=${ELASTICSEARCH_INDEX:-"fbopen"}
-echo "ELASTICSEARCH_INDEX = $ELASTICSEARCH_INDEX"
+FBOPEN_URI=${FBOPEN_URI:-"localhost:9200"}
+echo "FBOPEN_URI = $FBOPEN_URI"
+FBOPEN_INDEX=${FBOPEN_INDEX:-"fbopen"}
+echo "FBOPEN_INDEX = $FBOPEN_INDEX"
 
 mkdir -p workfiles #$attachment_download_dir
 
@@ -57,7 +57,7 @@ cat $bulk_output_file | split -l 10000 - workfiles/notices.bulk.
 
 # load into Elasticsearch
 echo "Loading into Elasticsearch..."
-find workfiles/ -name "notices.bulk.*" -print -exec curl -XPOST "$ELASTICSEARCH_URI/$ELASTICSEARCH_INDEX/_bulk" --data-binary @"{}" \;
+find workfiles/ -name "notices.bulk.*" -print -exec curl -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @"{}" \;
 
 echo "Done loading into Elasticsearch."
 
