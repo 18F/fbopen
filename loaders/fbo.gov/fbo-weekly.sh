@@ -61,9 +61,7 @@ find workfiles/ -name "notices.bulk.*" -print -exec curl -XPOST "$FBOPEN_URI/$FB
 
 echo "Done loading into Elasticsearch."
 
-# download and ingest attachments
-echo "Scraping, downloading and ingesting attachments..."
-cat $links_output_file | ./process-listing-links.sh | tee fbo-attachment-downloads.log
+echo "Now call the attachment loader with --file $links_output_file"
 
-echo "FBO-Weekly Done."
+echo "fbo-weekly done."
 
