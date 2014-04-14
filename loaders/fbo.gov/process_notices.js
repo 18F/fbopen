@@ -3,6 +3,7 @@ var datasource_id = 'FBO';
 var moment = require('moment');
 var S = require('string');
 var es = require('event-stream');
+var u_ = require('underscore');
 
 var field_map = {
 	'DATE': 'posted_dt'
@@ -25,7 +26,7 @@ es.pipeline(
         parent_notice = data;
         key = Object.keys(parent_notice)[0];
         notice = parent_notice[key]
-        if (key == 'PRESOL' || key == 'COMBINE' || key == 'MOD') {
+        if (u_.contains(['PRESOL', 'COMBINE', 'MOD'], key)) {
             notice_out = {};
             notice_out.data_source = datasource_id;
             notice_out.is_mod = (key == 'MOD');
@@ -49,10 +50,10 @@ es.pipeline(
                 // skip ntype
                 // skip YEAR because it gets combined with DATE instead (smh)
                 // 'DESC2' is always "Link to Document"
-                if (['SOLNBR', 'NTYPE', 'YEAR', 'DESC2'].indexOf(field) >= 0) continue;
+                if (u_.contains(['SOLNBR', 'NTYPE', 'YEAR', 'DESC2'], field)) continue;
 
                 // skip empty fields
-                if (notice[field] == '') continue;
+                if (S(notice[field]).isEmpty()) continue;
 
                 // get the proper field name: 
                 // some are mapped to core FBOpen Solr fields, 
@@ -121,16 +122,12 @@ function solrize_date(fbo_date) {
 } // solrize_date()
 
 function clean_field_value(field, val) {
-
-	// get field value, and:
-	// remove "<![CDATA[" and "]]>" if necessary
-	// replace <p> and <br> tags with newlines
-	// remove HTML entity codes ("&xyz;") [note: is there a better function?]
-
 	// unescape entity codes; strip out all other HTML
-	var field_value = S(val).escapeHTML().stripTags().s;
+	var field_value = S(val).decodeHTMLEntities().stripTags();
 
-	if (field_value == '') return '';
+	if (field_value.isEmpty()) return '';
+
+    field_value = field_value.s;
 
 	// make dates Solr-friendly
 	// if (tag == 'DATE' || tag == 'RESPDATE' || tag == 'ARCHDATE' || tag == 'AWDDATE') {
