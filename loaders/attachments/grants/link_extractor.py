@@ -1,4 +1,3 @@
-# from ghost import Ghost
 import json
 import os
 from base.link_extractor import LinkExtractor

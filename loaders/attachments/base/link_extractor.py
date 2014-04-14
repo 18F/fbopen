@@ -34,7 +34,13 @@ class LinkExtractor(AttachmentsImporter):
 
     def extract_for_file(self, filename, shelf):
         self.log.info("Found {}, parsing with pyquery...".format(filename))
-        doc = pq(filename=os.path.join(self.import_dir, filename))
+
+        try:
+            doc = pq(filename=os.path.join(self.import_dir, filename))
+        except UnicodeDecodeError as e:
+            self.log.exception(e)
+            self.log.info("Continuing with next one...")
+            return
 
         solnbr = self.get_opp_solnbr(doc)
         self.log.info("Pulled solicitation number (solnbr) {}".format(solnbr))
