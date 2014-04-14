@@ -39,8 +39,8 @@ After install, first load a full set of data using the one-time/weekly loader. T
 	Optional ENV vars:
 	
 	`$FBO_WEEKLY_XML_FILE` = where to save the downloaded file; default = *./workfiles/FBOFullXML.xml*
-	`$ELASTICSEARCH_URI` = the URI of your Elasticsearch instance; default = *localhost:9200*
-	`$ELASTICSEARCH_INDEX` = the name of the ES index to load into; default = *fbopen*
+	`$FBOPEN_URI` = the URI of your Elasticsearch instance; default = *localhost:9200*
+	`$FBOPEN_INDEX` = the name of the ES index to load into; default = *fbopen*
 	
 	Optional arguments:
 
@@ -70,8 +70,8 @@ All at once: **`fbo-nightly.sh [YYYYMMDD]`** (defaults to yesterday)
 
 	Optional ENV vars:
 	
-	`$ELASTICSEARCH_URI` = the URI of your Elasticsearch instance; default = *localhost:9200*
-	`$ELASTICSEARCH_INDEX` = the name of the ES index to load into; default = *fbopen*
+	`$FBOPEN_URI` = the URI of your Elasticsearch instance; default = *localhost:9200*
+	`$FBOPEN_INDEX` = the name of the ES index to load into; default = *fbopen*
 	
 If you want to do it in steps, consult `fbo-nightly.sh` for the proper commands.
 
