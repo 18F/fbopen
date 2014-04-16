@@ -19,7 +19,7 @@ file=$(openssl base64 -in $1)
 name=$(basename $1)
 json="{\"_name\" : \"${name}\", \"content\" : \"${file}\"}"
 
-tmpfile=$(mktemp)
+tmpfile=$(mktemp /tmp/fbopen_test.XXXXX)
 
 if [[ $# -eq 4 ]]; then
     echo $json > $tmpfile
