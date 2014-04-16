@@ -1,6 +1,6 @@
 def default(*args, **kwargs):
     scraper, url, directory = args
-    filename, response = scraper.urlretrieve(url, dir=directory)
+    filename, response = scraper.urlretrieve(url, dir=directory, verify=False)
     return filename
 
 def dibbs_bsm_dla_mil(*args, **kwargs):
