@@ -60,8 +60,12 @@
 
     form_params = ['q', 'p', 'naics', 'data_source'];
     for (i in form_params) {
-      $('#' + form_params[i]).val(getQueryVariable(form_params[i]));
-      search_params[form_params[i]] = getQueryVariable(form_params[i]);
+      param_name = form_params[i];
+      q_param = getQueryVariable(param_name);
+      if (! S(q_param).isEmpty()) {
+        $('#' + param_name).val(q_param);
+        search_params[param_name] = q_param;
+      }
     }
 
     // checkboxen:
@@ -502,11 +506,16 @@
 function getQueryVariable(variable)
 {
        var query = window.location.search.substring(1);
+
+       // don't let trailing slash get appended to the last query param value
+       query = query.replace(/\/$/, "");
+
        var vars = query.split("&");
        for (var i=0;i<vars.length;i++) {
-               var pair = vars[i].split("=");
-               if(pair[0] == variable){return pair[1];}
+         var pair = vars[i].split("=");
+         if(pair[0] == variable){return pair[1];}
        }
+
        return(false);
 }
 
