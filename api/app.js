@@ -1,4 +1,3 @@
-
 /*
  *
  
@@ -21,7 +20,6 @@ var express = require('express')
 
 	// other useful stuff
 	, request = require('request')
-	, qs = require('querystring')
     , ejs = require('elastic.js')
     , nc = require('elastic.js/elastic-node-client')
 	, url = require('url')
@@ -113,8 +111,6 @@ app.get('/v0/opps', function(req, res) {
 	var url_parts = url.parse(req.url, true);
 
 	var q = url_parts.query['q'];
-
-	// allow adding fq params
 	var fq = url_parts.query['fq'];
 
 	// //
@@ -226,7 +222,8 @@ app.get('/v0/opps', function(req, res) {
             _u.extend(doc_out, doc._source);
 
             // adjust score to 0-100
-            doc_out.score = Math.min(Math.round(doc_out.score * 100), 100);
+            console.log(doc_out._score);
+            doc_out.score = Math.min(Math.round(doc._score * 100), 100);
 
             // clean up fields
             doc_out.data_source = doc_out.data_source || '';
@@ -268,12 +265,10 @@ app.get('/v0/opps', function(req, res) {
 
     var query = undefined;
 
+    var qsq = ejs.QueryStringQuery(q);
     var bool_query = ejs.BoolQuery().should([
-        ejs.QueryStringQuery(q),
-        ejs.HasChildQuery(
-            ejs.QueryStringQuery(q),
-            "opp_attachment"
-        )
+        qsq,
+        ejs.HasChildQuery(qsq, "opp_attachment")
     ]);
 
     if (S(q).isEmpty()) {
@@ -283,7 +278,7 @@ app.get('/v0/opps', function(req, res) {
     }
 
     if (! S(fq).isEmpty()) {
-        query = ejs.FilteredQuery(ejs.QueryStringQuery(fq));
+        query = ejs.FilteredQuery(query, ejs.QueryFilter(ejs.QueryStringQuery(fq)));
     }
 
     console.log(query.toString());
