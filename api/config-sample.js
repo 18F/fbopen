@@ -37,6 +37,7 @@ config.ssl = {
 config.solr = {};
 config.solr.base_url = 'http://fbopen.gsa.gov:8983/solr/collection1/select';
 
+config.elasticsearch = {};
 config.elasticsearch.host = 'localhost';
 config.elasticsearch.port = '9200';
 
