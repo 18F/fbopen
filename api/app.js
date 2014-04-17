@@ -42,7 +42,7 @@ if (config.app.require_http_basic_auth) {
 }
 
 // Create Elasticsearch client
-var client = nc.NodeClient('localhost', '9200');
+var client = nc.NodeClient(config.elasticsearch.host, config.elasticsearch.port);
 ejs.client = client;
 
 
@@ -112,14 +112,9 @@ app.get('/v0/opps', function(req, res) {
 	// execute the Elasticsearch query and return results
 	var url_parts = url.parse(req.url, true);
 
-	var q_param = '';
 	var q = url_parts.query['q'];
-	if (q != undefined) {
-		q_param = '&q=+' + q;
-	}
 
 	// allow adding fq params
-	var fq_param = '';
 	var fq = url_parts.query['fq'];
 
 	// //
@@ -127,20 +122,17 @@ app.get('/v0/opps', function(req, res) {
 	// //
 
     // // omit or include non-competed listings
+    var non_competed_bool_query = ejs.BoolQuery().should([
+        ejs.MatchQuery('_all', 'single source'), 
+        ejs.MatchQuery('_all', 'sole source'), 
+        ejs.MatchQuery('_all', 'other than full and open competition')
+    ]);
+
+    var non_competed_flt = ejs.QueryFilter(non_competed_bool_query);
+
 	if (!url_parts.query['show_noncompeted'] || url_parts.query['show_noncompeted'] != 'true') {
-        var non_competed_flt = ejs.NotFilter(
-            ejs.QueryFilter(ejs.BoolQuery().should([
-                ejs.MatchQuery('_all', 'single source'), 
-                ejs.MatchQuery('_all', 'sole source'), 
-                ejs.MatchQuery('_all', 'other than full and open competition')
-            ]))
-        );
+        non_competed_flt = ejs.NotFilter(non_competed_flt);
     }
-    //     if (q_param == '') {
-    //         q_param += '&q=';
-    //     }
-    //     q_param += ' -"single source" -"sole source" -"other than full and open competition"';
-	// }
 
 	// // omit or include closed listings
     // if (!url_parts.query['show_closed'] || url_parts.query['show_closed'] != 'true') {
@@ -209,7 +201,13 @@ app.get('/v0/opps', function(req, res) {
     var results_callback = function (body) {
         // massage results into the format we want
         var results_out = {};
-        results_out.numFound = body.hits.total;
+        if (typeof(body.hits) != 'undefined') {
+            results_out.numFound = body.hits.total;
+        } else {
+            results_out.numFound = 0;
+            return res.json(results_out);
+        }
+
         results_out.facets = body.aggregations;
 
         // map facet_fields from [label1, value1, label2, value2 ...]
@@ -271,29 +269,32 @@ app.get('/v0/opps', function(req, res) {
     var query = undefined;
 
     var bool_query = ejs.BoolQuery().should([
-        ejs.MatchQuery("_all", q),
+        ejs.QueryStringQuery(q),
         ejs.HasChildQuery(
-            ejs.MatchQuery("_all", q),
+            ejs.QueryStringQuery(q),
             "opp_attachment"
         )
     ]);
 
-    if (fq) {
-        query = ejs.FilteredQuery(
-            bool_query,
-            ejs.QueryFilter(ejs.MatchQuery("_all", fq))
-        );
+    if (S(q).isEmpty()) {
+        query = non_competed_flt;
     } else {
         query = bool_query;
     }
 
+    if (! S(fq).isEmpty()) {
+        query = ejs.FilteredQuery(ejs.QueryStringQuery(fq));
+    }
+
+    console.log(query.toString());
+    
     var highlight = ejs.Highlight(['description', 'FBO_OFFADD'])
         .preTags('<highlight>')
         .postTags('</highlight>');
 
     var request = ejs.Request()
         .indices(["fbopen"])
-        .types(["opp", "opp_attachment"])
+        .types(["opp"])
         .highlight(highlight)
         .query(query);
     
@@ -408,7 +409,7 @@ app.post('*', function(req, res, next) {
 
 
 // Tagging
-
+//github.com/18F/fbopen/blob/esearch/loaders/test/test_attachment_load_and_search.sh
 app.post('/v0/opp/:doc_id/tags/:tags?', function(req, res) {
 
 	// 'opp/' + solnbr + '/tags/' + tags_serial
