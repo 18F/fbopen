@@ -1,0 +1,56 @@
+{
+    "settings": {
+        "index": {
+            "analysis": {
+                "analyzer": {
+                    "default": {
+                        "type": "snowball"
+                    }
+                }
+            }
+        }
+    },
+    "mappings": {
+        "opp": {},
+        "opp_attachment": {
+            "_parent": {
+                "type": "opp"
+            },
+            "_source": {
+                "excludes": [
+                    "content"
+                ]
+            },
+            "properties": {
+                "content": {
+                    "type": "attachment",
+                    "fields": {
+                        "content": {
+                            "store": "no"
+                        },
+                        "author": {
+                            "store": "no"
+                        },
+                        "title": {
+                            "store": "no",
+                            "analyzer": "english"
+                        },
+                        "date": {
+                            "store": "no"
+                        },
+                        "keywords": {
+                            "store": "no",
+                            "analyzer": "keyword"
+                        },
+                        "_name": {
+                            "store": "no"
+                        },
+                        "_content_type": {
+                            "store": "no"
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
