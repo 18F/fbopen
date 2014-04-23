@@ -113,12 +113,12 @@ app.get('/v0/opps', function(req, res) {
 	var q = url_parts.query['q'];
 	var fq = url_parts.query['fq'];
 
-	// //
-	// // special fields
-	// //
+	//
+	// special fields
+	//
 
-    // // omit or include non-competed listings
-    var non_competed_bool_query = ejs.BoolQuery().should([
+    // omit or include non-competed listings by default
+    non_competed_bool_query = ejs.BoolQuery().should([
         ejs.MatchQuery('_all', 'single source'), 
         ejs.MatchQuery('_all', 'sole source'), 
         ejs.MatchQuery('_all', 'other than full and open competition')
@@ -126,8 +126,13 @@ app.get('/v0/opps', function(req, res) {
 
     var non_competed_flt = ejs.QueryFilter(non_competed_bool_query);
 
-	if (!url_parts.query['show_noncompeted'] || url_parts.query['show_noncompeted'] != 'true') {
-        non_competed_flt = ejs.NotFilter(non_competed_flt);
+	if (url_parts.query['show_noncompeted']) {
+        if (S(url_parts.query['show_noncompeted']).toBoolean()) {
+            console.log(S('1').toBoolean());
+            console.log(S('0').toBoolean());
+            console.log(S('false').toBoolean());
+            non_competed_flt = ejs.MatchAllFilter();
+        }
     }
 
 	// // omit or include closed listings
@@ -222,7 +227,6 @@ app.get('/v0/opps', function(req, res) {
             _u.extend(doc_out, doc._source);
 
             // adjust score to 0-100
-            console.log(doc_out._score);
             doc_out.score = Math.min(Math.round(doc._score * 100), 100);
 
             // clean up fields
@@ -272,13 +276,14 @@ app.get('/v0/opps', function(req, res) {
     ]);
 
     if (S(q).isEmpty()) {
-        query = non_competed_flt;
+        query = ejs.FilteredQuery(ejs.MatchAllQuery(), non_competed_flt);
     } else {
-        query = bool_query;
+        query = ejs.FilteredQuery(bool_query, non_competed_flt);
     }
 
-    if (! S(fq).isEmpty()) {
-        query = ejs.FilteredQuery(query, ejs.QueryFilter(ejs.QueryStringQuery(fq)));
+    if (!S(fq).isEmpty()) {
+        query = ejs.FilteredQuery(query, 
+            ejs.AndFilter([ejs.QueryFilter(ejs.QueryStringQuery(fq)), non_competed_flt]));
     }
 
     console.log(query.toString());
