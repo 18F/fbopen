@@ -161,13 +161,6 @@ app.get('/v0/opps', function(req, res) {
     filters.filters(ejs.TermFilter('data_source', data_source.toLowerCase()));
   }
 
-  // var misc_params = '';
-  // // special case: request only the parent of a specific document
-  // // (for quickly pulling information about an attachment's parent solicitation)
-  // if (url_parts.query['get_parent'] && url_parts.query['solnbr']) {
-  //  misc_params += '&get_parent=true&solnbr=' + url_parts.query['solnbr'];
-  // }
-
   // // pagination
   // if (url_parts.query['from']) {
     //     search_settings.body.from = url_parts.query['from'];
