@@ -24,6 +24,15 @@ To post a new opportunity to your FBOpen server:
 
 There is also, currently commented out, a nascent POST method for tagging a record. It simply overwrites the contents of the record's `content_tags` field with whatever serialized list of tags you post. Check out the code.
 
+### Tests
+To run the tests (located in `api/test/app.js`), run:
+
+```
+    $ make test
+```
+
+Several aspects of the test run can be changed in the `Makefile`, such as the timeout, hostname, index name and test reporter.
+
 ### To do
 * add authentication
 * restore and improve POST /opp and POST /opp/:doc_id/tags/ 

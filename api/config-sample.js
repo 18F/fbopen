@@ -38,7 +38,10 @@ config.solr = {};
 config.solr.base_url = 'http://fbopen.gsa.gov:8983/solr/collection1/select';
 
 config.elasticsearch = {};
-config.elasticsearch.host = 'localhost';
+config.elasticsearch.host = process.env.ELASTICSEARCH_HOST || 'localhost';
 config.elasticsearch.port = '9200';
+config.elasticsearch.index = process.env.ELASTICSEARCH_INDEX || '9200';
+// this is used to adjust the date math that's used for searching within the (statically-dated) test data
+config.elasticsearch.now_str = process.env.ELASTICSEARCH_NOW || 'now';
 
 module.exports = config;
