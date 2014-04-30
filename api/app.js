@@ -11,27 +11,28 @@
 
 var express = require('express')
 
-	// express.js standard scaffolding components (some overkill here)
-	, routes = require('./routes')
-	, http = require('http')
-	, https = require('https')
-	, path = require('path')
-	, http_auth = require('http-auth')
+  // express.js standard scaffolding components (some overkill here)
+  , routes = require('./routes')
+  , http = require('http')
+  , https = require('https')
+  , path = require('path')
+  , http_auth = require('http-auth')
 
-	// other useful stuff
-	, request = require('request')
-    , ejs = require('elastic.js')
-    , nc = require('elastic.js/elastic-node-client')
-	, url = require('url')
-	, moment = require('moment') // momentjs.com
-	, S = require('string') // stringjs.com
-    , util = require('util')
-    , _u = require('underscore')
-	;
+  // other useful stuff
+  , request = require('request')
+  , ejs = require('elastic.js')
+  , nc = require('elastic.js/elastic-node-client')
+  , url = require('url')
+  , moment = require('moment') // momentjs.com
+  , S = require('string') // stringjs.com
+  , util = require('util')
+  , _u = require('underscore')
+  ;
 
 var config = require('./config');
 
 var app = express();
+module.exports = app;
 
 // http basic auth, if required in config
 if (config.app.require_http_basic_auth) {
@@ -40,6 +41,12 @@ if (config.app.require_http_basic_auth) {
 }
 
 // Create Elasticsearch client
+//
+// Leaving these here for debug logging when needed:
+// console.log("Elasticsearch host from within app:");
+// console.log(config.elasticsearch.host);
+// console.log("Elasticsearch index from within app:");
+// console.log(config.elasticsearch.index);
 var client = nc.NodeClient(config.elasticsearch.host, config.elasticsearch.port);
 ejs.client = client;
 
@@ -113,61 +120,64 @@ app.get('/v0/opps', function(req, res) {
 	var q = url_parts.query['q'];
 	var fq = url_parts.query['fq'];
 
-	//
-	// special fields
-	//
+  var queries = ejs.BoolQuery();
+  var filters = ejs.AndFilter([]);
 
-    // omit or include non-competed listings by default
-    non_competed_bool_query = ejs.BoolQuery().should([
-        ejs.MatchQuery('_all', 'single source'), 
-        ejs.MatchQuery('_all', 'sole source'), 
-        ejs.MatchQuery('_all', 'other than full and open competition')
-    ]);
+  //
+  // special fields
+  //
 
-    var non_competed_flt = ejs.QueryFilter(non_competed_bool_query);
+  // omit or include non-competed listings by default
+  non_competed_bool_query = ejs.BoolQuery().should([
+      ejs.MatchQuery('_all', 'single source'),
+      ejs.MatchQuery('_all', 'sole source'),
+      ejs.MatchQuery('_all', 'other than full and open competition')
+  ]);
 
-	if (url_parts.query['show_noncompeted']) {
-        if (S(url_parts.query['show_noncompeted']).toBoolean()) {
-            console.log(S('1').toBoolean());
-            console.log(S('0').toBoolean());
-            console.log(S('false').toBoolean());
-            non_competed_flt = ejs.MatchAllFilter();
-        }
+  var non_competed_flt = ejs.NotFilter(ejs.QueryFilter(non_competed_bool_query));
+
+  if (url_parts.query['show_noncompeted']) {
+    if (S(url_parts.query['show_noncompeted']).toBoolean()) {
+      non_competed_flt = ejs.MatchAllFilter();
     }
+  }
 
-	// // omit or include closed listings
-    // if (!url_parts.query['show_closed'] || url_parts.query['show_closed'] != 'true') {
-	// 	var param_phrase = 'close_dt:[NOW/DAY%20TO%20*]';
-	// 	if (q_param != '') {
-	// 		fq_param = fq_param + '&fq=' + param_phrase;
-	// 	} else {
-	// 		q_param = '&q=' + param_phrase;
-	// 	}
-	// }
+  filters.filters(non_competed_flt);
 
-	// // filter by data source
-	// var data_source = url_parts.query['data_source'];
-	// if (data_source != undefined && data_source != '') {
-	// 	if (q_param != '') {
-	// 		fq_param = fq_param + '&fq=data_source:' + data_source;
-	// 	} else {
-	// 		q_param = '&q=data_source:' + data_source;
-	// 	}
-	// }
+  // omit or include closed listings
+  // if it's not defined or it's false, add this filter
+  if (!url_parts.query['show_closed'] || S(url_parts.query['show_closed']).toBoolean() === false) {
+    var show_closed = ejs.RangeQuery('close_dt').gt(config.elasticsearch.now_str);
+    if (q != '') {
+      filters.filters(ejs.QueryFilter(show_closed));
+    } else {
+      queries.should(show_closed);
+    }
+  }
 
-	// var misc_params = '';
-	// // special case: request only the parent of a specific document
-	// // (for quickly pulling information about an attachment's parent solicitation)
-	// if (url_parts.query['get_parent'] && url_parts.query['solnbr']) {
-	// 	misc_params += '&get_parent=true&solnbr=' + url_parts.query['solnbr'];
-	// }
+  // // filter by data source
+  // var data_source = url_parts.query['data_source'];
+  // if (data_source != undefined && data_source != '') {
+  //  if (q_param != '') {
+  //    fq_param = fq_param + '&fq=data_source:' + data_source;
+  //  } else {
+  //    q_param = '&q=data_source:' + data_source;
+  //  }
+  // }
 
-	// // pagination
-	// if (url_parts.query['from']) {
+  // var misc_params = '';
+  // // special case: request only the parent of a specific document
+  // // (for quickly pulling information about an attachment's parent solicitation)
+  // if (url_parts.query['get_parent'] && url_parts.query['solnbr']) {
+  //  misc_params += '&get_parent=true&solnbr=' + url_parts.query['solnbr'];
+  // }
+
+  // // pagination
+  // if (url_parts.query['from']) {
     //     search_settings.body.from = url_parts.query['from'];
-	// }
+  // }
 
-	// if (url_parts.query['limit']) {
+  // if (url_parts.query['limit']) {
     //     if (parseInt(url_parts.query['limit']) <= config.app.max_rows) {
     //         misc_params += '&rows=' + url_parts.query['limit'];
     //     } else {
@@ -245,7 +255,7 @@ app.get('/v0/opps', function(req, res) {
 
 
     var search_settings = {
-        index: 'fbopen',
+        index: config.elasticsearch.index,
         type: 'opp',
         body: {
             highlight: {
@@ -267,37 +277,38 @@ app.get('/v0/opps', function(req, res) {
         }
     };
 
-    var query = undefined;
-
-    var qsq = ejs.QueryStringQuery(q);
-    var bool_query = ejs.BoolQuery().should([
-        qsq,
-        ejs.HasChildQuery(qsq, "opp_attachment")
-    ]);
-
     if (S(q).isEmpty()) {
-        query = ejs.FilteredQuery(ejs.MatchAllQuery(), non_competed_flt);
+        queries.should(ejs.MatchAllQuery());
     } else {
-        query = ejs.FilteredQuery(bool_query, non_competed_flt);
+        var qsq = ejs.QueryStringQuery(q);
+        var bool_query = ejs.BoolQuery().should([
+            qsq,
+            ejs.HasChildQuery(qsq, "opp_attachment")
+        ]);
+
+        queries.should(bool_query);
     }
 
     if (!S(fq).isEmpty()) {
-        query = ejs.FilteredQuery(query, 
-            ejs.AndFilter([ejs.QueryFilter(ejs.QueryStringQuery(fq)), non_competed_flt]));
+      filters.filters(ejs.QueryFilter(ejs.QueryStringQuery(fq)));
+    } else {
+      filters.filters(ejs.MatchAllFilter());
     }
 
-    console.log(query.toString());
-    
+    console.log('"query": { ' + queries.toString() + '}');
+    console.log('"filter": { ' + filters.toString() + '}');
+
     var highlight = ejs.Highlight(['description', 'FBO_OFFADD'])
         .preTags('<highlight>')
         .postTags('</highlight>');
 
     var request = ejs.Request()
-        .indices(["fbopen"])
+        .indices([config.elasticsearch.index])
         .types(["opp"])
         .highlight(highlight)
-        .query(query);
-    
+        .query(queries)
+        .filter(filters);
+
     request.doSearch(results_callback);
 });
 

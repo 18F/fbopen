@@ -9,11 +9,15 @@
     "express": "3.3.4",
     "jade": "*",
     "less-middleware": ">=0.2.1-beta",
-		"request": "*",
-        "elastic.js": "*",
-		"moment": "*",
-		"string": ">=1.8.1",
-		"http-auth": "*",
-        "underscore": "*"
+    "request": "*",
+    "elastic.js": "*",
+    "moment": "*",
+    "string": ">=1.8.1",
+    "http-auth": "*",
+    "underscore": "*",
+    "chai": "*",
+    "mocha": "*",
+    "async": "*",
+    "supertest": "*"
   }
 }
