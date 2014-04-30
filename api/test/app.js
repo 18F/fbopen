@@ -154,4 +154,29 @@ describe("The FBOpen API", function() {
     .expect(/Aberdeen/)
     .expect(/night vision/i)
   });
+
+  //TODO: we need data from more sources, or to mark some test data as being from other sources, to properly test this
+  it('should return results from FBO', function(done) {
+    request(app)
+    .get('/v0/opps?data_source=fbo&show_noncompeted=1&show_closed=1')
+    .expect(200, done)
+    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect(numFound(55))
+  });
+
+  it('should return results from FBO, case insensitively', function(done) {
+    request(app)
+    .get('/v0/opps?data_source=FBO&show_noncompeted=1&show_closed=1')
+    .expect(200, done)
+    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect(numFound(55))
+  });
+
+  it('should not return any results for missing dataset', function(done) {
+    request(app)
+    .get('/v0/opps?data_source=foobar&show_noncompeted=1&show_closed=1')
+    .expect(200, done)
+    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect(numFound(0))
+  });
 });

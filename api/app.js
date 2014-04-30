@@ -155,15 +155,11 @@ app.get('/v0/opps', function(req, res) {
     }
   }
 
-  // // filter by data source
-  // var data_source = url_parts.query['data_source'];
-  // if (data_source != undefined && data_source != '') {
-  //  if (q_param != '') {
-  //    fq_param = fq_param + '&fq=data_source:' + data_source;
-  //  } else {
-  //    q_param = '&q=data_source:' + data_source;
-  //  }
-  // }
+  // filter by data source
+  var data_source = url_parts.query['data_source'];
+  if (!S(data_source).isEmpty()) {
+    filters.filters(ejs.TermFilter('data_source', data_source.toLowerCase()));
+  }
 
   // var misc_params = '';
   // // special case: request only the parent of a specific document
