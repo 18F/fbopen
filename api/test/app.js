@@ -1,10 +1,8 @@
 var request = require('supertest'),
     chai = require('chai'),
     app = require('../app.js'),
-    readline = require('readline'),
     async = require('async'),
     path = require('path'),
-    line_by_line = require('line-by-line'),
     child_process = require('child_process'),
     elasticsearch = require('elasticsearch');
 
@@ -13,8 +11,6 @@ describe("The FBOpen API", function() {
   var expect = chai.expect;
 
   before(function(done) {
-    //chai.should();
-    //chai.use(require('chai-things'));
     console.log(process.env['ELASTICSEARCH_HOST']);
     var index_name = 'fbopen_api_test';
 
@@ -62,13 +58,9 @@ describe("The FBOpen API", function() {
         // Make sure elasticdump says it has WRITTEN the objects.
         console.log(child_cmd);
         child_process.exec(child_cmd, callback);
-      }, function (callback) {
-        console.log('Ended series!!!');
-        callback(null, 'post');
       }, function (err, resp) {
         console.log(resp);
         done();
-        //setTimeout(done, 10000);
       }
     ]);
   });
