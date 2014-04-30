@@ -143,26 +143,23 @@ describe("The FBOpen API", function() {
     .expect(numFound(1))
     .expect(/satellite/)
   });
-  return;
 
-  // it('should return competed, open opps, filtered to "Aberdeen"', function(done) {
-  //   request(app)
-  //   .get('/v0/opps?fq=Aberdeen')
-  //   .expect(200, done)
-  //   .expect('Content-Type', 'application/json;charset=utf-8')
-  //   .expect(numFound(0))
-  //   //.expect(/Aberdeen/)
-  //   // TODO: redo filter search to something that returns results
-  // });
+  it('should return competed, open opps, filtered to "Aberdeen"', function(done) {
+    request(app)
+    .get('/v0/opps?fq=Aberdeen')
+    .expect(200, done)
+    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect(numFound(1))
+    .expect(/Aberdeen/)
+  });
 
-  // it('should return competed, open opps, filtered to "Aberdeen" and about "night vision"', function(done) {
-  //   request(app)
-  //   .get('/v0/opps?fq=Aberdeen&q="night vision"')
-  //   .expect(200, done)
-  //   .expect('Content-Type', 'application/json;charset=utf-8')
-  //   .expect(/"numFound": 0/)
-  //   // .expect(/Aberdeen/)
-  //   // .expect(/night vision/i)
-  //   // TODO: fix this, too.
-  // });
+  it('should return competed, open opps, filtered to "Aberdeen" and about "night vision"', function(done) {
+    request(app)
+    .get('/v0/opps?fq=Aberdeen&q="night vision"')
+    .expect(200, done)
+    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect(numFound(1))
+    .expect(/Aberdeen/)
+    .expect(/night vision/i)
+  });
 });
