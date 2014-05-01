@@ -12,14 +12,12 @@
 var express = require('express')
 
   // express.js standard scaffolding components (some overkill here)
-  , routes = require('./routes')
   , http = require('http')
   , https = require('https')
   , path = require('path')
   , http_auth = require('http-auth')
 
   // other useful stuff
-  , request = require('request')
   , ejs = require('elastic.js')
   , nc = require('elastic.js/elastic-node-client')
   , url = require('url')
@@ -174,96 +172,65 @@ app.get('/v0/opps', function(req, res) {
     }
   }
 
-	// // let caller trim down which fields are returned
-	// // (TO DO: allow for other (all?) non-default params)
-	// var fieldlist;
-	// if (url_parts.query['fl']) {
-	// 	fieldlist = url_parts.query['fl'];
-	// } else {
-	// 	fieldlist = '*,score';
-	// }
+  // specify fields to be included in results
+  var fieldlist;
+  if (url_parts.query['fl']) {
+    fieldlist = url_parts.query['fl'].split(',');
+    console.log(fieldlist);
+  }
 
-	// var solnbr = url_parts.query['solnbr'] || '';
-
-	// if (url_parts.query['get_parent']) { // special request only for a parent url:
-	// 	solr_url += '?wt=json&fl=id,solnbr,title,listing_url&fq=solnbr:' + solnbr + '&q=listing_url:*';
-	// } else { // standard query
-	// 	solr_url += '?wt=json&facet=true&facet.field=FBO_NAICS&facet.field=data_source'
-	// 	+ '&defType=edismax'
-	// 	+ '&fl='+ fieldlist
-	// 	+ '&hl=true&hl.fl=description,content,summary&hl.fragsize=150&hl.mergeContiguous=true&hl.usePhraseHighlighter=true&hl.snippets=3&hl.simple.pre=<highlight>&hl.simple.post=</highlight>'
-	// 	+ fq_param
-	// 	+ q_param
-	// 	+ misc_params;
-	// }
-
-    var results_callback = function (body) {
-        // massage results into the format we want
-        var results_out = {};
-        if (typeof(body.hits) != 'undefined') {
-            results_out.numFound = body.hits.total;
-        } else {
-            results_out.numFound = 0;
-            return res.json(results_out);
-        }
-
-        results_out.facets = body.aggregations;
-
-        // map facet_fields from [label1, value1, label2, value2 ...]
-        // to label1: value1, label2: value2, etc.
-        //var facet;
-        //for (facet_field_name in results_in.facet_counts.facet_fields) {
-        //    facet = results_in.facet_counts.facet_fields[facet_field_name];
-        //    results_out.facets[facet_field_name] = flat_list_to_json(facet);
-        //}
-
-        // map highlights to into docs, instead of separate data,
-        // and do a few other cleanup manipulations
-        results_out['docs'] = _u.map(body.hits.hits, function (doc) {
-            var doc_out = _u.omit(doc, '_id', '_source');
-            doc_out.id = doc._id;
-            _u.extend(doc_out, doc._source);
-
-            // adjust score to 0-100
-            doc_out.score = Math.min(Math.round(doc._score * 100), 100);
-
-            // clean up fields
-            doc_out.data_source = doc_out.data_source || '';
-            if (doc_out.FBO_SETASIDE == 'N/A') doc_out.FBO_SETASIDE = '';
-
-            // type-specific changes, until we've normalized the data import
-            if (doc_out.FBO_CONTACT != '') doc_out.contact = doc_out.FBO_CONTACT;
-            if (doc_out.AgencyContact_t != '') doc_out.contact = doc_out.AgencyContact_t;
-
-            return doc_out;
-        });
-
-        res.json(results_out);
+  var results_callback = function (body) {
+    // massage results into the format we want
+    var results_out = {};
+    if (typeof(body.hits) != 'undefined') {
+      results_out.numFound = body.hits.total;
+    } else {
+      results_out.numFound = 0;
+      return res.json(results_out);
     }
 
+    results_out.facets = body.aggregations;
 
-    var search_settings = {
-        index: config.elasticsearch.index,
-        type: 'opp',
-        body: {
-            highlight: {
-                pre_tags: ["<highlight>"],
-                post_tags: ["</highlight>"],
-                fields : {
-                    "description" : {},
-                    "FBO_OFFADD" : {}
-                }
-            },
-            aggs: {
-                naics_code : {
-                    terms : { field : "FBO_NAICS" }
-                },
-                data_source : {
-                    terms : { field : "data_source" }
-                }
-            }
-        }
-    };
+    // map facet_fields from [label1, value1, label2, value2 ...]
+    // to label1: value1, label2: value2, etc.
+    //var facet;
+    //for (facet_field_name in results_in.facet_counts.facet_fields) {
+    //    facet = results_in.facet_counts.facet_fields[facet_field_name];
+    //    results_out.facets[facet_field_name] = flat_list_to_json(facet);
+    //}
+
+    // map highlights into docs, instead of separate data,
+    // and do a few other cleanup manipulations
+    results_out['docs'] = _u.map(body.hits.hits, function (doc) {
+      var doc_out = _u.omit(doc, '_id', '_source', 'fields');
+      doc_out.id = doc._id;
+
+      _u.extend(doc_out, doc._source);
+
+      // if a fieldlist (fl) is specified, the fields are returned
+      // under a "fields" key, and the values are returned as arrays
+      // the following is to flatten that structure
+      _u.each(_u.keys(doc.fields), function(key) {
+        doc_out[key] = doc.fields[key][0];
+      });
+
+      // adjust score to 0-100
+      doc_out.score = Math.min(Math.round(doc._score * 100), 100);
+
+      // clean up fields
+      doc_out.data_source = doc_out.data_source || '';
+      if (doc_out.FBO_SETASIDE == 'N/A') doc_out.FBO_SETASIDE = '';
+
+      // type-specific changes, until we've normalized the data import
+      if (doc_out.FBO_CONTACT != '') doc_out.contact = doc_out.FBO_CONTACT;
+      if (doc_out.AgencyContact_t != '') doc_out.contact = doc_out.AgencyContact_t;
+
+      return doc_out;
+    });
+
+    res.json(results_out);
+  }
+
 
     if (S(q).isEmpty()) {
         queries.should(ejs.MatchAllQuery());
@@ -299,6 +266,8 @@ app.get('/v0/opps', function(req, res) {
         .sort([ejs.Sort('close_dt').asc(), ejs.Sort('solnbr')])
         .query(queries)
         .filter(filters);
+
+    if (fieldlist) request.fields(fieldlist);
 
     request.doSearch(results_callback);
 });

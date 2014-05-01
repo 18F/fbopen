@@ -78,9 +78,10 @@ describe("The FBOpen API", function() {
     };
   };
 
-  var record_with_solnbr = function(index, solnbr) {
+  var record_with_field = function(field, index, value) {
     return function(resp) {
-      expect(resp.body.docs[index]).to.have.property('solnbr', solnbr);
+      console.log(util.inspect(resp.body));
+      expect(resp.body.docs[index]).to.have.property(field, value);
     };
   };
 
@@ -215,7 +216,7 @@ describe("The FBOpen API", function() {
     .expect(num_returned(2))
     // that this record has moved to the front will be confirmed in the test
     // "should allow paging results"
-    .expect(record_with_solnbr(1, 'spmym414q0334'))
+    .expect(record_with_field('solnbr', 1, 'spmym414q0334'))
     .end(done)
   });
 
@@ -226,7 +227,17 @@ describe("The FBOpen API", function() {
     .expect('Content-Type', 'application/json;charset=utf-8')
     .expect(num_found(16))
     .expect(num_returned(2))
-    .expect(record_with_solnbr(0, 'spmym414q0334'))
+    .expect(record_with_field('solnbr', 0, 'spmym414q0334'))
+    .end(done)
+  });
+
+  it('should accept a whitelist of fields to return', function(done) {
+    request(app)
+    .get('/v0/opps?fl=solnbr,close_dt')
+    .expect(200)
+    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect(num_found(16))
+    .expect(record_with_field('solnbr', 0, 'vcvh14-101'))
     .end(done)
   });
 });
