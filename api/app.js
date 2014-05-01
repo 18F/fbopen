@@ -188,16 +188,6 @@ app.get('/v0/opps', function(req, res) {
       return res.json(results_out);
     }
 
-    results_out.facets = body.aggregations;
-
-    // map facet_fields from [label1, value1, label2, value2 ...]
-    // to label1: value1, label2: value2, etc.
-    //var facet;
-    //for (facet_field_name in results_in.facet_counts.facet_fields) {
-    //    facet = results_in.facet_counts.facet_fields[facet_field_name];
-    //    results_out.facets[facet_field_name] = flat_list_to_json(facet);
-    //}
-
     // map highlights into docs, instead of separate data,
     // and do a few other cleanup manipulations
     results_out['docs'] = _u.map(body.hits.hits, function (doc) {

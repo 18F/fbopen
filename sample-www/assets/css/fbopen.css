@@ -75,10 +75,6 @@ a:hover {
 #fbopen-search-form .form-group {
 	margin-bottom: 5px;
 }
-#naics {
-	width: 100px;
-}
-
 #fbopen-search-form .form-group label {
 	margin: auto; /* was: auto 5px; */
 	font-weight: normal;
@@ -158,28 +154,7 @@ highlight {
 	background-color: beige;
 }
 
-.naics-facets {
-	display: none; /* starts hidden */
-}
-.naics-facets .badge {
-	height: 20px;
-	margin-left: 5px;
-}
-.naics-facets .list-group-item {
-	color: #428bca;
-	border: 0 none;
-}
-.naics-facets .list-group-item.text-muted {
-	color: #999999;
-}
-.naics-facets .list-group-header {
-	color: black;
-}
-.naics-facets a.active {
-	color: white;
-}
-
-.form-group label, .result-industry, .result-where {
+.form-group label, .result-where {
 	margin: 10px;
 }
 
@@ -187,13 +162,13 @@ highlight {
 	display: none;
 }
 
-#q, #naics, #data_source, #go, #more-options {
+#q, #data_source, #go, #more-options {
 	display: inline;
 }
 #more-options {
 	margin-left: 5px;
 }
-#naics, #data_source {
+#data_source {
 	/*width: 250px;*/
 	float: right;
 }

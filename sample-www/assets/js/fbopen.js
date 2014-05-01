@@ -58,7 +58,7 @@
   // re-fill query terms
   if (location.search != '') {
 
-    form_params = ['q', 'p', 'naics', 'data_source'];
+    form_params = ['q', 'fq', 'data_source'];
     for (i in form_params) {
       param_name = form_params[i];
       q_param = getQueryVariable(param_name);
