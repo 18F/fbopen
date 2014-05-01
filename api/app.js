@@ -176,7 +176,6 @@ app.get('/v0/opps', function(req, res) {
   var fieldlist;
   if (url_parts.query['fl']) {
     fieldlist = url_parts.query['fl'].split(',');
-    console.log(fieldlist);
   }
 
   var results_callback = function (body) {
@@ -232,44 +231,40 @@ app.get('/v0/opps', function(req, res) {
   }
 
 
-    if (S(q).isEmpty()) {
-        queries.should(ejs.MatchAllQuery());
-    } else {
-        var qsq = ejs.QueryStringQuery(q);
-        var bool_query = ejs.BoolQuery().should([
-            qsq,
-            ejs.HasChildQuery(qsq, "opp_attachment")
-        ]);
+  if (S(q).isEmpty()) {
+    queries.should(ejs.MatchAllQuery());
+  } else {
+    var qsq = ejs.QueryStringQuery(q);
+    var bool_query = ejs.BoolQuery().should([ qsq, ejs.HasChildQuery(qsq, "opp_attachment") ]);
+    queries.should(bool_query);
+  }
 
-        queries.should(bool_query);
-    }
+  if (!S(fq).isEmpty()) {
+    filters.filters(ejs.QueryFilter(ejs.QueryStringQuery(fq)));
+  } else {
+    filters.filters(ejs.MatchAllFilter());
+  }
 
-    if (!S(fq).isEmpty()) {
-      filters.filters(ejs.QueryFilter(ejs.QueryStringQuery(fq)));
-    } else {
-      filters.filters(ejs.MatchAllFilter());
-    }
+  console.log('"query": { ' + queries.toString() + '}');
+  console.log('"filter": { ' + filters.toString() + '}');
 
-    console.log('"query": { ' + queries.toString() + '}');
-    console.log('"filter": { ' + filters.toString() + '}');
+  var highlight = ejs.Highlight(['description', 'FBO_OFFADD'])
+    .preTags('<highlight>')
+    .postTags('</highlight>');
 
-    var highlight = ejs.Highlight(['description', 'FBO_OFFADD'])
-        .preTags('<highlight>')
-        .postTags('</highlight>');
+  var request = ejs.Request()
+    .indices([config.elasticsearch.index])
+    .types(["opp"])
+    .highlight(highlight)
+    .from(from)
+    .size(size)
+    .sort([ejs.Sort('close_dt').asc(), ejs.Sort('solnbr')])
+    .query(queries)
+    .filter(filters);
 
-    var request = ejs.Request()
-        .indices([config.elasticsearch.index])
-        .types(["opp"])
-        .highlight(highlight)
-        .from(from)
-        .size(size)
-        .sort([ejs.Sort('close_dt').asc(), ejs.Sort('solnbr')])
-        .query(queries)
-        .filter(filters);
+  if (fieldlist) request.fields(fieldlist);
 
-    if (fieldlist) request.fields(fieldlist);
-
-    request.doSearch(results_callback);
+  request.doSearch(results_callback);
 });
 
 
