@@ -4,6 +4,7 @@ var request = require('supertest'),
     async = require('async'),
     path = require('path'),
     child_process = require('child_process'),
+    util = require('util'),
     elasticsearch = require('elasticsearch');
 
 describe("The FBOpen API", function() {
@@ -65,118 +66,167 @@ describe("The FBOpen API", function() {
     ]);
   });
 
-  var numFound = function(num) {
+  var num_found = function(num) {
     return function(resp) {
       expect(resp.body).to.have.property('numFound', num);
+    };
+  };
+
+  var num_returned = function(num) {
+    return function(resp) {
+      expect(resp.body.docs).to.have.length(num);
+    };
+  };
+
+  var record_with_solnbr = function(index, solnbr) {
+    return function(resp) {
+      expect(resp.body.docs[index]).to.have.property('solnbr', solnbr);
     };
   };
 
   it('should have 56 total opp records in the test index', function(done) {
     request(app)
     .get('/v0/opps?show_noncompeted=1&show_closed=1')
-    .expect(200, done)
+    .expect(200)
     .expect('Content-Type', /json/)
-    .expect(numFound(55))
+    .expect(num_found(55))
+    .end(done)
   });
 
   it('should return all competed, open opps', function(done) {
     request(app)
     .get('/v0/opps')
-    .expect(200, done)
+    .expect(200)
     .expect('Content-Type', 'application/json;charset=utf-8')
-    .expect(numFound(16))
+    .expect(num_found(16))
+    .end(done)
   });
 
   it('should return all open opps', function(done) {
     request(app)
     .get('/v0/opps?show_noncompeted=1')
-    .expect(200, done)
+    .expect(200)
     .expect('Content-Type', 'application/json;charset=utf-8')
-    .expect(numFound(42))
+    .expect(num_found(42))
+    .end(done)
   });
 
   it('should return all competed, open opps', function(done) {
     request(app)
     .get('/v0/opps?show_noncompeted=0')
-    .expect(200, done)
+    .expect(200)
     .expect('Content-Type', 'application/json;charset=utf-8')
-    .expect(numFound(16))
+    .expect(num_found(16))
+    .end(done)
   });
 
   it('should return all competed opps, whether open or closed', function(done) {
     request(app)
     .get('/v0/opps?show_closed=1')
-    .expect(200, done)
+    .expect(200)
     .expect('Content-Type', 'application/json;charset=utf-8')
-    .expect(numFound(19))
+    .expect(num_found(19))
+    .end(done)
   });
 
   it('should return all competed, open opps', function(done) {
     request(app)
     .get('/v0/opps?show_closed=0')
-    .expect(200, done)
+    .expect(200)
     .expect('Content-Type', 'application/json;charset=utf-8')
-    .expect(numFound(16))
+    .expect(num_found(16))
+    .end(done)
   });
 
   it('should return **all** opps', function(done) {
     request(app)
     .get('/v0/opps?show_closed=1&show_noncompeted=1')
-    .expect(200, done)
+    .expect(200)
     .expect('Content-Type', 'application/json;charset=utf-8')
-    .expect(numFound(55))
+    .expect(num_found(55))
+    .end(done)
   });
 
   it('should return competed, open opps about "satellite"', function(done) {
     request(app)
     .get('/v0/opps?q=satellite')
-    .expect(200, done)
+    .expect(200)
     .expect('Content-Type', 'application/json;charset=utf-8')
-    .expect(numFound(1))
+    .expect(num_found(1))
     .expect(/satellite/)
+    .end(done)
   });
 
   it('should return competed, open opps, filtered to "Aberdeen"', function(done) {
     request(app)
     .get('/v0/opps?fq=Aberdeen')
-    .expect(200, done)
+    .expect(200)
     .expect('Content-Type', 'application/json;charset=utf-8')
-    .expect(numFound(1))
+    .expect(num_found(1))
     .expect(/Aberdeen/)
+    .end(done)
   });
 
   it('should return competed, open opps, filtered to "Aberdeen" and about "night vision"', function(done) {
     request(app)
     .get('/v0/opps?fq=Aberdeen&q="night vision"')
-    .expect(200, done)
+    .expect(200)
     .expect('Content-Type', 'application/json;charset=utf-8')
-    .expect(numFound(1))
+    .expect(num_found(1))
     .expect(/Aberdeen/)
     .expect(/night vision/i)
+    .end(done)
   });
 
   //TODO: we need data from more sources, or to mark some test data as being from other sources, to properly test this
   it('should return results from FBO', function(done) {
     request(app)
     .get('/v0/opps?data_source=fbo&show_noncompeted=1&show_closed=1')
-    .expect(200, done)
+    .expect(200)
     .expect('Content-Type', 'application/json;charset=utf-8')
-    .expect(numFound(55))
+    .expect(num_found(55))
+    .end(done)
   });
 
   it('should return results from FBO, case insensitively', function(done) {
     request(app)
     .get('/v0/opps?data_source=FBO&show_noncompeted=1&show_closed=1')
-    .expect(200, done)
+    .expect(200)
     .expect('Content-Type', 'application/json;charset=utf-8')
-    .expect(numFound(55))
+    .expect(num_found(55))
+    .end(done)
   });
 
   it('should not return any results for missing dataset', function(done) {
     request(app)
     .get('/v0/opps?data_source=foobar&show_noncompeted=1&show_closed=1')
-    .expect(200, done)
+    .expect(200)
     .expect('Content-Type', 'application/json;charset=utf-8')
-    .expect(numFound(0))
+    .expect(num_found(0))
+    .end(done)
+  });
+
+  it('should allow limiting results', function(done) {
+    request(app)
+    .get('/v0/opps?limit=2')
+    .expect(200)
+    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect(num_found(16))
+    .expect(num_returned(2))
+    // that this record has moved to the front will be confirmed in the test
+    // "should allow paging results"
+    .expect(record_with_solnbr(1, 'spmym414q0334'))
+    .end(done)
+  });
+
+  it('should allow paging results', function(done) {
+    request(app)
+    .get('/v0/opps?from=1&limit=2')
+    .expect(200)
+    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect(num_found(16))
+    .expect(num_returned(2))
+    .expect(record_with_solnbr(0, 'spmym414q0334'))
+    .end(done)
   });
 });
