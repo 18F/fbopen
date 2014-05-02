@@ -34,9 +34,11 @@ config.ssl = {
 	, rejectUnauthorized: false
 };
 
-config.solr = {};
-config.solr.base_url = 'http://fbopen.gsa.gov:8983/solr/collection1/select';
+// logger
+config.logger = {};
+config.logger.path = '/var/log/fbopen/api.log';
 
+// elasticsearch
 config.elasticsearch = {};
 config.elasticsearch.host = process.env.ELASTICSEARCH_HOST || 'localhost';
 config.elasticsearch.port = '9200';
