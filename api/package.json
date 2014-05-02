@@ -18,6 +18,7 @@
     "chai": "*",
     "mocha": "*",
     "async": "*",
-    "supertest": "*"
+    "supertest": "*",
+    "express-bunyan-logger": "*"
   }
 }
