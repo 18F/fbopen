@@ -1,7 +1,7 @@
 # Using the grants.gov loader for FBOpen
 
 ## To install the loader
-* Install Solr. See the README in `/solr-files` .
+* Install Elasticsearch. See the README in `/elasticsearch` .
 * `npm install`
 * `mkdir workfiles nightly-downloads tmp`
 
