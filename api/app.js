@@ -30,6 +30,14 @@ var express = require('express')
 var config = require('./config');
 
 var app = express();
+app.use(require('express-bunyan-logger')({
+  name: 'fbopen_api',
+  streams: [
+    level: 'debug',
+    path: config.logger.path
+  ]
+));
+app.use(require('express-bunyan-logger').ErrorLogger());
 module.exports = app;
 
 // http basic auth, if required in config
