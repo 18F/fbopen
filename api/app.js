@@ -32,12 +32,12 @@ var config = require('./config');
 var app = express();
 app.use(require('express-bunyan-logger')({
   name: 'fbopen_api',
-  streams: [
+  streams: [{
     level: 'debug',
     path: config.logger.path
-  ]
-));
-app.use(require('express-bunyan-logger').ErrorLogger());
+  }]
+}));
+app.use(require('express-bunyan-logger').errorLogger());
 module.exports = app;
 
 // http basic auth, if required in config
@@ -53,6 +53,7 @@ if (config.app.require_http_basic_auth) {
 // console.log(config.elasticsearch.host);
 // console.log("Elasticsearch index from within app:");
 // console.log(config.elasticsearch.index);
+
 var client = nc.NodeClient(config.elasticsearch.host, config.elasticsearch.port);
 ejs.client = client;
 
@@ -64,7 +65,6 @@ ejs.client = client;
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(express.favicon());
-app.use(express.logger('dev'));
 app.use(express.bodyParser());
 app.use(express.methodOverride());
 app.use(express.cookieParser('your secret here'));
@@ -117,8 +117,8 @@ app.get('/v0/hello', function(req, res){
 // Queries
 app.get('/v0/opps', function(req, res) {
 
-    res.set('Access-Control-Allow-Origin', '*');
-    res.set('Content-Type', 'application/json;charset=utf-8');
+  res.set('Access-Control-Allow-Origin', '*');
+  res.set('Content-Type', 'application/json;charset=utf-8');
 
 	// execute the Elasticsearch query and return results
 	var url_parts = url.parse(req.url, true);
@@ -243,8 +243,8 @@ app.get('/v0/opps', function(req, res) {
     filters.filters(ejs.MatchAllFilter());
   }
 
-  console.log('"query": { ' + queries.toString() + '}');
-  console.log('"filter": { ' + filters.toString() + '}');
+  // console.log('"query": { ' + queries.toString() + '}');
+  // console.log('"filter": { ' + filters.toString() + '}');
 
   var highlight = ejs.Highlight(['description', 'FBO_OFFADD'])
     .preTags('<highlight>')
