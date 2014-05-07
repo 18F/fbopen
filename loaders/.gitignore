@@ -7,6 +7,7 @@ fbo-attachments/*
 nightly-downloads/*
 workfiles/*
 downloads/*
+test/sample/output/*.tmp
 *.log
 *.out
 *.urls
