@@ -18,8 +18,8 @@ var express = require('express')
   , http_auth = require('http-auth')
 
   // other useful stuff
-  , ejs = require('elastic.js')
-  , nc = require('elastic.js/elastic-node-client')
+  , ejs = require('./elastic.min.js')
+  , es = require('elasticsearch')
   , url = require('url')
   , moment = require('moment') // momentjs.com
   , S = require('string') // stringjs.com
@@ -33,11 +33,11 @@ var app = express();
 app.use(require('express-bunyan-logger')({
   name: 'fbopen_api',
   streams: [{
-    level: 'debug',
+    level: 'trace',
     path: config.logger.path
+    // stream: process.stdout // for debugging
   }]
 }));
-app.use(require('express-bunyan-logger').errorLogger());
 module.exports = app;
 
 // http basic auth, if required in config
@@ -54,9 +54,11 @@ if (config.app.require_http_basic_auth) {
 // console.log("Elasticsearch index from within app:");
 // console.log(config.elasticsearch.index);
 
-var client = nc.NodeClient(config.elasticsearch.host, config.elasticsearch.port);
-ejs.client = client;
-
+var client = es.Client({
+  host: config.elasticsearch.host + ':' + config.elasticsearch.port,
+  log: ['debug', 'trace'],
+  api_version: '1.1'
+});
 
 // all environments
 // (express.js standard scaffolding -- see http://expressjs.com/guide.html#executable )
@@ -186,10 +188,10 @@ app.get('/v0/opps', function(req, res) {
     fieldlist = url_parts.query['fl'].split(',');
   }
 
-  var results_callback = function (body) {
+  var results_callback = function (error, body, status) {
     // massage results into the format we want
     var results_out = {};
-    if (typeof(body.hits) != 'undefined') {
+    if (_u.contains(_u.keys(body), 'hits') && typeof(body.hits) != 'undefined') {
       results_out.numFound = body.hits.total;
     } else {
       results_out.numFound = 0;
@@ -256,18 +258,18 @@ app.get('/v0/opps', function(req, res) {
     .postTags('</highlight>');
 
   var request = ejs.Request()
-    .indices([config.elasticsearch.index])
-    .types(["opp"])
     .highlight(highlight)
     .from(from)
     .size(size)
     .query(queries)
     .filter(filters);
 
-  if (fieldlist) request.fields(fieldlist);
   if (sorts.length > 0) request.sort(sorts);
+  if (fieldlist) request.fields = fieldlist;
 
-  request.doSearch(results_callback);
+  //console.log(request);
+
+  client.search({ index: config.elasticsearch.index, type: "opp", body: request.toJSON() }, results_callback);
 });
 
 
