@@ -484,22 +484,19 @@
     if (ie) { $.ajaxSetup({ cache: false }); };
   } 
 
-// http://css-tricks.com/snippets/javascript/get-url-variables/
-function getQueryVariable(variable)
-{
-       var query = window.location.search.substring(1);
+  // http://css-tricks.com/snippets/javascript/get-url-variables/
+  function getQueryVariable(variable) {
+    var query = window.location.search.substring(1);
 
-       // don't let trailing slash get appended to the last query param value
-       query = query.replace(/\/$/, "");
+    // don't let trailing slash get appended to the last query param value
+    query = query.replace(/\/$/, "");
 
-       var vars = query.split("&");
-       for (var i=0;i<vars.length;i++) {
-         var pair = vars[i].split("=");
-         if(pair[0] == variable){return pair[1];}
-       }
-
-       return(false);
-}
+    var vars = query.split("&");
+    for (var i=0;i<vars.length;i++) {
+      var pair = vars[i].split("=");
+      if(pair[0] == variable){return pair[1];}
+    }
+  }
 
   function htmlEncode(value){
     return $('<div/>').text(value).html();
