@@ -10,7 +10,7 @@
     "jade": "*",
     "less-middleware": ">=0.2.1-beta",
     "request": "*",
-    "elastic.js": "*",
+    "elasticsearch": "*",
     "moment": "*",
     "string": ">=1.8.1",
     "http-auth": "*",

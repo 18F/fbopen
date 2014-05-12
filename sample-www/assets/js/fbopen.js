@@ -71,7 +71,7 @@
     // checkboxen:
     form_checkboxes = ['show_closed', 'show_noncompeted'];
     for (i in form_checkboxes) {
-      if (getQueryVariable(form_checkboxes[i])) {
+      if (! S(getQueryVariable(form_checkboxes[i])).isEmpty()) {
         $('#' + form_checkboxes[i]).prop('checked', true);
         search_params[form_checkboxes[i]] = true;
       } else {
@@ -161,7 +161,6 @@
 
     var render_error = function (err) {
       dust.render('error', {}, function (err, out) {
-        // console.log(err);
         $('#results-list').html(out);
         $('#results-container').show();
       });
@@ -180,7 +179,7 @@
         dust.debugLevel = 'INFO';
         dust.render('result', results, function(err, out) {
 
-          if (err) {
+          if (!err === null) {
               render_error(err);
           } else {
             // display the results
