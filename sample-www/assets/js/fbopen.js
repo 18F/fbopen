@@ -237,24 +237,6 @@
 
   }
 
-  dust.helpers.parent_listing_url = function(chunk, context, bodies, params) {
-    
-    var parent_url = context.get('parent_link_t') || '';
-    if (parent_url) {
-      return chunk.write(parent_url);
-    }
-
-    var listing_url = context.get('listing_url') || '';
-    if (listing_url != undefined) {
-      return chunk.write(listing_url);
-    }
-
-    // get parent url ?
-    var solnbr = context.get('solnbr');
-    var data_source = context.get('data_source');
-    return chunk.write('')
-  }
-
   dust.helpers.set_aside = function(chunk, context, bodies, params) {
 
     var data_source = context.get('data_source')
