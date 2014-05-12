@@ -212,7 +212,9 @@ app.get('/v0/opps', function(req, res) {
       });
 
       // adjust score to 0-100
-      doc_out.score = Math.min(Math.round(doc._score * 100), 100);
+      if (doc._score !== null) {
+        doc_out.score = Math.min(Math.round(doc._score * 100), 100);
+      }
 
       // clean up fields
       doc_out.data_source = doc_out.data_source || '';
