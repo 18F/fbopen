@@ -19,6 +19,7 @@
 			<div class="agency-name">{agency}</div>
 		</div>
 		<div class="listing-top-right col-md-2 col-sm-2">
+            {#score}
 			<div class="score">
 				<div class="score-dots">
 					<span class="score-dots">{@score_dots score="{score}" /}</span>
@@ -27,6 +28,7 @@
 					<strong>{score}%</strong> RELEVANT
 				</div>
 			</div>
+            {/score}
 		</div>
 	</div>
 
