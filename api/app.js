@@ -231,8 +231,11 @@ app.get('/v0/opps', function(req, res) {
   }
 
 
+  var sorts = [];
   if (S(q).isEmpty()) {
     queries.should(ejs.MatchAllQuery());
+    sorts.push(ejs.Sort('close_dt').asc());
+    sorts.push(ejs.Sort('solnbr'));
   } else {
     var qsq = ejs.QueryStringQuery(q);
     var bool_query = ejs.BoolQuery().should([ qsq, ejs.HasChildQuery(qsq, "opp_attachment") ]);
@@ -258,11 +261,11 @@ app.get('/v0/opps', function(req, res) {
     .highlight(highlight)
     .from(from)
     .size(size)
-    .sort([ejs.Sort('close_dt').asc(), ejs.Sort('solnbr')])
     .query(queries)
     .filter(filters);
 
   if (fieldlist) request.fields(fieldlist);
+  if (sorts.length > 0) request.sort(sorts);
 
   request.doSearch(results_callback);
 });
