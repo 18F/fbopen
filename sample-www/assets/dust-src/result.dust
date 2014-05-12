@@ -4,7 +4,7 @@
 	</div>
 	<div id="results-sorted-by" class="col-md-6 col-sm-6">
 		Sorted by 
-		<span class="selected">Relevance</span>
+		<span class="selected">{#score}Relevance{:else}Due Date</span> (oldest first), <span class="selected">Opportunity #{/score}</span>
 	</div>
 </div>
 {#docs}
