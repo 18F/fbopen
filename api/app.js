@@ -241,8 +241,9 @@ app.get('/v0/opps', function(req, res) {
     sorts.push(ejs.Sort('solnbr'));
   } else {
     var qsq = ejs.QueryStringQuery(q);
-    var bool_query = ejs.BoolQuery().should([ qsq, ejs.HasChildQuery(qsq, "opp_attachment") ]);
-    queries.should(bool_query);
+    var child_query = ejs.HasChildQuery(qsq, "opp_attachment");
+    queries.should(qsq);
+    queries.should(child_query);
   }
 
   if (!S(fq).isEmpty()) {
