@@ -187,7 +187,7 @@ app.get('/v0/opps', function(req, res) {
   var results_callback = function (error, body, status) {
     // massage results into the format we want
     var results_out = {};
-    if (_u.contains(_u.keys(body), 'hits') && typeof(body.hits) != 'undefined') {
+    if (_u.has(body, 'hits') && _u.has(body.hits, 'total')) {
       results_out.numFound = body.hits.total;
     } else {
       results_out.numFound = 0;
@@ -197,7 +197,7 @@ app.get('/v0/opps', function(req, res) {
     // map highlights into docs, instead of separate data,
     // and do a few other cleanup manipulations
     results_out['docs'] = _u.map(body.hits.hits, function (doc) {
-      var doc_out = _u.omit(doc, '_id', '_source', 'fields');
+      var doc_out = _u.omit(doc, '_id', '_source', '_index', 'fields');
       doc_out.id = doc._id;
 
       _u.extend(doc_out, doc._source);
