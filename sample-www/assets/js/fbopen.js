@@ -428,11 +428,11 @@
     //} else 
     if (doc.summary) {
       content_snippet = opening_ellipsis(doc.summary) + S(doc.summary).stripTags().s;
-    } else if (doc.highlights.hasOwnProperty('description') && typeof(doc.highlights.hasOwnProperty('description')) == 'array') {
+    } else if (doc.highlights.hasOwnProperty('description')) {
       content_snippet = opening_ellipsis(doc.highlights.description[0]) + S(doc.highlights.description.join(ELLIPSIS + '</div><div class="content-snippet">')).s;
     } else if (doc.hasOwnProperty('description') && ! S(doc.description).isEmpty()) {
       content_snippet = opening_ellipsis(doc.description) + S(doc.description).stripTags().truncate(CONTENT_MAX_LENGTH).s;
-    } else if (doc.highlights.hasOwnProperty('content') && _u.isArray(doc.highlights.hasOwnProperty('content'))) {
+    } else if (doc.highlights.hasOwnProperty('content')) {
       content_snippet = opening_ellipsis(doc.highlights.content[0]) + S(doc.highlights.content.join(ELLIPSIS + '</div><div class="content-snippet">')).s;
     } else if (doc.hasOwnProperty('content') & ! S(doc.content).isEmpty()) {
       content_snippet = opening_ellipsis(doc.content) + S(doc.content).stripTags().truncate(CONTENT_MAX_LENGTH).s;
