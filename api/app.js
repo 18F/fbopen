@@ -135,22 +135,18 @@ app.get('/v0/opps', function(req, res) {
   // special fields
   //
 
-  // omit or include non-competed listings by default
-  non_competed_bool_query = ejs.BoolQuery().should([
-      ejs.MatchQuery('_all', 'single source'),
-      ejs.MatchQuery('_all', 'sole source'),
-      ejs.MatchQuery('_all', 'other than full and open competition')
-  ]);
+  if (! (url_parts.query['show_noncompeted'] && S(url_parts.query['show_noncompeted']).toBoolean())) {
+    // omit non-competed listings unless otherwise specified
+    non_competed_bool_query = ejs.BoolQuery().should([
+        ejs.MatchQuery('_all', 'single source'),
+        ejs.MatchQuery('_all', 'sole source'),
+        ejs.MatchQuery('_all', 'other than full and open competition')
+    ]);
 
-  var non_competed_flt = ejs.NotFilter(ejs.QueryFilter(non_competed_bool_query));
+    var non_competed_flt = ejs.NotFilter(ejs.QueryFilter(non_competed_bool_query));
 
-  if (url_parts.query['show_noncompeted']) {
-    if (S(url_parts.query['show_noncompeted']).toBoolean()) {
-      non_competed_flt = ejs.MatchAllFilter();
-    }
+    filters.filters(non_competed_flt);
   }
-
-  filters.filters(non_competed_flt);
 
   // omit or include closed listings
   // if it's not defined or it's false, add this filter
