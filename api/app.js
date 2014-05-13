@@ -196,6 +196,8 @@ app.get('/v0/opps', function(req, res) {
 
     // map highlights into docs, instead of separate data,
     // and do a few other cleanup manipulations
+    var sorted_by_score = false;
+
     results_out['docs'] = _u.map(body.hits.hits, function (doc) {
       var doc_out = _u.omit(doc, '_id', '_source', '_index', 'fields');
       doc_out.id = doc._id;
@@ -211,6 +213,7 @@ app.get('/v0/opps', function(req, res) {
 
       // adjust score to 0-100
       if (doc._score !== null) {
+        sorted_by_score = true;
         doc_out.score = Math.min(Math.round(doc._score * 100), 100);
       }
 
@@ -224,6 +227,8 @@ app.get('/v0/opps', function(req, res) {
 
       return doc_out;
     });
+
+    results_out['sorted_by_score'] = sorted_by_score;
 
     res.json(results_out);
   }
