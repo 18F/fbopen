@@ -236,7 +236,8 @@ app.get('/v0/opps', function(req, res) {
       return doc_out;
     });
 
-    results_out['sorted_by_score'] = sorted_by_score;
+    // required by sort indicator
+    results_out['sorted_by'] = sorted_by_score ? 'relevance' : 'due date (oldest first), opportunity #';
     // required by paging
     results_out['start'] = from;
 
