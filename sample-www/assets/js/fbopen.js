@@ -1,4 +1,4 @@
-// fbopen2.js
+// fbopen.js
 (function( fbopen, $, undefined ) { // http://stackoverflow.com/q/5947280/185839
 
   // console.log stub for IE compatibility -- see http://forum.jquery.com/topic/ie-console-log
@@ -25,7 +25,8 @@
   // CONFIGURATION
   //
 
-  var PAGESIZE = 10; // results per page -- fixed by the API, not customizable here
+  var PAGESIZE = 10; // results per page -- in order for pagination to work properly,
+                     // this value must be in sync with the default page size in the API
 
   // always call current version of the API (currently v0)
   $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
@@ -326,51 +327,49 @@
 
   // pagination
 
-  // dust.helpers.pager = function(chunk, context, bodies, params) {
+  dust.helpers.pager = function(chunk, context, bodies, params) {
 
-  //   var numPages = Math.floor(context.get('numFound') / PAGESIZE) + 1;
-  //   // TODO: put this back! When you figure out how to do it w/ Elasticsearch
-  //   //var currentPage = parseInt(context.get('start')) / PAGESIZE + 1;
-  //   var currentPage = 1;
+    var numPages = Math.floor(context.get('numFound') / PAGESIZE) + 1;
+    var currentPage = parseInt(context.get('start')) / PAGESIZE + 1;
 
-  //   var pager_str = '';
+    var pager_str = '';
 
-  //   var button_disabled = (currentPage > 1 ? '' : ' class="disabled"');
-  //   // pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, 1) + '">&lt;&lt;</a></li>'; // first page
-  //   pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, Math.max(currentPage - 1, 1)) + '">&lt;</a></li>'; // previous page
+    var button_disabled = (currentPage > 1 ? '' : ' class="disabled"');
+    // pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, 1) + '">&lt;&lt;</a></li>'; // first page
+    pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, Math.max(currentPage - 1, 1)) + '">&lt;</a></li>'; // previous page
 
-  //   // numbered page links
-  //   var this_page;
-  //   var begin_page = Math.max(1, currentPage - 3);
-  //   var end_page = Math.min(begin_page + 7, numPages);
-  //   for (this_page = begin_page; this_page <= end_page; this_page++) {
-  //     button_disabled = (currentPage != this_page ? '' : ' class="disabled"');
-  //     if (button_disabled) {
-  //       pager_str += '<li class="current"><span>' + this_page + '</span></li>';
-  //     } else {
-  //       pager_str += '<li><span><a href="' + pager_link(currentPage, this_page) + '">' + this_page + '</a></span></li>';
-  //     }
-  //   }
-  //   // pager_str += '<li class="disabled"><span>page ' + currentPage + ' of ' + numPages + '</span></li>';
+    // numbered page links
+    var this_page;
+    var begin_page = Math.max(1, currentPage - 3);
+    var end_page = Math.min(begin_page + 7, numPages);
+    for (this_page = begin_page; this_page <= end_page; this_page++) {
+      button_disabled = (currentPage != this_page ? '' : ' class="disabled"');
+      if (button_disabled) {
+        pager_str += '<li class="current"><span>' + this_page + '</span></li>';
+      } else {
+        pager_str += '<li><span><a href="' + pager_link(currentPage, this_page) + '">' + this_page + '</a></span></li>';
+      }
+    }
+    // pager_str += '<li class="disabled"><span>page ' + currentPage + ' of ' + numPages + '</span></li>';
 
-  //   button_disabled = (currentPage < numPages ? '' : ' class="disabled"');
-  //   pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, Math.min(currentPage + 1, numPages)) + '">&gt;</a></li>'; // next page
-  //   // pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, numPages) + '">&gt;&gt;</a></li>'; // last page
+    button_disabled = (currentPage < numPages ? '' : ' class="disabled"');
+    pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, Math.min(currentPage + 1, numPages)) + '">&gt;</a></li>'; // next page
+    // pager_str += '<li' + button_disabled + '><a href="' + pager_link(currentPage, numPages) + '">&gt;&gt;</a></li>'; // last page
 
-  //   return chunk.write(pager_str);
-  // }
+    return chunk.write(pager_str);
+  }
 
-  //function pager_link(currentPage, i) {
-  //  
-  //  current_url = location.href;
-  //  page_str = '&p=' + i;
-  //  if (current_url.match(/&p=[0-9]*/)) {
-  //    out_url = current_url.replace(/&p=[0-9]*/, page_str);
-  //  } else {
-  //    out_url = current_url + page_str;
-  //  }
-  //  return out_url;
-  //}
+  function pager_link(currentPage, i) {
+    
+    current_url = location.href;
+    page_str = '&p=' + i;
+    if (current_url.match(/&p=[0-9]*/)) {
+      out_url = current_url.replace(/&p=[0-9]*/, page_str);
+    } else {
+      out_url = current_url + page_str;
+    }
+    return out_url;
+  }
 
 
   // date formatting

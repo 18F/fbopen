@@ -166,8 +166,6 @@ app.get('/v0/opps', function(req, res) {
   }
 
   // pagination
-  var from = url_parts.query.from || 0;
-
   var size = 10;
   if (url_parts.query['limit']) {
     if (parseInt(url_parts.query['limit']) <= config.app.max_rows) {
@@ -176,6 +174,16 @@ app.get('/v0/opps', function(req, res) {
       res.json(400, { error: 'Sorry, param "limit" must be <= ' + config.app.max_rows });
       return;
     }
+  }
+
+  // default to using 'p' if present, as that will come from the webclient
+  // calculate 'from' from 'p' and 'limit'
+  var p = url_parts.query.p;
+  var from;
+  if (!p) {
+    from = url_parts.query.from || 0;
+  } else {
+    from = (p - 1) * size;
   }
 
   // specify fields to be included in results
@@ -229,6 +237,8 @@ app.get('/v0/opps', function(req, res) {
     });
 
     results_out['sorted_by_score'] = sorted_by_score;
+    // required by paging
+    results_out['start'] = from;
 
     res.json(results_out);
   }
