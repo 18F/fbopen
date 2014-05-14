@@ -7,6 +7,9 @@
 		<span class="selected">{#sorted_by_score}Relevance{:else}Due Date</span> (oldest first), <span class="selected">Opportunity #{/sorted_by_score}</span>
 	</div>
 </div>
+<div class="pagination-box">
+    <ul class="pagination">{@pager /}</ul>
+</div>
 {#docs}
 <div class="result-item" data-solr-id="{id}" data-attachment-url="{@get_attachment_url /}">
 	<div class="row listing-top">
@@ -105,3 +108,6 @@
 	</div>
 </div>
 {/docs}
+<div class="pagination-box">
+    <ul class="pagination">{@pager /}</ul>
+</div>
