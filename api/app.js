@@ -10,8 +10,6 @@
  */
 
 var express = require('express')
-
-  // express.js standard scaffolding components (some overkill here)
   , http = require('http')
   , https = require('https')
   , path = require('path')
@@ -20,25 +18,30 @@ var express = require('express')
   // other useful stuff
   , ejs = require('./elastic.min.js')
   , es = require('elasticsearch')
-  , url = require('url')
   , moment = require('moment') // momentjs.com
   , S = require('string') // stringjs.com
   , util = require('util')
   , _u = require('underscore')
+  , LogClass = require('./log_to_bunyan')
+  , body_parser = require('body-parser')
+  , serve_favicon = require('serve-favicon')
+  , errorhandler = require('errorhandler')
+  , morgan = require('morgan')
   ;
 
 var config = require('./config');
 
 var app = express();
+module.exports = app;
+
 app.use(require('express-bunyan-logger')({
-  name: 'fbopen_api',
+  name: 'api',
   streams: [{
     level: 'trace',
     path: config.logger.path
     // stream: process.stdout // for debugging
   }]
 }));
-module.exports = app;
 
 // http basic auth, if required in config
 if (config.app.require_http_basic_auth) {
@@ -56,28 +59,17 @@ if (config.app.require_http_basic_auth) {
 
 var client = es.Client({
   host: config.elasticsearch.host + ':' + config.elasticsearch.port,
-  log: ['debug', 'trace'],
+  log: LogClass,
   api_version: '1.1'
 });
 
-// all environments
-// (express.js standard scaffolding -- see http://expressjs.com/guide.html#executable )
-// some of this is unused/overkill at the moment
-// app.set('port', config.app.port);
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
-app.use(express.favicon());
-app.use(express.bodyParser());
-app.use(express.methodOverride());
-app.use(express.cookieParser('your secret here'));
-app.use(express.session());
-app.use(app.router);
-app.use(require('less-middleware')(__dirname + '/public'));
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(serve_favicon(__dirname + '/public/favicon.png'));
+app.use(body_parser());
 
-// development only
-if ('development' == app.get('env')) {
-  app.use(express.errorHandler());
+if ('development' === process.env.NODE_ENV) {
+  app.use(errorhandler());
 }
 
 // Allow cross-site queries (CORS)
@@ -99,7 +91,7 @@ app.options('*', function(req, res) {
 
 
 app.get('/v0/', function(req, res) {
-	res.send('FBOpen APi v0. See http://docs.fbopen.apiary.io for initial documentation.');
+	res.send('FBOpen API v0. See http://docs.fbopen.apiary.io for initial documentation.');
 });
 
 app.get('/v0/hello', function(req, res){

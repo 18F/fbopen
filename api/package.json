@@ -6,9 +6,13 @@
     "start": "node app.js"
   },
   "dependencies": {
-    "express": "3.3.4",
+    "express": "",
+    "serve-favicon": "",
+    "body-parser": "",
+    "method-override": "",
+    "errorhandler": "",
+    "morgan": "",
     "jade": "*",
-    "less-middleware": ">=0.2.1-beta",
     "request": "*",
     "elasticsearch": "*",
     "moment": "*",
