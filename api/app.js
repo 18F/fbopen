@@ -114,11 +114,8 @@ app.get('/v0/opps', function(req, res) {
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Content-Type', 'application/json;charset=utf-8');
 
-	// execute the Elasticsearch query and return results
-	var url_parts = url.parse(req.url, true);
-
-	var q = url_parts.query['q'];
-	var fq = url_parts.query['fq'];
+	var q = req.param('q');
+	var fq = req.param('fq');
 
   var queries = ejs.BoolQuery();
   var filters = ejs.AndFilter([]);
@@ -127,7 +124,7 @@ app.get('/v0/opps', function(req, res) {
   // special fields
   //
 
-  if (! (url_parts.query['show_noncompeted'] && S(url_parts.query['show_noncompeted']).toBoolean())) {
+  if (! (req.param('show_noncompeted') && S(req.param('show_noncompeted')).toBoolean())) {
     // omit non-competed listings unless otherwise specified
     non_competed_bool_query = ejs.BoolQuery().should([
         ejs.MatchQuery('_all', 'single source'),
@@ -142,9 +139,9 @@ app.get('/v0/opps', function(req, res) {
 
   // omit or include closed listings
   // if it's not defined or it's false, add this filter
-  if (!url_parts.query['show_closed'] || S(url_parts.query['show_closed']).toBoolean() === false) {
+  if (!req.param('show_closed') || S(req.param('show_closed')).toBoolean() === false) {
     var show_closed = ejs.RangeQuery('close_dt').gt(config.elasticsearch.now_str);
-    if (q != '') {
+    if (q !== '') {
       filters.filters(ejs.QueryFilter(show_closed));
     } else {
       queries.should(show_closed);
@@ -152,16 +149,16 @@ app.get('/v0/opps', function(req, res) {
   }
 
   // filter by data source
-  var data_source = url_parts.query['data_source'];
+  var data_source = req.param('data_source');
   if (!S(data_source).isEmpty()) {
     filters.filters(ejs.TermFilter('data_source', data_source.toLowerCase()));
   }
 
   // pagination
   var size = 10;
-  if (url_parts.query['limit']) {
-    if (parseInt(url_parts.query['limit']) <= config.app.max_rows) {
-      size = url_parts.query.limit;
+  if (req.param('limit')) {
+    if (parseInt(req.param('limit')) <= config.app.max_rows) {
+      size = req.param('limit');
     } else {
       res.json(400, { error: 'Sorry, param "limit" must be <= ' + config.app.max_rows });
       return;
@@ -170,18 +167,18 @@ app.get('/v0/opps', function(req, res) {
 
   // default to using 'p' if present, as that will come from the webclient
   // calculate 'from' from 'p' and 'limit'
-  var p = url_parts.query.p;
+  var p = req.param('p');
   var from;
   if (!p) {
-    from = url_parts.query.from || 0;
+    from = req.param('from') || 0;
   } else {
     from = (p - 1) * size;
   }
 
   // specify fields to be included in results
   var fieldlist;
-  if (url_parts.query['fl']) {
-    fieldlist = url_parts.query['fl'].split(',');
+  if (req.param('fl')) {
+    fieldlist = req.param('fl').split(',');
   }
 
   var results_callback = function (error, body, status) {
@@ -198,7 +195,7 @@ app.get('/v0/opps', function(req, res) {
     // and do a few other cleanup manipulations
     var sorted_by_score = false;
 
-    results_out['docs'] = _u.map(body.hits.hits, function (doc) {
+    results_out.docs = _u.map(body.hits.hits, function (doc) {
       var doc_out = _u.omit(doc, '_id', '_source', '_index', 'fields');
       doc_out.id = doc._id;
 
@@ -222,19 +219,19 @@ app.get('/v0/opps', function(req, res) {
       if (doc_out.FBO_SETASIDE == 'N/A') doc_out.FBO_SETASIDE = '';
 
       // type-specific changes, until we've normalized the data import
-      if (doc_out.FBO_CONTACT != '') doc_out.contact = doc_out.FBO_CONTACT;
-      if (doc_out.AgencyContact_t != '') doc_out.contact = doc_out.AgencyContact_t;
+      if (doc_out.FBO_CONTACT !== '') doc_out.contact = doc_out.FBO_CONTACT;
+      if (doc_out.AgencyContact_t !== '') doc_out.contact = doc_out.AgencyContact_t;
 
       return doc_out;
     });
 
     // required by sort indicator
-    results_out['sorted_by'] = sorted_by_score ? 'relevance' : 'due date (oldest first), opportunity #';
+    results_out.sorted_by = sorted_by_score ? 'relevance' : 'due date (oldest first), opportunity #';
     // required by paging
-    results_out['start'] = from;
+    results_out.start = from;
 
     res.json(results_out);
-  }
+  };
 
 
   var sorts = [];
@@ -391,10 +388,10 @@ app.post('/v0/opp/:doc_id/tags/:tags?', function(req, res) {
 	// 'opp/' + solnbr + '/tags/' + tags_serial
 	doc_id = req.params.doc_id;
 	
-	solr_doc = { 'id': doc_id }
+	solr_doc = { 'id': doc_id };
 
 	tags = req.params.tags;
-	if (tags != undefined) {
+	if (tags !==  undefined) {
 		// console.log('tags.length = ' + tags.length);
 		tags_array = tags.split(',');
 		content_tags_array = [];
@@ -404,7 +401,7 @@ app.post('/v0/opp/:doc_id/tags/:tags?', function(req, res) {
 	}
 
 	// console.log('content_tags_list = ' + content_tags_list);
-	solr_doc['content_tags'] = JSON.parse(content_tags_list);
+	solr_doc.content_tags = JSON.parse(content_tags_list);
 
 	docs = [];
 	docs.push(solr_doc);
@@ -415,7 +412,7 @@ app.post('/v0/opp/:doc_id/tags/:tags?', function(req, res) {
 			fail = {
 				'status': 'fail'
 				, 'message': 'client.UPDATE failed: ' + err
-			}
+			};
 			res.send(fail);
 		} else {
 			// console.log('updated: ' + JSON.stringify(obj));
@@ -423,7 +420,7 @@ app.post('/v0/opp/:doc_id/tags/:tags?', function(req, res) {
 				'status': 'success'
 				, 'message': 'Ok'
 				, 'data': doc_id
-			}
+			};
 			res.send(success);
 		}
 	});
