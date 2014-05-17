@@ -23,6 +23,8 @@ var express = require('express')
 	, request = require('request')
 	, qs = require('querystring')
 	, solr = require('solr-client')
+	, icalendar = require('icalendar')
+	, uuid = require('node-uuid')
 	, url = require('url')
 	, moment = require('moment') // momentjs.com
 	, S = require('string') // stringjs.com
@@ -248,6 +250,57 @@ app.get('/v0/opps', function(req, res) {
 		}
 	});
 
+});
+
+// Create a calendar event from record id
+app.get('/v0/cal/:id?', function(req, res) {
+	// Make sure we have a record id to retrieve
+	if (req.param('id') === undefined) {
+		return res.json(404, { error: 'Invalid record id supplied.' });
+	}
+
+	// start with base endpoint, then add query params
+	var solr_url = config.solr.base_url;
+	
+	// Adding the fq here to get rid of a links record that was being returned 
+	// unwantedly.
+	solr_url += '?q=id="' + req.param('id') + '"' +
+					'&fq=%2Bclose_dt%3A%5B*+TO+*%5D' +
+					'&fl=id,title,listing_url,close_dt,description' +
+					'&wt=json&indent=true';
+
+	// Search solor for our record
+	request(solr_url, function(err, resp, body) {
+
+		res.set('Access-Control-Allow-Origin', '*');
+		res.set('Content-Type', 'application/json;charset=utf-8');
+
+		if (!err && resp.statusCode == 200) {
+
+			var results_in = JSON.parse(body);
+			// Grab the first result, there should only be one if we're 
+			// correctly using a uid
+			var result = results_in.response.docs[0];
+			
+			// Got good results, create the calendar event
+			var ev = new icalendar.VEvent(uuid.v4());
+			ev.setSummary("FBOpen Deadline for " + result.title);
+
+			// We want the start date to be 1 hour before the closing time
+			var endDate = new Date(result.close_dt);
+			var startDate = new moment(result.close_dt);
+			startDate.subtract('hours', 1);
+			console.log(startDate.toDate(), endDate);
+			ev.setDate(startDate.toDate(), endDate);
+			ev.setDescription(result.description);
+			ev.addProperty('URL', result.listing_url);
+			res.setHeader('Content-Disposition', 'attachment; filename=fbopen.ics');
+			res.type('text/calendar');
+			res.end(ev.toString());
+		} else {
+			res.json(resp.statusCode, { error: err });
+		}
+	});
 });
 
 // translate solr facets into JSON

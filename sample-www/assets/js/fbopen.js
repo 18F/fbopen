@@ -28,12 +28,15 @@
   var PAGESIZE = 10; // results per page -- fixed by the API, not customizable here
 
   // always call current version of the API (currently v0)
+  var api_base;
+  if (location.protocol == 'https:' && fbopen_config.API_SERVER_SSL) {
+    api_base = fbopen_config.API_SERVER_SSL + '/v0';
+  } else {
+    api_base = fbopen_config.API_SERVER + '/v0';
+  }
+
   $.ajaxPrefilter( function( options, originalOptions, jqXHR ) {
-    if (location.protocol == 'https:' && fbopen_config.API_SERVER_SSL) {
-      options.url = fbopen_config.API_SERVER_SSL + '/v0' + options.url;
-    } else {
-      options.url = fbopen_config.API_SERVER + '/v0' + options.url;
-    }
+    options.url = api_base + options.url;
   });
 
   // disable ajax caching in IE
@@ -194,6 +197,17 @@
           $('.setaside_tooltip').popover({
             'placement': 'auto'
             , 'html': true
+          });
+
+          // Add handler for calendar event creation
+          $('.listing-dates').click(function () {
+            var id = $(this).parents(".result-item").attr("data-solr-id");
+            
+            // Make sure the record has a valid id
+            if (!id) {
+              return;
+            }
+            window.open(api_base + '/cal/' + id, 'FBOpen Calendar Event');
           });
 
         });
