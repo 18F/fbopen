@@ -1,6 +1,12 @@
 ## Using Dust Templates
 
-The dust templates should be pre-compiled, so if you edit them, you'll need to run a command from this directory like so:
+The dust templates should be pre-compiled, so if you edit them, first you'll need to install dustc
+
+```
+npm install -g dustjs-linkedin
+```
+
+and then you'll need to run a command from this directory like so:
 
 ```
 dustc -n=result dust-src/result.dust dust-compiled/result.js
