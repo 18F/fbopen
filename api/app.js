@@ -240,7 +240,7 @@ app.get('/v0/opps', function(req, res) {
     sorts.push(ejs.Sort('close_dt').asc());
     sorts.push(ejs.Sort('solnbr'));
   } else {
-    var qsq = ejs.QueryStringQuery(q);
+    var qsq = ejs.QueryStringQuery(decodeURIComponent(q));
     var child_query = ejs.HasChildQuery(qsq, "opp_attachment");
     queries.should(qsq);
     queries.should(child_query);
