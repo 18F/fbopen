@@ -1,4 +1,7 @@
 {
+    "aliases": {
+      "fbopen": {}
+    },
     "settings": {
         "index": {
             "analysis": {
