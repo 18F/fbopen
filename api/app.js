@@ -252,9 +252,6 @@ app.get('/v0/opps', function(req, res) {
     filters.filters(ejs.MatchAllFilter());
   }
 
-  // console.log('"query": { ' + queries.toString() + '}');
-  // console.log('"filter": { ' + filters.toString() + '}');
-
   var highlight = ejs.Highlight(['description', 'FBO_OFFADD'])
     .preTags('<highlight>')
     .postTags('</highlight>');
@@ -269,7 +266,7 @@ app.get('/v0/opps', function(req, res) {
   if (sorts.length > 0) request.sort(sorts);
   if (fieldlist) request.fields = fieldlist;
 
-  //console.log(request);
+  // console.log(util.inspect(request.query().bool.should, null));
 
   client.search({ index: config.elasticsearch.index, type: "opp", body: request.toJSON() }, results_callback);
 });
