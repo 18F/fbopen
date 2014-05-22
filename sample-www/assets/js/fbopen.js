@@ -59,7 +59,7 @@
   // re-fill query terms
   if (location.search != '') {
 
-    form_params = ['q', 'fq', 'data_source'];
+    form_params = ['q', 'fq', 'data_source', 'p'];
     for (i in form_params) {
       param_name = form_params[i];
       q_param = getQueryVariable(param_name);
@@ -360,14 +360,15 @@
   }
 
   function pager_link(currentPage, i) {
-    
-    current_url = location.href;
+    current_url = location.href.replace(/\/$/, '');
     page_str = '&p=' + i;
+
     if (current_url.match(/&p=[0-9]*/)) {
       out_url = current_url.replace(/&p=[0-9]*/, page_str);
     } else {
       out_url = current_url + page_str;
     }
+
     return out_url;
   }
 
