@@ -220,13 +220,24 @@ describe("The FBOpen API", function() {
     .end(done)
   });
 
-  it('should allow paging results', function(done) {
+  it('should allow paging results with start/limit', function(done) {
     request(app)
-    .get('/v0/opps?from=1&limit=2')
+    .get('/v0/opps?start=1&limit=2')
     .expect(200)
     .expect('Content-Type', 'application/json;charset=utf-8')
     .expect(num_found(16))
     .expect(num_returned(2))
+    .expect(record_with_field('solnbr', 0, 'spmym414q0334'))
+    .end(done)
+  });
+
+  it('should allow paging results with p', function(done) {
+    request(app)
+    .get('/v0/opps?p=2&limit=1')
+    .expect(200)
+    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect(num_found(16))
+    .expect(num_returned(1))
     .expect(record_with_field('solnbr', 0, 'spmym414q0334'))
     .end(done)
   });

@@ -166,13 +166,13 @@ app.get('/v0/opps', function(req, res) {
   }
 
   // default to using 'p' if present, as that will come from the webclient
-  // calculate 'from' from 'p' and 'limit'
+  // calculate 'start' from 'p' and 'limit'
   var p = req.param('p');
-  var from;
+  var start;
   if (!p) {
-    from = req.param('from') || 0;
+    start = req.param('start') || 0;
   } else {
-    from = (p - 1) * size;
+    start = (p - 1) * size;
   }
 
   // specify fields to be included in results
@@ -228,7 +228,7 @@ app.get('/v0/opps', function(req, res) {
     // required by sort indicator
     results_out.sorted_by = sorted_by_score ? 'relevance' : 'due date (oldest first), opportunity #';
     // required by paging
-    results_out.start = from;
+    results_out.start = start;
 
     res.json(results_out);
   };
@@ -258,7 +258,7 @@ app.get('/v0/opps', function(req, res) {
 
   var request = ejs.Request()
     .highlight(highlight)
-    .from(from)
+    .from(start)
     .size(size)
     .query(queries)
     .filter(filters);
