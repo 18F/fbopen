@@ -35,6 +35,7 @@ To query the third page of grants that mention bioinformatics, including opportu
     + q (string) ... the keyword(s) or phrase you want to search for. Supports [Lucene query syntax](http://lucene.apache.org/core/2_9_4/queryparsersyntax.html).
     + api_key (string) ... your api.data.gov API key ([sign up](https://api.data.gov/signup))
     + data_source = `all` (string, optional) ... get results only from a particular data source. As of 2014-04-10, the available sources are 'FBO' and 'grants.gov'. Case sensitive.
+    + p = `1` (integer, optional) ... page (one-indexed) of results to return. Takes precedence over `start`, if given.
     + limit = `10` (integer, optional) ... number of results to return per request
     + start = `0` (integer, optional) ... get the next [limit] results starting with this number (zero-indexed)
     + show_noncompeted = `false` (true/false, optional) ... include sole-sourced or otherwise non-competed opportunities in the results
