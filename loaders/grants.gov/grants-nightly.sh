@@ -29,6 +29,11 @@ then
 	fi
 fi
 
+FBOPEN_URI=${FBOPEN_URI:-"localhost:9200"}
+echo "FBOPEN_URI = $FBOPEN_URI"
+FBOPEN_INDEX=${FBOPEN_INDEX:-"fbopen"}
+echo "FBOPEN_INDEX = $FBOPEN_INDEX"
+
 zipped_basename="GrantsDBExtract$download_date" # .zip
 download_dir="downloads"
 
@@ -78,6 +83,10 @@ cat workfiles/listings-solrized.xml | node xml2json.js > workfiles/grants.json
 echo "Converting JSON to Elasticsearch bulk JSON format"
 cat workfiles/grants.json | node ../common/format-bulk.js > workfiles/grants.bulk
 
+curl -s -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @workfiles/grants.bulk; echo
+
 echo "Extracting links"
 # the '-c "this.listing_url"' part filters the results to only lines where the listing_url is defined
 cat workfiles/grants.json | json -agc "this.listing_url" listing_url > workfiles/links.txt
+
+echo "Grants nightly done"
