@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/ksh
 
 # fbo-nightly.sh [YYYYMMDD]
 
@@ -35,7 +35,7 @@ echo "FBOPEN_INDEX = $FBOPEN_INDEX"
 
 # mkdir -p will ensure the nightly download dir is in place, but won't fail if it already exists
 nightly_dir="nightly-downloads"
-mkdir -p $nightly_dir
+mkdir -p $nightly_dir workfiles
 
 # download the nightly file, if not downloaded already
 nightly_download_file="$nightly_dir/FBOFeed$download_date.txt"
