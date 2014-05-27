@@ -8,13 +8,25 @@
                 "analyzer": {
                     "default": {
                         "type": "snowball"
+                    },
+                    "keyword-analyzer": {
+                        "tokenizer": "keyword",
+                        "filter": "lowercase"
                     }
                 }
             }
         }
     },
     "mappings": {
-        "opp": {},
+        "opp": {
+            "properties": {
+                "solnbr": {
+                    "analyzer": "keyword-analyzer",
+                    "type": "string"
+                
+                }
+            }
+        },
         "opp_attachment": {
             "_parent": {
                 "type": "opp"
