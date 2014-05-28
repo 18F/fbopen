@@ -30,6 +30,11 @@ To run the tests (located in `api/test/app.js`), run:
 ```
     $ make test
 ```
+You'll need to install elasticdump globally as well:
+
+```
+npm install -g elasticdump
+```
 
 Several aspects of the test run can be changed in the `Makefile`, such as the timeout, hostname, index name and test reporter.
 

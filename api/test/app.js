@@ -27,10 +27,10 @@ describe("The FBOpen API", function() {
         client.indices.delete({index: index_name}, callback);
       }, function (callback) {
         client.indices.create({index: index_name, body: {
-          "settings": { "index": { "analysis": { "analyzer": { "default": { "type": "snowball" } } } } }
+          "settings": { "index": { "analysis": { "analyzer": { "default": { "type": "snowball" }, "keyword-analyzer":{"tokenizer": "keyword", "filter":"lowercase" } } } } }
         }}, callback);
       }, function (callback) {
-        client.indices.putMapping({index: index_name, type: 'opp', body: { "opp": { } }}, callback);
+        client.indices.putMapping({index: index_name, type: 'opp', body: { "opp": { "properties": { "solnbr": {"analyzer": "keyword-analyzer", "type": "string"}} } }}, callback);
       }, function (callback) {
         client.indices.putMapping({index: index_name, type: 'opp_attachment', body: {
           "opp_attachment" : {
@@ -61,6 +61,7 @@ describe("The FBOpen API", function() {
         child_process.exec(child_cmd, callback);
       }, function (err, resp) {
         console.log(resp);
+        console.log(err);
         done();
       }
     ]);
@@ -98,7 +99,7 @@ describe("The FBOpen API", function() {
     request(app)
     .get('/v0/opps')
     .expect(200)
-    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(16))
     .end(done)
   });
@@ -107,7 +108,7 @@ describe("The FBOpen API", function() {
     request(app)
     .get('/v0/opps?show_noncompeted=1')
     .expect(200)
-    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(42))
     .end(done)
   });
@@ -116,7 +117,7 @@ describe("The FBOpen API", function() {
     request(app)
     .get('/v0/opps?show_noncompeted=0')
     .expect(200)
-    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(16))
     .end(done)
   });
@@ -125,7 +126,7 @@ describe("The FBOpen API", function() {
     request(app)
     .get('/v0/opps?show_closed=1')
     .expect(200)
-    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(19))
     .end(done)
   });
@@ -134,7 +135,7 @@ describe("The FBOpen API", function() {
     request(app)
     .get('/v0/opps?show_closed=0')
     .expect(200)
-    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(16))
     .end(done)
   });
@@ -143,7 +144,7 @@ describe("The FBOpen API", function() {
     request(app)
     .get('/v0/opps?show_closed=1&show_noncompeted=1')
     .expect(200)
-    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(55))
     .end(done)
   });
@@ -152,7 +153,7 @@ describe("The FBOpen API", function() {
     request(app)
     .get('/v0/opps?q=satellite')
     .expect(200)
-    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(1))
     .expect(/satellite/)
     .end(done)
@@ -162,7 +163,7 @@ describe("The FBOpen API", function() {
     request(app)
     .get('/v0/opps?fq=Aberdeen')
     .expect(200)
-    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(1))
     .expect(/Aberdeen/)
     .end(done)
@@ -172,7 +173,7 @@ describe("The FBOpen API", function() {
     request(app)
     .get('/v0/opps?fq=Aberdeen&q="night vision"')
     .expect(200)
-    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(1))
     .expect(/Aberdeen/)
     .expect(/night vision/i)
@@ -184,7 +185,7 @@ describe("The FBOpen API", function() {
     request(app)
     .get('/v0/opps?data_source=fbo&show_noncompeted=1&show_closed=1')
     .expect(200)
-    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(55))
     .end(done)
   });
@@ -193,7 +194,7 @@ describe("The FBOpen API", function() {
     request(app)
     .get('/v0/opps?data_source=FBO&show_noncompeted=1&show_closed=1')
     .expect(200)
-    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(55))
     .end(done)
   });
@@ -202,7 +203,7 @@ describe("The FBOpen API", function() {
     request(app)
     .get('/v0/opps?data_source=foobar&show_noncompeted=1&show_closed=1')
     .expect(200)
-    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(0))
     .end(done)
   });
@@ -211,12 +212,12 @@ describe("The FBOpen API", function() {
     request(app)
     .get('/v0/opps?limit=2')
     .expect(200)
-    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(16))
     .expect(num_returned(2))
     // that this record has moved to the front will be confirmed in the test
     // "should allow paging results"
-    .expect(record_with_field('solnbr', 1, 'spmym414q0334'))
+    .expect(record_with_field('solnbr', 1, 'vcvh14-101'))
     .end(done)
   });
 
@@ -224,10 +225,10 @@ describe("The FBOpen API", function() {
     request(app)
     .get('/v0/opps?start=1&limit=2')
     .expect(200)
-    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(16))
     .expect(num_returned(2))
-    .expect(record_with_field('solnbr', 0, 'spmym414q0334'))
+    .expect(record_with_field('solnbr', 0, 'vcvh14-101'))
     .end(done)
   });
 
@@ -235,10 +236,10 @@ describe("The FBOpen API", function() {
     request(app)
     .get('/v0/opps?p=2&limit=1')
     .expect(200)
-    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(16))
     .expect(num_returned(1))
-    .expect(record_with_field('solnbr', 0, 'spmym414q0334'))
+    .expect(record_with_field('solnbr', 0, 'vcvh14-101'))
     .end(done)
   });
 
@@ -246,9 +247,18 @@ describe("The FBOpen API", function() {
     request(app)
     .get('/v0/opps?fl=solnbr,close_dt')
     .expect(200)
-    .expect('Content-Type', 'application/json;charset=utf-8')
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(16))
-    .expect(record_with_field('solnbr', 0, 'vcvh14-101'))
+    .expect(record_with_field('solnbr', 0, 'spmym414q0334'))
+    .end(done)
+  });
+ it('first result in search should match solicitation number exactly', function(done) {
+    request(app)
+    .get('/v0/opps?q=w91ytz-14-t-0046')
+    .expect(200)
+    .expect('Content-Type', 'application/json; charset=utf-8')
+    .expect(num_found(9))
+    .expect(record_with_field('solnbr', 0, 'w91ytz-14-t-0046'))
     .end(done)
   });
 });
