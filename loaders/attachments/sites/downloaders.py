@@ -7,7 +7,7 @@ def dibbs_bsm_dla_mil(*args, **kwargs):
     scraper, url, directory = args
     solnbr = kwargs['solnbr']
     solnbr = solnbr.replace('-', '')
-    url = 'http://www.dibbs2.bsm.dla.mil/Downloads/RFQ/{}/{}.PDF'.format(solnbr[-1], solnbr)
+    url = 'https://dibbs2.bsm.dla.mil/Downloads/RFQ/{}/{}.PDF'.format(solnbr[-1], solnbr)
     filename, response = scraper.urlretrieve(url, dir=directory, verify=False)
     return filename
 

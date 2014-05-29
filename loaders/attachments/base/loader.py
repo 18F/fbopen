@@ -23,6 +23,7 @@ class AttachmentLoader(AttachmentsImporter):
 
         self.fbopen_uri = os.getenv('FBOPEN_URI')
         self.fbopen_index = os.getenv('FBOPEN_INDEX')
+        self.data_source = kwargs['data_source']
 
     def run(self):
         self.log.info("Starting...")
@@ -47,6 +48,7 @@ class AttachmentLoader(AttachmentsImporter):
             n = 0
             for key in db:
                 self.log.info("Pulled solnbr {}".format(key))
+                self.log.info(self.__dict__)
                 record = db[key]
                 for (i, a) in enumerate(record['attachments']):
 
@@ -78,4 +80,4 @@ class AttachmentLoader(AttachmentsImporter):
         return count
 
     def get_attachment_id(self, solnbr, i):
-        return "{}__attach__{}".format(solnbr, i)
+        return "{}:{}__{}".format(self.data_source, solnbr, i)

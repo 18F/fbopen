@@ -14,7 +14,12 @@ class GrantsLinkExtractor(LinkExtractor):
     def extract_for_file(self, filename, shelf):
         self.log.info("Found {}, parsing the JSON...".format(filename))
         with open(os.path.join(self.import_dir, filename), 'r') as f:
-            opp = json.load(f)
+            try:
+                opp = json.load(f)
+            except UnicodeDecodeError:
+                f = open(os.path.join(self.import_dir, filename), encoding="latin-1")
+                opp = json.load(f)
+
             solnbr = self.get_opp_solnbr(opp)
             self.log.info('Pulled opp id ({}) number ({})'.format(opp['id'], solnbr))
             attachments = []
