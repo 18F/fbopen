@@ -7,4 +7,3 @@ pyflakes==0.8.1
 pyquery==1.2.8
 requests==2.2.1
 scrapelib==0.9.1
-wsgiref==0.1.2
