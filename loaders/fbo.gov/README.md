@@ -39,6 +39,7 @@ After install, first load a full set of data using the one-time/weekly loader. T
     - **Optional arguments:**
         - `$1` = output filepath/name of the list of links to the FBO listings that were prepped; default = *./workfiles/listings-links.txt*
         - `$2` = directory into which attachments should be downloaded; default = *./fbo-attachments*
+    - Example full command: `FBOPEN_ROOT=/home/fbopen/fbopen FBOPEN_URI=localhost:9200 FBOPEN_INDEX=fbopen ./fbo-weekly.sh`
 2. Load attachments. See [README](../attachments/README.md)
 	
 ### Nightly updates
@@ -52,6 +53,7 @@ After install, first load a full set of data using the one-time/weekly loader. T
     - **Optional ENV vars:**
         - `FBOPEN_URI` = the URI of your Elasticsearch instance; default = *localhost:9200*
         - `FBOPEN_INDEX` = the name of the ES index to load into; default = *fbopen*
+    - Example full command: `FBOPEN_ROOT=/home/fbopen/fbopen FBOPEN_URI=localhost:9200 FBOPEN_INDEX=fbopen ./fbo-nightly.sh`
 2. Load attachments. See [README](../attachments/README.md)
 	
 If you want to do it in steps, consult `fbo-nightly.sh` for the proper commands.
