@@ -1,7 +1,6 @@
-from base.downloader import AttachmentsDownloader
+from base.downloader import AttachmentDownloader
 
-
-class GrantsAttachmentDownloader(AttachmentsImporter):
+class GrantsAttachmentDownloader(AttachmentDownloader):
     '''
     This class downloads the attachment files. Requires a shelf file populated
     with URLs from link_extractor.py.

@@ -47,7 +47,7 @@ class GrantsAttachmentsRunner(AttachmentsRunner):
         GrantsAttachmentDownloader(log=self.log, dir=self.import_dir).run()
 
     def load(self):
-        GrantsAttachmentLoader(log=self.log, dir=self.import_dir).run()
+        GrantsAttachmentLoader(log=self.log, dir=self.import_dir, data_source="grants.gov").run()
 
     # TODO: pull all into a base class so we can reuse for other datasets
 

@@ -25,3 +25,6 @@ npm-debug.log
 .idea
 build
 .vagrant
+*.env
+*.pyc
+loaders/attachments/attach*
