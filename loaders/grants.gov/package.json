@@ -7,6 +7,7 @@
     , "underscore": "*"
     , "big-xml": "*"
     , "request": "*"
+    , "xml-splitter": "*"
 		, "optimist": "*"
 		, "moment": "*"
     , "solr-client": "*"
