@@ -20,19 +20,20 @@ var es_data = [];
 bids.forEach(function(bid){
     
     var b = bid['properties'];
-    var bid_obj = {};
+    var bid_obj = { 'ext': {} };
 
     for (var field in b){
         if (field in field_map){
             bid_obj[field_map[field]] = b[field]
         } else {
-            bid_obj['bids.state.gov_' + field] = b[field];
+            bid_obj['ext'][field] = b[field];
         }
     }
     
     bid_obj['id'] = datasource_id + ':' + bid_obj['solnbr'];
     bid_obj['data_source'] = datasource_id;
     bid_obj['posted_dt'] = new Date(bid_obj['posted_dt']);
+
     es_data.push(JSON.stringify(bid_obj));
 });
 
