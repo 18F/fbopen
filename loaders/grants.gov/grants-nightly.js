@@ -110,15 +110,10 @@ var field_map = {
 	, 'Location': 'location'
 	, 'ApplicationsDueDate': 'close_dt'
 	, 'FundingOppDescription': 'description'
-	, 'AwardCeiling': 'AwardCeiling_i' // but note could be "None"; we'll ignore
-	, 'AwardFloor': 'AwardFloor_i' // but note could be "None"; we'll ignore
-	, 'ArchiveDate': 'ArchiveDate_dt'
-	, 'AgencyContact': 'AgencyContact_t'
 	, 'listing_url': 'listing_url' // constructed below
 }
 
 var skip_list = [ 'UserID', 'Password' ];
-
 
 function process_notice(notice, notice_idx) {
 
@@ -267,11 +262,7 @@ function format_notice_field(e_name, field_value) {
 			e_name = mapped_field;
 		} else {
 			// prefix non-standard fields with the datasource
-			if (S(e_name).endsWith('DATE')) {
-				e_name = datasource_id + '_' + e_name + '_dt'; // make date fields data-friendly in Solr
-			} else {
-				e_name = datasource_id + '_' + e_name + '_t'; // default = text field
-			}
+			e_name = datasource_id + '_' + e_name;
 		}
 	}
 
