@@ -1,5 +1,5 @@
-name: openFDA
-url: https://open.fda.gov
+name: FBOpen
+url: https://18f.github.io/fbopen
 
 markdown: kramdown
 kramdown:
