@@ -56,6 +56,12 @@ if (argv.j) {
 	json_file = config.json_filename || 'downloads/grants-ids-' + moment().subtract('days', 1).format('YYYYMMDD') + '.json';
 }
 
+if (argv.o){
+    output_file = argv.o;
+} else {
+    output_file = 'workfiles/grants.json'
+}
+
 simple_log('Processing ' + xml_file + ' using ' + json_file);
 
 // exit if no JSON file is provided
@@ -77,13 +83,15 @@ if (!file_exists) {
 // load the JSON into memory
 var json_data = JSON.parse(fs.readFileSync(json_file));
 var oppHits = json_data.oppHits;
+
 console.log('oppHits count = ' + oppHits.length);
+
+var output_data = [];
 
 // oppHits[0].id == unique ID, oppHits[0].number == solnbr
 
-var xml_output_stream = fs.createWriteStream(config.xml_output_filename || 'workfiles/listings-solrized.xml');
-xml_output_stream.write('<add>\n');
-
+//var xml_output_stream = fs.createWriteStream(config.xml_output_filename || 'workfiles/listings-solrized.xml');
+//xml_output_stream.write('<add>\n');
 var reader = bigXml.createReader(xml_file, /^FundingOppSynopsis|FundingOppModSynopsis$/, { gzip: false});
 var notice_idx = 0;
 var notices_written = 0;
@@ -96,8 +104,8 @@ reader.on('record', function(record) {
 });
 
 reader.on('end', function() {
+    fs.writeFile(output_file, output_data.join('\n'));
 	console.log('\n\nTOTAL GRANT NOTICES READ = ' + notice_idx + ', TOTAL WRITTEN = ' + notices_written);
-	close_streams();
 });
 
 
@@ -113,10 +121,12 @@ var field_map = {
 	, 'listing_url': 'listing_url' // constructed below
 }
 
+var multiple_list = ['EligibilityCategory', 'AgencyContact', 'FundingInstrumentType', 'FundingActivityCategory', 'CFDANumber'];
 var skip_list = [ 'UserID', 'Password' ];
 
 function process_notice(notice, notice_idx) {
 
+    var es_obj = { 'ext': {}};
 	// collect fields and reformat them for Solr ingestion
 	var notice_values = new Array(); // clean values
 	var notice_fields = new Array(); // formatted fields for Solr-friendly XML
@@ -129,59 +139,69 @@ function process_notice(notice, notice_idx) {
 
 		el = notice['children'][el_idx];
 		el_tag = el['tag'];
-		el_value = el['text'];
+		//el_value = el['text'];
 
+        el_value = clean_field_value(el);
+		// skip certain fields
+		if (skip_list.indexOf(el_tag) > -1) continue;
+        
+		// other than FundingOppNumber (below), skip empty fields
+		if ((el_value === 'None' || el_value === '' || el_value === undefined) && el_tag != 'FundingOppNumber') {
+			continue;
+		}
+        
+        //Add tag to json notice object
+        if (el_tag in field_map){
+            es_obj[field_map[el_tag]] = el_value;
+        } else if (multiple_list.indexOf(el_tag) > -1) {
+            if(es_obj['ext'][el_tag] !== undefined) {
+                es_obj['ext'][el_tag].push(el_value);
+            } else {
+                es_obj['ext'][el_tag] = [el_value];
+            }
+        } else {
+            es_obj['ext'][el_tag] = el_value;
+        }
 		// TESTING
 		// console.log('tag ' + el_tag + ' == ' + el_value + '.');
 		// if (el.tag == 'ObtainFundingOppText') {
 		// 	console.log('.. FundingOppURL == ' + el.attrs.FundingOppURL);
 		// }
 
-		// skip certain fields
-		if (skip_list.indexOf(el_tag) > -1) continue;
-
-		// other than FundingOppNumber (below), skip empty fields
-		if ((el_value === 'None' || el_value === '' || el_value === undefined) && el_tag != 'FundingOppNumber') {
-			continue;
-		}
-
 		// handle this el
 		notice_values[el_tag] = clean_field_value(el);
-		notice_fields[el_tag] = format_notice_field(el_tag, clean_field_value(el));
-
 		// special: id = SOLNBR + notice type (+ __AWARD__ + sequential/unique award it, for AWARDs)
 		// ... AND use solnbr for lookup to construct listing_url
 		if (el_tag == 'FundingOppNumber') {
 
-			solnbr_raw = notice_values['FundingOppNumber'];
-			solnbr = clean_solnbr(notice_values['FundingOppNumber']);
-			notice_values['FundingOppNumber'] = solnbr; // store the "extra-clean" (trimmed/slugified) solnbr value
-
+			solnbr_raw = el['text'];//  notice_values['FundingOppNumber'];
+			solnbr = clean_solnbr(el_value); //clean_solnbr(notice_values['FundingOppNumber']);
+			//notice_values['FundingOppNumber'] = solnbr; // store the "extra-clean" (trimmed/slugified) solnbr value
 			// For awards, add the sequential number of this award.
 			// NOTE: when importing from a daily update file, we will need to query for all existing first.
 			// (This could be tricky.)
-			notice_solr_id = solnbr;
+			notice_id = solnbr;
 			// if (notice_type == 'AWARD') {
 			// 	award_count = ++award_counts[solnbr] || (award_counts[solnbr] = 0);
 			// 	notice_solr_id += '__AWARD__' + award_count;
 			// }
 
-			notice_values['id'] = datasource_id + ':' + notice_solr_id;
-			notice_fields['id'] = format_notice_field('id', notice_values['id']);
+            es_obj['id'] = datasource_id + ':' + notice_id;
+            es_obj['data_source'] = datasource_id;
 
 			// console.log('solnbr ' + solnbr + ': notice_type = ' + notice_type + ', id = ' + notice_fields['id']);
 
 		}
 
 		// handle any possible children (only ever runs one level deep)
-		if (el['children'] != undefined) {
+		/*if (el['children'] != undefined) {
 			if (el['children'].length > 0) {
 				for (child_el in el['children']) {
-					child_tag = child_el['tag'] + '_t'; // always assume strings
-					notice_fields[child_tag] = format_notice_field(child_tag, clean_field_value(child_el));
+					child_tag = child_el['tag']; // always assume strings
+                    notice_fields[child_tag] = format_notice_field(child_tag, clean_field_value(child_el));
 				}
 			}
-		}
+		}*/
 
 		// if (tag == 'LINK') {
 		// 	 link_url = get_field_value(el);
@@ -189,21 +209,17 @@ function process_notice(notice, notice_idx) {
 
 	} // for el_idx in notice['children']
 
+
 	// FOR NOW, only load grants that haven't closed yet
-	if (moment(notice_values['ApplicationsDueDate'], 'YYYY-MM-DD[T]HH:mm:ss[Z]') > moment()) {
+	if (moment(es_obj['close_dt'], 'YYYY-MM-DD[T]HH:mm:ss[Z]') > moment()) {
 
 		// get the unique ID, via REST request, to construct the URL
-		notice_values['listing_url'] = get_listing_url(solnbr_raw);
-		notice_fields['listing_url'] = format_notice_field('listing_url', notice_values['listing_url']);
-
+		es_obj['listing_url'] = get_listing_url(solnbr_raw);
 		// console.log('Writing one grant, close_dt = ' + notice_values['ApplicationsDueDate']);
-
-		// create Solr-friendly XML for ingestion
-		s_out = solr_add_string(notice_fields, notice['tag']);
-
 		// write it out
-		write_solr_files(notice_type, notice_values, notice_fields, notice_idx);
-		
+        output_data.push(JSON.stringify(es_obj));
+        track_output_completion();
+        //console.log(es_obj);
 	}
 
 }
@@ -234,9 +250,7 @@ function clean_field_value(field_el) {
 		|| S(tag).endsWith('Date') 
 		|| S(tag).endsWith('_dt')) {
 		
-		// console.log('e_name = ' + e_name + ', pre-solrized date = [' + field_value + ']');
-		field_value = solrize_date(field_value);
-		// console.log('solrized = [' + field_value + ']');
+		field_value = clean_date(field_value);
 	}
 
 	return field_value;	
@@ -247,31 +261,8 @@ function clean_solnbr(solnbr) {
 	return S(solnbr).trim().slugify().s;
 }
 
-function format_notice_field(e_name, field_value) {
-	
-	// return nothing for empty values
-	if (field_value.length == 0 || field_value == undefined) return '';
 
-	// OLD: make sure field names are unique in Solr
-	// if (e_name != 'id') e_name = 'FBO_' + e_name;
-
-	// NEW: map field names to Solr
-	if (e_name != 'id') {
-		mapped_field = field_map[e_name];
-		if (mapped_field) {
-			e_name = mapped_field;
-		} else {
-			// prefix non-standard fields with the datasource
-			e_name = datasource_id + '_' + e_name;
-		}
-	}
-
-	return '<field name="' + e_name + '">' + field_value + '</field>';
-
-} // format_notice_field()
-
-
-function solrize_date(raw_date) {
+function clean_date(raw_date) {
 	// dates from grants.gov are always MMDDYYYY
 	// Solr date is yyyy-MM-dd'T'HH:mm:sss'Z
 	var dt = moment(raw_date, ['MMDDYYYY', 'MMDDYY']);
@@ -285,28 +276,7 @@ function solrize_date(raw_date) {
 		return false;
 	}
 
-} // solrize_date()
-
-
-
-function solr_add_string(notice_fields, notice_tag) {
-
-	s_out = '<doc>\n' 
-			+ '<field name="data_source">' + datasource_id + '</field>\n';
-
-	// for now, just write it all out
-	for (e in notice_fields) {
-		if (notice_fields[e] != '' && notice_fields[e] != undefined) {
-			s_out += notice_fields[e] + '\n';
-			// console.log('s_out for ' + e + ' = ' + notice_fields[e]);
-		}
-	}
-	s_out += '</doc>\n';
-
-	return s_out;
-
-} // solr_add_string()
-
+}
 
 
 function get_listing_url(solnbr_raw) {
@@ -324,20 +294,9 @@ function get_listing_url(solnbr_raw) {
 	return listing_url;
 }
 
-
-function write_solr_files(notice_type, notice_values, notice_fields, notice_idx) {
-	xml_output_stream.write(s_out, track_xml_completion());
-}
-
-
-function track_xml_completion() {
+function track_output_completion() {
 	notices_written++;
 }
-
-function close_streams() {
-	xml_output_stream.end('</add>');
-}
-
 
 function simple_log(str, console_too) {
 	str = moment().format('YYYY-MM-DD hh:mm:ss') + ' ' + S(str).trim().s + '\n';

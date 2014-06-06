@@ -77,8 +77,8 @@ else
 	echo "ERROR: cannot find file $downloaded_zipped_file."
 fi
 
-echo "Converting XML to JSON"
-cat workfiles/listings-solrized.xml | node xml2json.js > workfiles/grants.json
+#echo "Converting XML to JSON"
+#cat workfiles/listings-solrized.xml | node xml2json.js > workfiles/grants.json
 echo "Converting JSON to Elasticsearch bulk JSON format"
 cat workfiles/grants.json | node ../common/format-bulk.js > workfiles/grants.bulk
 
