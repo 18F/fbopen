@@ -31,11 +31,11 @@ then
     fi
 else 
     echo "Downloading JSON dump..."
-    wget $BIDS_URL -O $raw_json $json_output_file
+    wget $BIDS_URL -O $raw_json
 fi
 
 #echo "Converting to JSON..." 
-node process_bids.js $raw_json  > $json_output_file
+node process_bids.js $raw_json
 
 echo "Converting JSON to Elasticsearch bulk format..."
 cat $json_output_file | node ../common/format-bulk.js -a > $bulk_output_file
