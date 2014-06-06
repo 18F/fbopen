@@ -1,5 +1,5 @@
 var util = require('util');
-var datasource_id = 'FBO';
+var datasource_id = 'fbo.gov';
 var moment = require('moment');
 var S = require('string');
 var es = require('event-stream');
@@ -16,7 +16,13 @@ var field_map = {
 	, 'RESPDATE': 'close_dt'
 	, 'DESC': 'description'
 	, 'URL': 'listing_url'
-}
+};
+
+var ext_field_map = {
+  'EMAIL': 'email_address',
+  'EMAIL2': 'email_address',
+  'DESC3': 'email_desc'
+};
 
 es.pipeline(
     process.openStdin(),
@@ -25,9 +31,9 @@ es.pipeline(
     es.map(function (data, callback) {
         parent_notice = data;
         key = Object.keys(parent_notice)[0];
-        notice = parent_notice[key]
+        notice = parent_notice[key];
         if (u_.contains(['PRESOL', 'COMBINE', 'MOD'], key)) {
-            notice_out = {};
+            notice_out = { 'ext': {} };
             notice_out.data_source = datasource_id;
             notice_out.is_mod = (key == 'MOD');
 
@@ -43,7 +49,7 @@ es.pipeline(
             var mapped_field;
             //util.log(util.inspect(notice));
 
-            for (field in notice) {
+            for (var field in notice) {
                 //util.log("field: " + field);
 
                 // skip solnbr, already handled above
@@ -56,38 +62,28 @@ es.pipeline(
                 if (S(notice[field]).isEmpty()) continue;
 
                 // get the proper field name: 
-                // some are mapped to core FBOpen Solr fields, 
-                // others simply prefixed "FBO_", 
-                // and non-core date fields get "_dt" added.
-
-                // simple_log('field = ' + field);
+                // map some to core FBOpen fieldnames
+                // add the rest to the 'ext' dict to indicate
+                // extended fields
 
                 mapped_field = field_map[field];
-                if (mapped_field) {
-                    field_out = mapped_field;
-                } else {
-                    field_out = datasource_id + '_' + field; // prefix non-standard fields
-                    if (S(field_out).endsWith('DATE')) field_out += '_dt'; // make date fields date-friendly in Solr
-                }
-
-                // exceptions
-                if (field == 'EMAIL' || field == 'EMAIL2') {
-                    field_out = 'FBO_EMAIL_ADDRESS';
-                }
-                if (field == 'DESC3') { // email description always goes here (smh)
-                    field_out = 'FBO_EMAIL_DESC';
-                }
+                field_out = ext_field_map[field] || field;
 
                 val_in = notice[field];
+
                 if (field == 'DATE') {
                     val_in = val_in + notice.YEAR;
                 }
 
                 // fix up data fields
-                val_out = clean_field_value(field, val_in);
+                val_out = clean_field_value(field_out, val_in);
 
                 // add to the notice JSON
-                notice_out[field_out] = val_out;
+                if (mapped_field) {
+                  notice_out[mapped_field] = val_out;
+                } else {
+                  notice_out.ext[field_out] = val_out;
+                }
             }
             
             callback(null, notice_out);
@@ -103,15 +99,12 @@ function clean_solnbr(solnbr) {
 	return S(solnbr).trim().slugify().s;
 }
 
-function solrize_date(fbo_date) {
+function clean_date(fbo_date) {
 	// fbo_date is MMDDYYYY or MMDDYY
 	// Solr date is yyyy-MM-dd'T'HH:mm:sss'Z
 	var dt = moment(fbo_date, ['MMDDYY', 'MMDDYYYY']);
 
 	if (dt.isValid()) {
-		
-		// simple_log('fbo_date = ' + fbo_date + ', dt = ' + dt.format('YYYY-MM-DD'));
-
 		dt_out = dt.format('YYYY-MM-DD[T]HH:mm:ss[Z]');
 		return dt_out;
 	} else {
@@ -119,7 +112,7 @@ function solrize_date(fbo_date) {
 		return false;
 	}
 
-} // solrize_date()
+} // clean_date()
 
 function clean_field_value(field, val) {
 	// unescape entity codes; strip out all other HTML
@@ -129,12 +122,8 @@ function clean_field_value(field, val) {
 
     field_value = field_value.s;
 
-	// make dates Solr-friendly
-	// if (tag == 'DATE' || tag == 'RESPDATE' || tag == 'ARCHDATE' || tag == 'AWDDATE') {
 	if (S(field).endsWith('DATE') || S(field).endsWith('_dt')) {
-		// simple_log('e_name = ' + e_name + ', pre-solrized date = [' + field_value + ']');
-		field_value = solrize_date(field_value);
-		// simple_log('solrized = [' + field_value + ']');
+		field_value = clean_date(field_value);
 	}
 
 	return field_value;	
