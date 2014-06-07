@@ -20,12 +20,14 @@ var fs = require("fs")
 	, moment = require('moment')
 	, date_format_lite = require('date-format-lite')
 	, optimist = require('optimist')
+  , tools = require('../common/tools')
 	;
 
 var config = require('./grants-loader-config.js');
 
 var log_file = config.log_file || 'grants-nightly.log';
 var datasource_id = config.datasource_id || 'grants.gov';
+var datetime_now = moment();
 
 var cdata_regex = /<!\[CDATA\[(.*)\]\]>/;
 
@@ -47,19 +49,19 @@ if (argv.h) { // show help
 if (argv.f) {
 	xml_file = argv.f;
 } else {
-	xml_file = config.input_filename || 'downloads/GrantsDBExtract' + moment().subtract('days', 1).format('YYYYMMDD') + '.xml';
+	xml_file = config.input_filename || 'downloads/GrantsDBExtract' + datetime_now.subtract('days', 1).format('YYYYMMDD') + '.xml';
 }
 
 if (argv.j) {
 	json_file = argv.j;
 } else {
-	json_file = config.json_filename || 'downloads/grants-ids-' + moment().subtract('days', 1).format('YYYYMMDD') + '.json';
+	json_file = config.json_filename || 'downloads/grants-ids-' + datetime_now.subtract('days', 1).format('YYYYMMDD') + '.json';
 }
 
 if (argv.o){
     output_file = argv.o;
 } else {
-    output_file = 'workfiles/grants.json'
+    output_file = 'workfiles/grants.json';
 }
 
 simple_log('Processing ' + xml_file + ' using ' + json_file);
@@ -119,49 +121,49 @@ var field_map = {
 	, 'ApplicationsDueDate': 'close_dt'
 	, 'FundingOppDescription': 'description'
 	, 'listing_url': 'listing_url' // constructed below
-}
+};
 
 var multiple_list = ['EligibilityCategory', 'AgencyContact', 'FundingInstrumentType', 'FundingActivityCategory', 'CFDANumber'];
 var skip_list = [ 'UserID', 'Password' ];
 
 function process_notice(notice, notice_idx) {
 
-    var es_obj = { 'ext': {}};
+  var es_obj = { 'ext': {} };
 	// collect fields and reformat them for Solr ingestion
 	var notice_values = new Array(); // clean values
 	var notice_fields = new Array(); // formatted fields for Solr-friendly XML
 	var el, el_tag, el_value, solnbr, solnbr_raw, link_url, s_out, notice_type;
-	var email_tag, email_child_el
+	var email_tag, email_child_el;
 
 	notice_type = notice['tag']; // always "FundingOppSynopsis" or "FundingOppModSynopsis"
 
-	for (el_idx in notice['children']) {
+	for (var el_idx in notice.children) {
 
 		el = notice['children'][el_idx];
 		el_tag = el['tag'];
-		//el_value = el['text'];
+    el_value = clean_field(el);
 
-        el_value = clean_field_value(el);
 		// skip certain fields
 		if (skip_list.indexOf(el_tag) > -1) continue;
         
 		// other than FundingOppNumber (below), skip empty fields
-		if ((el_value === 'None' || el_value === '' || el_value === undefined) && el_tag != 'FundingOppNumber') {
+    if ((el_value === 'None' || el_value === '' || el_value === undefined) && el_tag != 'FundingOppNumber') {
 			continue;
 		}
         
-        //Add tag to json notice object
-        if (el_tag in field_map){
-            es_obj[field_map[el_tag]] = el_value;
-        } else if (multiple_list.indexOf(el_tag) > -1) {
-            if(es_obj['ext'][el_tag] !== undefined) {
-                es_obj['ext'][el_tag].push(el_value);
-            } else {
-                es_obj['ext'][el_tag] = [el_value];
-            }
+    //Add tag to json notice object
+    if (el_tag in field_map){
+        es_obj[field_map[el_tag]] = el_value;
+    } else if (multiple_list.indexOf(el_tag) > -1) {
+        if(es_obj['ext'][el_tag] !== undefined) {
+            es_obj['ext'][el_tag].push(el_value);
         } else {
-            es_obj['ext'][el_tag] = el_value;
+            es_obj['ext'][el_tag] = [el_value];
         }
+    } else {
+        es_obj['ext'][el_tag] = el_value;
+    }
+
 		// TESTING
 		// console.log('tag ' + el_tag + ' == ' + el_value + '.');
 		// if (el.tag == 'ObtainFundingOppText') {
@@ -169,113 +171,52 @@ function process_notice(notice, notice_idx) {
 		// }
 
 		// handle this el
-		notice_values[el_tag] = clean_field_value(el);
+		notice_values[el_tag] = clean_field(el);
 		// special: id = SOLNBR + notice type (+ __AWARD__ + sequential/unique award it, for AWARDs)
 		// ... AND use solnbr for lookup to construct listing_url
 		if (el_tag == 'FundingOppNumber') {
 
-			solnbr_raw = el['text'];//  notice_values['FundingOppNumber'];
-			solnbr = clean_solnbr(el_value); //clean_solnbr(notice_values['FundingOppNumber']);
-			//notice_values['FundingOppNumber'] = solnbr; // store the "extra-clean" (trimmed/slugified) solnbr value
+			solnbr_raw = el['text'];
+			solnbr = tools.clean_solnbr(el_value);
+
 			// For awards, add the sequential number of this award.
-			// NOTE: when importing from a daily update file, we will need to query for all existing first.
-			// (This could be tricky.)
 			notice_id = solnbr;
 			// if (notice_type == 'AWARD') {
 			// 	award_count = ++award_counts[solnbr] || (award_counts[solnbr] = 0);
 			// 	notice_solr_id += '__AWARD__' + award_count;
 			// }
 
-            es_obj['id'] = datasource_id + ':' + notice_id;
-            es_obj['data_source'] = datasource_id;
+      es_obj['id'] = datasource_id + ':' + notice_id;
+      es_obj['data_source'] = datasource_id;
 
 			// console.log('solnbr ' + solnbr + ': notice_type = ' + notice_type + ', id = ' + notice_fields['id']);
-
 		}
-
-		// handle any possible children (only ever runs one level deep)
-		/*if (el['children'] != undefined) {
-			if (el['children'].length > 0) {
-				for (child_el in el['children']) {
-					child_tag = child_el['tag']; // always assume strings
-                    notice_fields[child_tag] = format_notice_field(child_tag, clean_field_value(child_el));
-				}
-			}
-		}*/
-
-		// if (tag == 'LINK') {
-		// 	 link_url = get_field_value(el);
-		// }
 
 	} // for el_idx in notice['children']
 
 
 	// FOR NOW, only load grants that haven't closed yet
-	if (moment(es_obj['close_dt'], 'YYYY-MM-DD[T]HH:mm:ss[Z]') > moment()) {
-
+	if (moment(es_obj['close_dt'], 'YYYY-MM-DD') > datetime_now) {
 		// get the unique ID, via REST request, to construct the URL
 		es_obj['listing_url'] = get_listing_url(solnbr_raw);
-		// console.log('Writing one grant, close_dt = ' + notice_values['ApplicationsDueDate']);
-		// write it out
-        output_data.push(JSON.stringify(es_obj));
-        track_output_completion();
-        //console.log(es_obj);
+    output_data.push(JSON.stringify(es_obj));
+    track_output_completion();
 	}
-
-}
-
-function clean_field_value(field_el) {
-
-	// get field value, and:
-	// remove "<![CDATA[" and "]]>" if necessary
-	// replace <p> and <br> tags with newlines
-	// remove HTML entity codes ("&xyz;") [note: is there a better function?]
-
-	var field_value = field_el['text']
-		.replace(cdata_regex, "$1")
-		.replace(/<\/*p>/g, '\n')
-		.replace(/<br *\/*>/g, '\n')
-		;
-
-	// unescape entity codes; strip out all other HTML
-	field_value = S(field_value).escapeHTML().stripTags().s;
-
-	if (field_value == '') return '';
-
-	// make dates Solr-friendly
-	tag = field_el['tag'];
-	// if (tag == 'DATE' || tag == 'RESPDATE' || tag == 'ARCHDATE' || tag == 'AWDDATE') {
-	if (S(tag).endsWith('DATE') 
-		|| S(tag).endsWith('date') 
-		|| S(tag).endsWith('Date') 
-		|| S(tag).endsWith('_dt')) {
-		
-		field_value = clean_date(field_value);
-	}
-
-	return field_value;	
 }
 
 
-function clean_solnbr(solnbr) {
-	return S(solnbr).trim().slugify().s;
-}
+function clean_field(field_el) {
+  // get field value, and:
+  // remove "<![CDATA[" and "]]>" if necessary
+  // replace <p> and <br> tags with newlines
 
+  var field_value = field_el['text']
+    .replace(cdata_regex, "$1")
+    .replace(/<\/*p>/g, '\n')
+    .replace(/<br *\/*>/g, '\n')
+  ;
 
-function clean_date(raw_date) {
-	// dates from grants.gov are always MMDDYYYY
-	// Solr date is yyyy-MM-dd'T'HH:mm:sss'Z
-	var dt = moment(raw_date, ['MMDDYYYY', 'MMDDYY']);
-
-	if (dt.isValid()) {
-		// simple_log('fbo_date = ' + fbo_date + ', dt = ' + dt.format('YYYY-MM-DD'));
-		dt_out = dt.format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-		return dt_out;
-	} else {
-		simple_log('WARNING: momentjs could not convert [' + fbo_date + '] into a valid date.', true);
-		return false;
-	}
-
+  return tools.clean_field_value(field_el.tag, field_value);
 }
 
 

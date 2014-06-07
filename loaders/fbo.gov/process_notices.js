@@ -1,9 +1,9 @@
 var util = require('util');
 var datasource_id = 'fbo.gov';
-var moment = require('moment');
 var S = require('string');
 var es = require('event-stream');
 var u_ = require('underscore');
+var tools = require('../common/tools');
 
 var field_map = {
 	'DATE': 'posted_dt'
@@ -43,7 +43,7 @@ es.pipeline(
                 notice_out.notice_type = key;
             }
 
-            notice_out.solnbr = clean_solnbr(notice.SOLNBR);
+            notice_out.solnbr = tools.clean_solnbr(notice.SOLNBR);
             notice_out.id = datasource_id + ':' + notice_out.notice_type + ':' + notice_out.solnbr;
 
             var mapped_field;
@@ -76,7 +76,7 @@ es.pipeline(
                 }
 
                 // fix up data fields
-                val_out = clean_field_value(field_out, val_in);
+                val_out = tools.clean_field_value(field_out, val_in);
 
                 // add to the notice JSON
                 if (mapped_field) {
@@ -94,39 +94,4 @@ es.pipeline(
     es.stringify(),
     process.stdout
 );
-
-function clean_solnbr(solnbr) {
-	return S(solnbr).trim().slugify().s;
-}
-
-function clean_date(fbo_date) {
-	// fbo_date is MMDDYYYY or MMDDYY
-	// Solr date is yyyy-MM-dd'T'HH:mm:sss'Z
-	var dt = moment(fbo_date, ['MMDDYY', 'MMDDYYYY']);
-
-	if (dt.isValid()) {
-		dt_out = dt.format('YYYY-MM-DD[T]HH:mm:ss[Z]');
-		return dt_out;
-	} else {
-		simple_log('WARNING: momentjs could not convert [' + fbo_date + '] into a valid date.', true);
-		return false;
-	}
-
-} // clean_date()
-
-function clean_field_value(field, val) {
-	// unescape entity codes; strip out all other HTML
-	var field_value = S(val).decodeHTMLEntities().stripTags();
-
-	if (field_value.isEmpty()) return '';
-
-    field_value = field_value.s;
-
-	if (S(field).endsWith('DATE') || S(field).endsWith('_dt')) {
-		field_value = clean_date(field_value);
-	}
-
-	return field_value;	
-}
-
 
