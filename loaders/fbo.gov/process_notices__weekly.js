@@ -1,9 +1,9 @@
 //
-// fbo-solrize-big.js
+// process_notices__weekly.js
 //
 // From a weekly FBO XML dump file on STDIN, output JSON on STDOUT consisting of
 // all the listings. Example inovocation:
-// cat workfiles/FBOFullXML.xml | node fbo-solrize-big.js > workfiles/notices-weekly.json
+// cat workfiles/FBOFullXML.xml | node process_notices__weekly.js > workfiles/notices-weekly.json
 
 var S = require('string');
 var XmlSplitter = require('xml-splitter');
@@ -69,7 +69,6 @@ function process_notice(notice, notice_type) {
 		}
 	}
 
-	// make sure there is a solnbr and an id (the latter required by Solr)
 	if (S(notice_new.solnbr).isEmpty()) return;
 
   notice_new.data_source = datasource_id;
