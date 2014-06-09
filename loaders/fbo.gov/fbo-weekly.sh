@@ -32,7 +32,7 @@ wget ftp://ftp.fbo.gov/datagov/FBOFullXML.xml -O $FBO_WEEKLY_XML_FILE
 #wget -c ftp://ftp.fbo.gov/datagov/FBOFullXML.xml -O $outfile
 
 echo "Converting to JSON..."
-cat $FBO_WEEKLY_XML_FILE | node fbo-solrize-big.js > $json_output_file
+cat $FBO_WEEKLY_XML_FILE | node process_notices__weekly.js > $json_output_file
 
 echo "Extracting links..."
 cat $json_output_file | json -ga listing_url > $links_output_file
