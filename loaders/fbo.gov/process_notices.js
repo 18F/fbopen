@@ -1,9 +1,10 @@
 var util = require('util');
-var datasource_id = 'fbo.gov';
 var S = require('string');
 var es = require('event-stream');
 var u_ = require('underscore');
 var tools = require('../common/tools');
+
+var datasource_id = 'fbo.gov';
 
 var field_map = {
 	'DATE': 'posted_dt'
