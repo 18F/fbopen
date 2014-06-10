@@ -44,7 +44,7 @@ class FBOAttachmentsRunner(AttachmentsRunner):
         AttachmentDownloader(log=self.log, dir=self.import_dir).run()
 
     def load(self):
-        AttachmentLoader(log=self.log, dir=self.import_dir, data_source='fbo').run()
+        AttachmentLoader(log=self.log, dir=self.import_dir, data_source='fbo.gov').run()
 
     # TODO: pull all into a base class so we can reuse for other datasets
 
