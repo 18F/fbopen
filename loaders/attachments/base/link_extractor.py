@@ -32,6 +32,8 @@ class LinkExtractor(AttachmentsImporter):
                 with closing(shelve.open(os.path.join(self.import_dir, self.shelf_file))) as db:
                     self.extract_for_file(filename, db)
 
+        self.log.info("Done.")
+
     def extract_for_file(self, filename, shelf):
         self.log.info("Found {}, parsing with pyquery...".format(filename))
 
