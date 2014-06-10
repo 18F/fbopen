@@ -19,6 +19,12 @@ class GrantsLinkExtractor(LinkExtractor):
             except UnicodeDecodeError:
                 f = open(os.path.join(self.import_dir, filename), encoding="latin-1")
                 opp = json.load(f)
+            except ValueError:
+                self.log.error('Couldn\'t parse the JSON in {}'.format(filename))
+                continue
+            except Exception, e:
+                self.log.exception(e)
+                continue
 
             solnbr = self.get_opp_solnbr(opp)
             self.log.info('Pulled opp id ({}) number ({})'.format(opp['id'], solnbr))
