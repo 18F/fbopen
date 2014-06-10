@@ -21,10 +21,10 @@ class GrantsLinkExtractor(LinkExtractor):
                 opp = json.load(f)
             except ValueError:
                 self.log.error('Couldn\'t parse the JSON in {}'.format(filename))
-                continue
-            except Exception, e:
+                return
+            except Exception as e:
                 self.log.exception(e)
-                continue
+                return
 
             solnbr = self.get_opp_solnbr(opp)
             self.log.info('Pulled opp id ({}) number ({})'.format(opp['id'], solnbr))
