@@ -8,7 +8,7 @@ kramdown:
   parse_block_html: true
 
 pygments: true
-baseurl: https://18f.github.io/fbopen
+baseurl: 
 permalink: /update/:title/
 
 welcome_message: "A set of open-source tools to help small businesses search for opportunities to work with the U.S. government."
