@@ -21,9 +21,6 @@ describe("The FBOpen API", function() {
     });
     async.series([
       function (callback) {
-        console.log('Starting series!!!');
-        callback(null, 'pre');
-      }, function (callback) {
         client.indices.delete({index: index_name}, callback);
       }, function (callback) {
         client.indices.create({index: index_name, body: {
@@ -82,7 +79,13 @@ describe("The FBOpen API", function() {
   var record_with_field = function(field, index, value) {
     return function(resp) {
       console.log(util.inspect(resp.body));
-      expect(resp.body.docs[index]).to.have.property(field, value);
+      if (resp.body.docs) {
+        // in case of multiple returned docs
+        expect(resp.body.docs[index]).to.have.property(field, value);
+      } else if (resp.body._source) {
+        // in case of single returned doc
+        expect(resp.body._source).to.have.property(field, value);
+      }
     };
   };
 
@@ -252,12 +255,20 @@ describe("The FBOpen API", function() {
     .expect(record_with_field('solnbr', 0, 'spmym414q0334'))
     .end(done)
   });
- it('first result in search should match solicitation number exactly', function(done) {
+ it('should order results such that first result matches solicitation number exactly when filtering to solnbr', function(done) {
     request(app)
     .get('/v0/opps?q=w91ytz-14-t-0046')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(9))
+    .expect(record_with_field('solnbr', 0, 'w91ytz-14-t-0046'))
+    .end(done)
+  });
+ it('should allow users to return a single record by id', function(done) {
+    request(app)
+    .get('/v0/opp/fbo.gov:PRESOL:w91ytz-14-t-0046')
+    .expect(200)
+    .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(record_with_field('solnbr', 0, 'w91ytz-14-t-0046'))
     .end(done)
   });

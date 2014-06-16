@@ -272,6 +272,14 @@ app.get('/v0/opps', function(req, res) {
 });
 
 
+app.get('/v0/opp/:id', function(req, res) {
+  client.search(
+    { index: config.elasticsearch.index, type:"opp", _id: req.params.id }, 
+    function(err, body) { res.json(body) }
+  );
+});
+
+
 // Allow POST operations only according to configuration
 app.post('*', function(req, res, next) {
 	if (config.app.read_only) {
