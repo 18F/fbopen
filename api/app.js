@@ -53,9 +53,9 @@ if (config.app.require_http_basic_auth) {
 //
 // Leaving these here for debug logging when needed:
 // console.log("Elasticsearch host from within app:");
-// console.log(config.elasticsearch.host);
+ //console.log(config.elasticsearch.host);
 // console.log("Elasticsearch index from within app:");
-// console.log(config.elasticsearch.index);
+ //console.log(config.elasticsearch.index);
 
 var client = es.Client({
   host: config.elasticsearch.host + ':' + config.elasticsearch.port,
@@ -127,9 +127,9 @@ app.get('/v0/opps', function(req, res) {
   if (! (req.param('show_noncompeted') && S(req.param('show_noncompeted')).toBoolean())) {
     // omit non-competed listings unless otherwise specified
     non_competed_bool_query = ejs.BoolQuery().should([
-        ejs.MatchQuery('_all', 'single source'),
-        ejs.MatchQuery('_all', 'sole source'),
-        ejs.MatchQuery('_all', 'other than full and open competition')
+        ejs.MatchQuery('_all', 'single source').type('phrase'),
+        ejs.MatchQuery('_all', 'sole source').type('phrase'),
+        ejs.MatchQuery('_all', 'other than full and open competition').type('phrase')
     ]);
 
     var non_competed_flt = ejs.NotFilter(ejs.QueryFilter(non_competed_bool_query));
@@ -140,13 +140,20 @@ app.get('/v0/opps', function(req, res) {
   // omit or include closed listings
   // if it's not defined or it's false, add this filter
   if (!req.param('show_closed') || S(req.param('show_closed')).toBoolean() === false) {
-    var show_closed = ejs.RangeQuery('close_dt').gt(config.elasticsearch.now_str);
+    var show_closed = ejs.OrFilter([
+                        ejs.QueryFilter(ejs.MatchQuery("ext.Status", "Pipeline")), //bids.stat.gov data has no close date, only status field
+                        ejs.AndFilter([
+                            ejs.QueryFilter(ejs.RangeQuery('close_dt').gt(config.elasticsearch.now_str)),
+                            ejs.MissingFilter('ext.Status')
+                        ])
+                      ]);
+
     if (q !== '') {
-      filters.filters(ejs.QueryFilter(show_closed));
+      filters.filters(show_closed);
     } else {
       queries.should(show_closed);
     }
-  }
+  } 
 
   // filter by data source
   var data_source = req.param('data_source');
