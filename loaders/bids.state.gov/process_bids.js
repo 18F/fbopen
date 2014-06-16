@@ -1,5 +1,6 @@
 var datasource_id = 'bids.state.gov';
 var fs = require('fs');
+var sha1 = require('sha1');
 
 var infile = process.argv[2] || 'workfiles/download.json';
 var outfile = process.argv[3] || 'workfiles/notices.json';
@@ -30,7 +31,7 @@ bids.forEach(function(bid){
         }
     }
     
-    bid_obj['id'] = datasource_id + ':' + bid_obj['solnbr'];
+    bid_obj['id'] = sha1( b['Lat'] + ':' + b['Lon'] + ':' + b['title']);
     bid_obj['data_source'] = datasource_id;
     bid_obj['posted_dt'] = new Date(bid_obj['posted_dt']);
 
