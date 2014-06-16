@@ -30,6 +30,8 @@ class SourceDownloader(AttachmentsImporter):
 
         self.get_sources()
 
+        self.log.info("Done.")
+
     def grab_urls_from_file(self):
         if self.urls_file:
             self.log.info("Getting URLs from file {}".format(self.urls_file))

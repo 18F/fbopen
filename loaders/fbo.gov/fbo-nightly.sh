@@ -66,7 +66,8 @@ cat $prepped_json_notices_file | node ../common/format-bulk.js -a > $bulk_notice
 # load into Elasticsearch
 curl -s -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @$bulk_notices_file; echo
 
-echo "Now call the attachment loader with --file $nightly_links_file"
+echo "Starting attachment scrape/load. See ~/log/fbo_attach.log for more info..."
+python $FBOPEN_ROOT/loaders/attachments/fbo.py run --file $nightly_links_file
 
 echo "fbo-nightly done."
 

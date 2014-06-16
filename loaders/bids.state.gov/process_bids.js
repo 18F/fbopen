@@ -11,8 +11,8 @@ var field_map = {
 	, 'Country': 'location'
 	, 'Project_Description': 'description'
 	, 'Link_To_Project': 'listing_url'
-    , 'Project_Number': 'solnbr'
-}
+  , 'Project_Number': 'solnbr'
+};
 
 var data = JSON.parse(fs.readFileSync(infile, "utf-8"));
 var bids = data['features'];
@@ -25,7 +25,7 @@ bids.forEach(function(bid){
 
     for (var field in b){
         if (field in field_map){
-            bid_obj[field_map[field]] = b[field]
+            bid_obj[field_map[field]] = b[field];
         } else {
             bid_obj['ext'][field] = b[field];
         }

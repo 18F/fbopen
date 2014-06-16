@@ -1,9 +1,9 @@
 {
   "name": "loaders-fbo.gov",
   "version": "0.0.1",
-  "description": "parses FBO FTP weekly data dumps and loads them into Solr, including attachments",
+  "description": "parses FBO FTP weekly data dumps and loads them into Elasticsearch, including attachments",
   "scripts": {
-	  "preinstall": "sudo npm i -g jsontool"
+	  "preinstall": "sudo npm i -g json"
   },
   "dependencies": {
     "string": "*"

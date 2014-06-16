@@ -88,4 +88,7 @@ echo "Extracting links"
 # the '-c "this.listing_url"' part filters the results to only lines where the listing_url is defined
 cat workfiles/grants.json | json -agc "this.listing_url" listing_url > workfiles/links.txt
 
+echo "Starting attachment scrape/load. See ~/log/grants_attach.log for more info..."
+python $FBOPEN_ROOT/loaders/attachments/grants.py run --file workfiles/links.txt
+
 echo "Grants nightly done"

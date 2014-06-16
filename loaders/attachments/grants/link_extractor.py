@@ -11,14 +11,26 @@ class GrantsLinkExtractor(LinkExtractor):
 
         self.base_url = 'http://www.grants.gov/grantsws/AttachmentDownload?attID={}'
 
-    def extract_for_file(self, filename, shelf):
+    def extract_for_file(self, filename, shelf, encoding='utf-8'):
         self.log.info("Found {}, parsing the JSON...".format(filename))
-        with open(os.path.join(self.import_dir, filename), 'r') as f:
+        with open(os.path.join(self.import_dir, filename), 'r', encoding=encoding) as f:
             try:
                 opp = json.load(f)
             except UnicodeDecodeError:
-                f = open(os.path.join(self.import_dir, filename), encoding="latin-1")
-                opp = json.load(f)
+                self.log.error('Got UnicodeDecodeError.')
+                if (encoding is not 'latin-1'):
+                    self.log.info('Opening the file again with latin-1.')
+                    self.extract_for_file(filename, shelf, "latin-1")
+                else:
+                    self.log.error('I\'m out of ideas. Skipping.')
+
+                return
+            except ValueError:
+                self.log.error('Couldn\'t parse the JSON in {}'.format(filename))
+                return
+            except Exception as e:
+                self.log.exception(e)
+                return
 
             solnbr = self.get_opp_solnbr(opp)
             self.log.info('Pulled opp id ({}) number ({})'.format(opp['id'], solnbr))
