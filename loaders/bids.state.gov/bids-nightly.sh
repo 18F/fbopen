@@ -38,7 +38,7 @@ fi
 node process_bids.js $raw_json
 
 echo "Converting JSON to Elasticsearch bulk format..."
-cat $json_output_file | node ../common/format-bulk.js -a > $bulk_output_file
+cat $json_output_file | node $FBOPEN_ROOT/loaders/common/format-bulk.js -a > $bulk_output_file
 
 
 # load into Elasticsearch

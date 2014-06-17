@@ -61,7 +61,7 @@ cat $prepped_json_notices_file | json -ga listing_url > $nightly_links_file
 
 # convert notices to Elasticsearch's bulk format, adding -a flag to append descriptions in MODs
 bulk_notices_file=$nightly_dir/notices.$download_date.bulk
-cat $prepped_json_notices_file | node ../common/format-bulk.js -a > $bulk_notices_file
+cat $prepped_json_notices_file | node $FBOPEN_ROOT/loaders/common/format-bulk.js -a > $bulk_notices_file
 
 # load into Elasticsearch
 curl -s -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @$bulk_notices_file; echo
