@@ -49,11 +49,11 @@ else
 fi
 
 # process the nightly file into JSON
-cat $nightly_download_file | node xml2json.js > $nightly_download_file.json
+cat $nightly_download_file | node $FBOPEN_ROOT/loaders/fbo.gov/xml2json.js > $nightly_download_file.json
 
 # prep the JSON further
 prepped_json_notices_file=$nightly_dir/prepped_notices.$download_date.json
-cat $nightly_download_file.json | node process_notices.js > $prepped_json_notices_file
+cat $nightly_download_file.json | node $FBOPEN_ROOT/loaders/fbo.gov/process_notices.js > $prepped_json_notices_file
 
 # extract links
 nightly_links_file=$nightly_dir/links.$download_date.txt

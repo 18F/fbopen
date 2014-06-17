@@ -33,7 +33,7 @@ wget ftp://ftp.fbo.gov/datagov/FBOFullXML.xml -O $FBO_WEEKLY_XML_FILE
 #wget -c ftp://ftp.fbo.gov/datagov/FBOFullXML.xml -O $outfile
 
 echo "Converting to JSON..."
-cat $FBO_WEEKLY_XML_FILE | node process_notices__weekly.js > $json_output_file
+cat $FBO_WEEKLY_XML_FILE | node $FBOPEN_ROOT/loaders/fbo.gov/process_notices__weekly.js > $json_output_file
 
 echo "Finding open notices..."
 cat $json_output_file | node $FBOPEN_ROOT/loaders/common/get_open_listings.js > $open_json_output_file

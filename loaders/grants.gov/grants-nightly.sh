@@ -33,11 +33,14 @@ echo "FBOPEN_URI = $FBOPEN_URI"
 FBOPEN_INDEX=${FBOPEN_INDEX:-"fbopen"}
 echo "FBOPEN_INDEX = $FBOPEN_INDEX"
 
+PWD=$FBOPEN_ROOT/loaders/grants.gov
+
 zipped_basename="GrantsDBExtract$download_date" # .zip
-download_dir="downloads"
+download_dir="$PWD/downloads"
+workfiles_dir="$PWD/workfiles"
 
 mkdir -p "$download_dir"
-mkdir -p workfiles
+mkdir -p "$workfiles_dir"
 
 download_url="http://www.grants.gov/web/grants/xml-extract.html?p_p_id=xmlextract_WAR_grantsxmlextractportlet_INSTANCE_5NxW0PeTnSUa&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_cacheability=cacheLevelPage&p_p_col_id=column-1&p_p_col_pos=1&p_p_col_count=2&download=$zipped_basename.zip"
 
@@ -69,7 +72,7 @@ then
 	unzip $download_dir/$zipped_basename -d $download_dir/
 	if [[ -s "$xml_file" ]]
 	then
-		node grants-nightly.js -f $xml_file -j $json_file
+		node $PWD/grants-nightly.js -f $xml_file -j $json_file -o $workfiles_dir/grants.json
 	else
 		echo "ERROR: cannot find $xml_file."
 	fi
@@ -77,18 +80,16 @@ else
 	echo "ERROR: cannot find file $downloaded_zipped_file."
 fi
 
-#echo "Converting XML to JSON"
-#cat workfiles/listings-solrized.xml | node xml2json.js > workfiles/grants.json
 echo "Converting JSON to Elasticsearch bulk JSON format"
-cat workfiles/grants.json | node ../common/format-bulk.js > workfiles/grants.bulk
+cat $workfiles_dir/grants.json | node $FBOPEN_ROOT/loaders/common/format-bulk.js > $workfiles_dir/grants.bulk
 
-curl -s -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @workfiles/grants.bulk; echo
+curl -s -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @$workfiles_dir/grants.bulk; echo
 
 echo "Extracting links"
 # the '-c "this.listing_url"' part filters the results to only lines where the listing_url is defined
-cat workfiles/grants.json | json -agc "this.listing_url" listing_url > workfiles/links.txt
+cat $workfiles_dir/grants.json | json -agc "this.listing_url" listing_url > $workfiles_dir/links.txt
 
 echo "Starting attachment scrape/load. See ~/log/grants_attach.log for more info..."
-python $FBOPEN_ROOT/loaders/attachments/grants.py run --file workfiles/links.txt
+python $FBOPEN_ROOT/loaders/attachments/grants.py run --file $workfiles_dir/links.txt
 
 echo "Grants nightly done"
