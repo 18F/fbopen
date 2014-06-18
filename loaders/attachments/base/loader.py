@@ -23,6 +23,7 @@ class AttachmentLoader(AttachmentsImporter):
 
         self.fbopen_uri = os.getenv('FBOPEN_URI')
         self.fbopen_index = os.getenv('FBOPEN_INDEX')
+        self.fbopen_root = os.getenv('FBOPEN_ROOT')
         self.data_source = kwargs['data_source']
 
     def run(self):
@@ -62,7 +63,7 @@ class AttachmentLoader(AttachmentsImporter):
                     self.log.info("Loading attachment {} with data: {}".format(attach_id, a))
 
                     script_output = call([
-                        '../common/load_attachment.sh',
+                        os.path.join(self.fbopen_root, '/loaders/common/load_attachment.sh'),
                         a['local_file_path'],
                         attach_id,
                         key,
