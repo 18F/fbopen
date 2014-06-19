@@ -7,18 +7,18 @@ The loader currently loads in the notices but does not load in attachments, if t
 * Node
 * wget
 
-### Environment
-
-You'll need to specify several environment variables in order to run either script. Here's a sample call:
-
-```
-FBOPEN_LOGDIR=~/projects/fbopen/log FBOPEN_ROOT=~/projects/fbopen FBOPEN_URI=http://localhost:9200 FBOPEN_INDEX=fbopen python fbo.py run --file links.txt
-```
-
 We suggest using a tool like [autoenv](https://github.com/groovecoder/autoenv) to manage these variables.
 
 ### Install node modules
 `npm install`
+
+### Environment
+
+You'll need to set the `FBOPEN_ROOT` environment variable in order to run the script.
+
+```
+FBOPEN_ROOT=~/projects/fbopen
+```
 
 ### Run the loader
 `bids-nightly.sh`
