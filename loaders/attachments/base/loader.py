@@ -63,7 +63,7 @@ class AttachmentLoader(AttachmentsImporter):
                     self.log.info("Loading attachment {} with data: {}".format(attach_id, a))
 
                     script_output = call([
-                        os.path.join(self.fbopen_root, '/loaders/common/load_attachment.sh'),
+                        os.path.join(self.fbopen_root, 'loaders/common/load_attachment.sh'),
                         a['local_file_path'],
                         attach_id,
                         key,
