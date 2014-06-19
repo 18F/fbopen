@@ -2,7 +2,7 @@
 
 source setup.sh
 
-echo "Formatting standard JSON into Elasticsearch bulk format JSON"
+echo "Formatting standard JSON into Elasticsearch bulk format JSON (for grants.gov)"
 # http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-bulk.html
 
 cat sample/grants.json | node $FBOPEN_ROOT/loaders/common/format-bulk.js > /tmp/fbopen_output

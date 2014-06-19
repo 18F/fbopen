@@ -2,6 +2,7 @@
 
 source setup.sh
 
+echo "test_load_bulk_into_es__fbo.sh"; echo
 echo "Creating a test index"
 curl -XPUT 'http://localhost:9200/fbopen_test'
 
@@ -28,8 +29,7 @@ echo "Asserting output (/tmp/fbopen_output.tmp) equals expected (sample/output/f
 assert "diff -q /tmp/fbopen_output.tmp sample/output/fbo.json.tmp"
 assert_end
 
-echo "Dropping the test index"
-curl -XDELETE 'http://localhost:9200/fbopen_test'; echo
+curl -q -XDELETE 'http://localhost:9200/fbopen_test'; echo
 
 echo "Done."
 
