@@ -8,12 +8,12 @@
 
 json_output_file='workfiles/notices.json'
 open_json_output_file='workfiles/notices_open.json'
-links_output_file='workfiles/listings-links.txt'
+weekly_links_file='workfiles/listings-links.txt'
 bulk_output_file='workfiles/notices.bulk'
 
 if [ $# -eq 1 ]
 then
-	links_output_file=$1
+	weekly_links_file=$1
 fi
 
 FBO_WEEKLY_XML_FILE=${FBO_WEEKLY_XML_FILE:-"workfiles/FBOFullXML.xml"}
@@ -25,7 +25,7 @@ echo "FBOPEN_INDEX = $FBOPEN_INDEX"
 mkdir -p workfiles
 
 echo "JSON output file is " $json_output_file
-echo "list of links is " $links_output_file
+echo "list of links is " $weekly_links_file
 
 echo "Downloading weekly XML dump..."
 wget ftp://ftp.fbo.gov/datagov/FBOFullXML.xml -O $FBO_WEEKLY_XML_FILE
@@ -39,7 +39,7 @@ echo "Finding open notices..."
 cat $json_output_file | node $FBOPEN_ROOT/loaders/common/get_open_listings.js > $open_json_output_file
 
 echo "Extracting links from open notices..."
-cat $open_json_output_file | json -ga listing_url > $links_output_file
+cat $open_json_output_file | json -ga listing_url > $weekly_links_file
 
 echo "Converting JSON to Elasticsearch bulk format..."
 # Note the need to split the file into chunks. Else ES will fail with either a
@@ -55,7 +55,9 @@ find workfiles/ -name "notices.bulk.*" -print -exec curl -XPOST "$FBOPEN_URI/$FB
 
 echo "Done loading into Elasticsearch."
 
-echo "Now call the attachment loader with --file $links_output_file"
+echo "Starting attachment scrape/load. See ~/log/fbo_attach.log for more info..."
+cd $FBOPEN_ROOT/loaders/attachments
+python fbo.py run --file $weekly_links_file
 
 echo "fbo-weekly done."
 

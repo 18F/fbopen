@@ -90,6 +90,7 @@ echo "Extracting links"
 cat $workfiles_dir/grants.json | json -agc "this.listing_url" listing_url > $workfiles_dir/links.txt
 
 echo "Starting attachment scrape/load. See ~/log/grants_attach.log for more info..."
-python $FBOPEN_ROOT/loaders/attachments/grants.py run --file $workfiles_dir/links.txt
+cd $FBOPEN_ROOT/loaders/attachments
+python grants.py run --file $workfiles_dir/links.txt
 
 echo "Grants nightly done"
