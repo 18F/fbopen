@@ -10,17 +10,24 @@ The loader currently loads in the notices but does not load in attachments, if t
 We suggest using a tool like [autoenv](https://github.com/groovecoder/autoenv) to manage these variables.
 
 ### Install node modules
-`npm install`
+From the `loaders/bids.state.gov` directory:
+
+```
+$ npm install
+$ (cd ../common/ && npm install)
+```
 
 ### Environment
 
 You'll need to set the `FBOPEN_ROOT` environment variable in order to run the script.
 
 ```
-FBOPEN_ROOT=~/projects/fbopen
+$ FBOPEN_ROOT=~/projects/fbopen
 ```
 
 ### Run the loader
-`bids-nightly.sh`
+```
+$ bids-nightly.sh
+```
 
 That's it! You may need to create a workfiles directory for the first run. 
