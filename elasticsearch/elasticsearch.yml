@@ -137,6 +137,13 @@
 # Use the Index Status API (<http://localhost:9200/A/_status>) to inspect
 # the index status.
 
+################################### Scripting #################################
+#
+# Re-enable dynamic scripting, which has been disabled by default in v1.2.
+# Explainer here:
+# http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/modules-scripting.html#_enabling_dynamic_scripting
+
+script.disable_dynamic: false
 
 #################################### Paths ####################################
 
