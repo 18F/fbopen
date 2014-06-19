@@ -272,4 +272,11 @@ describe("The FBOpen API", function() {
     .expect(record_with_field('solnbr', 0, 'fa8571-14-r-0008'))
     .end(done)
   });
+  it('should have results for bids.state.gov data', function(done){
+    request(app)
+    .get('/v0/opps?data_source=bids.state.gov')
+    .expect(200)
+    .expect(num_found(24))
+    .end(done)
+  });
 });
