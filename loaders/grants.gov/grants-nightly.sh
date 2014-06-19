@@ -69,7 +69,7 @@ fi
 # unzip it
 if [[ -s "$downloaded_zipped_file" ]]
 then
-	unzip $download_dir/$zipped_basename -d $download_dir/
+	unzip -n $download_dir/$zipped_basename -d $download_dir/
 	if [[ -s "$xml_file" ]]
 	then
 		node $PWD/grants-nightly.js -f $xml_file -j $json_file -o $workfiles_dir/grants.json
