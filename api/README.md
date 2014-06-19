@@ -9,7 +9,7 @@ To install:
 To run: `node app.js` (or, say, [`nodemon app.js`](https://github.com/remy/nodemon))
 
 ### API Documentation and Examples
-There's some very rough, basic documentation of this APi at [http://docs.fbopen.apiary.io/](http://docs.fbopen.apiary.io/) , but here are a couple quick sample queries to get you started:
+There's some very rough, basic documentation of this APi at [http://18f.github.io/fbopen/](http://18f.github.io/fbopen/) , but here are a couple quick sample queries to get you started:
 
 To query for the first page (i.e., numbers 0 through 9) of opportunities that mention software development:
 [http://localhost:3000/v0/opps?q=software+development](http://localhost:3000/v0/opps?q=software+development)
@@ -40,6 +40,5 @@ Several aspects of the test run can be changed in the `Makefile`, such as the ti
 
 ### To do
 * add authentication
-* restore and improve POST /opp and POST /opp/:doc_id/tags/ 
+* restore and improve POST /opp and POST /opp/:doc_id/tags/
 * ?
-
