@@ -1,6 +1,6 @@
 /*
  *
- 
+
  FBOpen API server v0
 
  Supports /opp ("opportunity") POST and GET
@@ -91,7 +91,7 @@ app.options('*', function(req, res) {
 
 
 app.get('/v0/', function(req, res) {
-	res.send('FBOpen API v0. See http://docs.fbopen.apiary.io for initial documentation.');
+	res.send('FBOpen API v0. See http://18f.github.io/fbopen for initial documentation.');
 });
 
 app.get('/v0/hello', function(req, res){
@@ -153,7 +153,7 @@ app.get('/v0/opps', function(req, res) {
     } else {
       queries.should(show_closed);
     }
-  } 
+  }
 
   // filter by data source
   var data_source = req.param('data_source');
@@ -281,7 +281,7 @@ app.get('/v0/opps', function(req, res) {
 
 app.get('/v0/opp/:id', function(req, res) {
   client.search(
-    { index: config.elasticsearch.index, type:"opp", _id: req.params.id }, 
+    { index: config.elasticsearch.index, type:"opp", _id: req.params.id },
     function(err, body) { res.json(body) }
   );
 });
@@ -380,15 +380,15 @@ app.post('*', function(req, res, next) {
 // 		return false;
 // 	}
 // }
-// 
+//
 // // to add: much better validation
 // // e.g., https://github.com/ctavan/express-validator
 // function has_required_fields(req) {
-// 	return (req.body.data_source 
+// 	return (req.body.data_source
 // 		&& req.body.solnbr
 // 		&& req.body.listing_url
 // 		&& req.body.title
-// 		&& req.body.close_dt 
+// 		&& req.body.close_dt
 // 	);
 // }
 
@@ -399,7 +399,7 @@ app.post('/v0/opp/:doc_id/tags/:tags?', function(req, res) {
 
 	// 'opp/' + solnbr + '/tags/' + tags_serial
 	doc_id = req.params.doc_id;
-	
+
 	solr_doc = { 'id': doc_id };
 
 	tags = req.params.tags;

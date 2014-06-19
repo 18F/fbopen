@@ -69,7 +69,7 @@ fi
 # unzip it
 if [[ -s "$downloaded_zipped_file" ]]
 then
-	unzip $download_dir/$zipped_basename -d $download_dir/
+	unzip -n $download_dir/$zipped_basename -d $download_dir/
 	if [[ -s "$xml_file" ]]
 	then
 		node $PWD/grants-nightly.js -f $xml_file -j $json_file -o $workfiles_dir/grants.json
@@ -90,6 +90,7 @@ echo "Extracting links"
 cat $workfiles_dir/grants.json | json -agc "this.listing_url" listing_url > $workfiles_dir/links.txt
 
 echo "Starting attachment scrape/load. See ~/log/grants_attach.log for more info..."
-python $FBOPEN_ROOT/loaders/attachments/grants.py run --file $workfiles_dir/links.txt
+cd $FBOPEN_ROOT/loaders/attachments
+python grants.py run --file $workfiles_dir/links.txt
 
 echo "Grants nightly done"

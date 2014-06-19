@@ -34,8 +34,9 @@ FBOPEN_INDEX=${FBOPEN_INDEX:-"fbopen"}
 echo "FBOPEN_INDEX = $FBOPEN_INDEX"
 
 # mkdir -p will ensure the nightly download dir is in place, but won't fail if it already exists
-nightly_dir="nightly-downloads"
-mkdir -p $nightly_dir workfiles
+nightly_dir="$FBOPEN_ROOT/loaders/fbo.gov/nightly-downloads"
+workfiles_dir="$FBOPEN_ROOT/loaders/fbo.gov/workfiles"
+mkdir -p $nightly_dir $workfiles_dir
 
 # download the nightly file, if not downloaded already
 nightly_download_file="$nightly_dir/FBOFeed$download_date.txt"
@@ -67,7 +68,8 @@ cat $prepped_json_notices_file | node $FBOPEN_ROOT/loaders/common/format-bulk.js
 curl -s -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @$bulk_notices_file; echo
 
 echo "Starting attachment scrape/load. See ~/log/fbo_attach.log for more info..."
-python $FBOPEN_ROOT/loaders/attachments/fbo.py run --file $nightly_links_file
+cd $FBOPEN_ROOT/loaders/attachments
+python fbo.py run --file $nightly_links_file
 
 echo "fbo-nightly done."
 

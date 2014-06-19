@@ -11,7 +11,6 @@
     , "optimist": "*"
     , "moment": "*"
     , "solr-client": "*"
-    , "unzip": "*"
     , "date-format-lite": "*"
     , "wget": "*"
   }
