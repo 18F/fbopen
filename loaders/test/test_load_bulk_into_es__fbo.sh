@@ -4,12 +4,12 @@ source setup.sh
 
 echo "test_load_bulk_into_es__fbo.sh"; echo
 echo "Creating a test index"
-curl -XPUT 'http://localhost:9200/fbopen_test'
+curl -q -XPUT 'http://localhost:9200/fbopen_test'; echo
 
 echo "Indexing sample/fbo.bulk in ElasticSearch"
-curl -s -XPOST 'http://localhost:9200/fbopen_test/_bulk' --data-binary @sample/fbo.bulk; echo
+curl -q -s -XPOST 'http://localhost:9200/fbopen_test/_bulk' --data-binary @sample/fbo.bulk; echo
 
-echo "Waiting for indexing..."
+echo "Waiting for indexing..."; echo
 sleep 2
 
 # query ES via the multi get API
