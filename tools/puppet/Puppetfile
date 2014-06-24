@@ -2,8 +2,9 @@
 #
 forge "http://forge.puppetlabs.com"
 
+mod "puppetlabs/vcsrepo"
 mod "puppetlabs/stdlib"
-mod "willdurand/nodejs"
+mod "puppetlabs/nodejs"
 mod "maestrodev/puppet-wget",
     :git => "git://github.com/maestrodev/puppet-wget.git"
 mod "puppetlabs/postgresql"
