@@ -42,7 +42,7 @@ config.logger.path = '/var/log/fbopen/api.log';
 config.elasticsearch = {};
 config.elasticsearch.host = process.env.ELASTICSEARCH_HOST || 'localhost';
 config.elasticsearch.port = '9200';
-config.elasticsearch.index = process.env.ELASTICSEARCH_INDEX || '9200';
+config.elasticsearch.index = process.env.ELASTICSEARCH_INDEX || 'fbopen';
 // this is used to adjust the date math that's used for searching within the (statically-dated) test data
 config.elasticsearch.now_str = process.env.ELASTICSEARCH_NOW || 'now';
 
