@@ -50,6 +50,13 @@ exec { 'npm_fbopen_install':
   command   => "npm install",
   cwd       => "/home/fbopen/fbopen/api",
   require   => Class['nodejs']
+}->
+file { 'fbopen_api_log':
+  path => '/var/log/fbopen/api.log',
+  ensure => 'present'
+}->
+file { '/home/fbopen/fbopen/api/config.js':
+  ensure => '/home/fbopen/fbopen/api/config-sample_dev.js',
 }
 
 #Install and configure elasticsearch
@@ -76,6 +83,9 @@ exec { "upstart_conf_chmod":
 }->
 exec { "upstart_reload":
   command => "initctl reload-configuration"
+}->
+file { '/var/log/upstart/fbopen_api.log':
+  ensure => 'exists'
 }->
 service { 'fbopen_api':
   provider => 'upstart',
