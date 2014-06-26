@@ -39,32 +39,38 @@ package {['python3.4', 'python3.4-dev']:
   ensure  => 'installed',
 }
 
-vcsrepo {'/home/fbopen/fbopen':
-    ensure => present,
-    provider => git,
-    source => 'https://github.com/18F/fbopen.git',
-    user => 'fbopen',
-    revision => 'esearch'
+#vcsrepo {'/home/fbopen/fbopen':
+#    ensure => present,
+#    provider => git,
+#    source => 'https://github.com/18F/fbopen.git',
+#    user => 'fbopen'
+#}->
+#exec {'repo_symlink':
+#  command => 'ln -s /vagrant /home/fbopen/fbopen'
+#}->
+exec { 'fbopen_setup':
+  command => 'bash setup.sh',
+  cwd     => '/home/fbopen/fbopen',
+  require => Package['nodejs']
 }->
 exec { 'npm_fbopen_install':
   command   => "npm install",
-  cwd       => "/home/fbopen/fbopen/api",
-  require   => Class['nodejs']
+  cwd       => "/home/fbopen/fbopen/api"
 }->
-file { 'fbopen_api_log':
-  path => '/var/log/fbopen/api.log',
-  ensure => 'present'
+file { '/var/log/fbopen':
+  ensure => directory
 }->
 file { '/home/fbopen/fbopen/api/config.js':
-  ensure => '/home/fbopen/fbopen/api/config-sample_dev.js',
+  ensure => link,
+  target => '/home/fbopen/fbopen/api/config-sample_dev.js'
 }
 
 #Install and configure elasticsearch
 exec {"install_key":
   command         => 'wget -O - http://packages.elasticsearch.org/GPG-KEY-elasticsearch | apt-key add -',
 }->
-apt::source { 'elasticsearch_1.1stable':
-  location          => 'http://packages.elasticsearch.org/elasticsearch/1.0/debian',
+apt::source { 'elasticsearch_1.2stable':
+  location          => 'http://packages.elasticsearch.org/elasticsearch/1.2/debian',
   release           => 'stable',
   repos             => 'main',
   include_src       => false,

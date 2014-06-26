@@ -3,8 +3,7 @@
   "version": "0.0.1",
   "private": true,
   "scripts": {
-    "start": "node app.js",
-    "preinstall": "sudo npm i -g mocha bunyan elasticdump"
+    "start": "node app.js"
   },
   "dependencies": {
     "express": "",
