@@ -17,22 +17,8 @@ mkdir -p workfiles
 echo "JSON raw file is " $raw_json
 echo "list of links is " $links_output_file
 
-if [ -f $raw_json ];
-then
-    today=`date +%s`
-    modified=`stat -f "%m" $raw_json`
-    diff=`expr $today - $modified`
-    if  (($diff > 43200));
-    then 
-        echo "file older than 12 hours, redownloading ..."
-        wget $BIDS_URL -O $raw_json $json_output_file
-    else
-        echo "File exists and is recent, skipping download..."
-    fi
-else 
-    echo "Downloading JSON dump..."
-    wget $BIDS_URL -O $raw_json
-fi
+echo "Downloading JSON dump..."
+wget $BIDS_URL -O $raw_json
 
 #echo "Converting to JSON..." 
 node process_bids.js $raw_json
@@ -44,7 +30,7 @@ cat $json_output_file | node $FBOPEN_ROOT/loaders/common/format-bulk.js -a > $bu
 # load into Elasticsearch
 echo "Loading into Elasticsearch..."
 curl -s -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @$bulk_output_file;
- echo
+echo
 echo "Done loading into Elasticsearch."
 
 
