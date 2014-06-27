@@ -187,9 +187,16 @@ app.get('/v0/opps', function(req, res) {
     fieldlist = req.param('fl').split(',');
   }
 
-  var results_callback = function(error, body, status) {
+  var results_callback = function(error, body, status_code) {
     // massage results into the format we want
     var results_out = {};
+    results_out.status = status_code;
+
+    if (status_code !== 200) {
+      results_out.error = error;
+      return res.json(results_out);
+    };
+
     if (_u.has(body, 'hits') && _u.has(body.hits, 'total')) {
       results_out.numFound = body.hits.total;
     } else {
