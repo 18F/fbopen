@@ -13,12 +13,19 @@ var express = require('express'),
   http = require('http'),
   https = require('https'),
   path = require('path'),
-  http_auth = require('http-auth')
+  http_auth = require('http-auth'),
 
-// other useful stuff
-, ejs = require('./elastic.min.js'), es = require('elasticsearch'), moment = require('moment') // momentjs.com
-  , S = require('string') // stringjs.com
-  , util = require('util'), _u = require('underscore'), LogClass = require('./log_to_bunyan'), body_parser = require('body-parser'), serve_favicon = require('serve-favicon'), errorhandler = require('errorhandler'), morgan = require('morgan');
+  // other useful stuff
+  ejs = require('./elastic.min.js'),
+  es = require('elasticsearch'),
+  moment = require('moment'), // momentjs.com,
+  S = require('string'), // stringjs.com
+  util = require('util'),
+  _u = require('underscore'),
+  LogClass = require('./log_to_bunyan'),
+  serve_favicon = require('serve-favicon'),
+  errorhandler = require('errorhandler'),
+  morgan = require('morgan');
 
 var config = require('./config');
 
@@ -30,7 +37,7 @@ app.use(require('express-bunyan-logger')({
   streams: [{
     level: 'trace',
     path: config.logger.path
-      // stream: process.stdout // for debugging
+    // stream: process.stdout // for debugging
   }]
 }));
 
@@ -44,9 +51,9 @@ if (config.app.require_http_basic_auth) {
 //
 // Leaving these here for debug logging when needed:
 // console.log("Elasticsearch host from within app:");
-//console.log(config.elasticsearch.host);
+// console.log(config.elasticsearch.host);
 // console.log("Elasticsearch index from within app:");
-//console.log(config.elasticsearch.index);
+// console.log(config.elasticsearch.index);
 
 var client = es.Client({
   host: config.elasticsearch.host + ':' + config.elasticsearch.port,
@@ -57,7 +64,6 @@ var client = es.Client({
 app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(serve_favicon(__dirname + '/public/favicon.png'));
-app.use(body_parser());
 
 if ('development' === process.env.NODE_ENV) {
   app.use(errorhandler());
