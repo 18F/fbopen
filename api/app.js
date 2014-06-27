@@ -9,25 +9,16 @@
  *
  */
 
-var express = require('express')
-  , http = require('http')
-  , https = require('https')
-  , path = require('path')
-  , http_auth = require('http-auth')
+var express = require('express'),
+  http = require('http'),
+  https = require('https'),
+  path = require('path'),
+  http_auth = require('http-auth')
 
-  // other useful stuff
-  , ejs = require('./elastic.min.js')
-  , es = require('elasticsearch')
-  , moment = require('moment') // momentjs.com
+// other useful stuff
+, ejs = require('./elastic.min.js'), es = require('elasticsearch'), moment = require('moment') // momentjs.com
   , S = require('string') // stringjs.com
-  , util = require('util')
-  , _u = require('underscore')
-  , LogClass = require('./log_to_bunyan')
-  , body_parser = require('body-parser')
-  , serve_favicon = require('serve-favicon')
-  , errorhandler = require('errorhandler')
-  , morgan = require('morgan')
-  ;
+  , util = require('util'), _u = require('underscore'), LogClass = require('./log_to_bunyan'), body_parser = require('body-parser'), serve_favicon = require('serve-favicon'), errorhandler = require('errorhandler'), morgan = require('morgan');
 
 var config = require('./config');
 
@@ -39,23 +30,23 @@ app.use(require('express-bunyan-logger')({
   streams: [{
     level: 'trace',
     path: config.logger.path
-    // stream: process.stdout // for debugging
+      // stream: process.stdout // for debugging
   }]
 }));
 
 // http basic auth, if required in config
 if (config.app.require_http_basic_auth) {
-	var basic = http_auth.basic(config.app.http_basic_auth);
-	app.use(http_auth.connect(basic));
+  var basic = http_auth.basic(config.app.http_basic_auth);
+  app.use(http_auth.connect(basic));
 }
 
 // Create Elasticsearch client
 //
 // Leaving these here for debug logging when needed:
 // console.log("Elasticsearch host from within app:");
- //console.log(config.elasticsearch.host);
+//console.log(config.elasticsearch.host);
 // console.log("Elasticsearch index from within app:");
- //console.log(config.elasticsearch.index);
+//console.log(config.elasticsearch.index);
 
 var client = es.Client({
   host: config.elasticsearch.host + ':' + config.elasticsearch.port,
@@ -91,20 +82,20 @@ app.options('*', function(req, res) {
 
 
 app.get('/v0/', function(req, res) {
-	res.send('FBOpen API v0. See http://18f.github.io/fbopen for initial documentation.');
+  res.send('FBOpen API v0. See http://18f.github.io/fbopen for initial documentation.');
 });
 
-app.get('/v0/hello', function(req, res){
-    client.ping({
-        requestTimeout: 10000,
-        hello: "elasticsearch!"
-    }, function (error) {
-        if (error) {
-            res.send('elasticsearch cluster is down!');
-        } else {
-            res.send('All is well');
-        }
-    });
+app.get('/v0/hello', function(req, res) {
+  client.ping({
+    requestTimeout: 10000,
+    hello: "elasticsearch!"
+  }, function(error) {
+    if (error) {
+      res.send('elasticsearch cluster is down!');
+    } else {
+      res.send('All is well');
+    }
+  });
 });
 
 
@@ -114,8 +105,8 @@ app.get('/v0/opps', function(req, res) {
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Content-Type', 'application/json;charset=utf-8');
 
-	var q = req.param('q');
-	var fq = req.param('fq');
+  var q = req.param('q');
+  var fq = req.param('fq');
 
   var queries = ejs.BoolQuery();
   var filters = ejs.AndFilter([]);
@@ -124,12 +115,12 @@ app.get('/v0/opps', function(req, res) {
   // special fields
   //
 
-  if (! (req.param('show_noncompeted') && S(req.param('show_noncompeted')).toBoolean())) {
+  if (!(req.param('show_noncompeted') && S(req.param('show_noncompeted')).toBoolean())) {
     // omit non-competed listings unless otherwise specified
     non_competed_bool_query = ejs.BoolQuery().should([
-        ejs.MatchQuery('_all', 'single source').type('phrase'),
-        ejs.MatchQuery('_all', 'sole source').type('phrase'),
-        ejs.MatchQuery('_all', 'other than full and open competition').type('phrase')
+      ejs.MatchQuery('_all', 'single source').type('phrase'),
+      ejs.MatchQuery('_all', 'sole source').type('phrase'),
+      ejs.MatchQuery('_all', 'other than full and open competition').type('phrase')
     ]);
 
     var non_competed_flt = ejs.NotFilter(ejs.QueryFilter(non_competed_bool_query));
@@ -141,12 +132,12 @@ app.get('/v0/opps', function(req, res) {
   // if it's not defined or it's false, add this filter
   if (!req.param('show_closed') || S(req.param('show_closed')).toBoolean() === false) {
     var show_closed = ejs.OrFilter([
-                        ejs.QueryFilter(ejs.MatchQuery("ext.Status", "Pipeline")), //bids.stat.gov data has no close date, only status field
-                        ejs.AndFilter([
-                            ejs.QueryFilter(ejs.RangeQuery('close_dt').gt(config.elasticsearch.now_str)),
-                            ejs.MissingFilter('ext.Status')
-                        ])
-                      ]);
+      ejs.QueryFilter(ejs.MatchQuery("ext.Status", "Pipeline")), //bids.stat.gov data has no close date, only status field
+      ejs.AndFilter([
+        ejs.QueryFilter(ejs.RangeQuery('close_dt').gt(config.elasticsearch.now_str)),
+        ejs.MissingFilter('ext.Status')
+      ])
+    ]);
 
     if (q !== '') {
       filters.filters(show_closed);
@@ -167,7 +158,9 @@ app.get('/v0/opps', function(req, res) {
     if (parseInt(req.param('limit')) <= config.app.max_rows) {
       size = req.param('limit');
     } else {
-      res.json(400, { error: 'Sorry, param "limit" must be <= ' + config.app.max_rows });
+      res.json(400, {
+        error: 'Sorry, param "limit" must be <= ' + config.app.max_rows
+      });
       return;
     }
   }
@@ -188,7 +181,7 @@ app.get('/v0/opps', function(req, res) {
     fieldlist = req.param('fl').split(',');
   }
 
-  var results_callback = function (error, body, status) {
+  var results_callback = function(error, body, status) {
     // massage results into the format we want
     var results_out = {};
     if (_u.has(body, 'hits') && _u.has(body.hits, 'total')) {
@@ -202,7 +195,7 @@ app.get('/v0/opps', function(req, res) {
     // and do a few other cleanup manipulations
     var sorted_by_score = false;
 
-    results_out.docs = _u.map(body.hits.hits, function (doc) {
+    results_out.docs = _u.map(body.hits.hits, function(doc) {
       var doc_out = _u.omit(doc, '_id', '_source', '_index', 'fields');
       doc_out.id = doc._id;
 
@@ -275,25 +268,34 @@ app.get('/v0/opps', function(req, res) {
 
   // console.log(util.inspect(request.query().bool.should, null));
 
-  client.search({ index: config.elasticsearch.index, type: "opp", body: request.toJSON() }, results_callback);
+  client.search({
+    index: config.elasticsearch.index,
+    type: "opp",
+    body: request.toJSON()
+  }, results_callback);
 });
 
 
 app.get('/v0/opp/:id', function(req, res) {
-  client.search(
-    { index: config.elasticsearch.index, type:"opp", _id: req.params.id },
-    function(err, body) { res.json(body) }
+  client.search({
+      index: config.elasticsearch.index,
+      type: "opp",
+      _id: req.params.id
+    },
+    function(err, body) {
+      res.json(body)
+    }
   );
 });
 
 
 // Allow POST operations only according to configuration
 app.post('*', function(req, res, next) {
-	if (config.app.read_only) {
-		res.send(405);
-	} else {
-	  next();
-	}
+  if (config.app.read_only) {
+    res.send(405);
+  } else {
+    next();
+  }
 });
 
 //// new opportunity POSTed
@@ -397,52 +399,54 @@ app.post('*', function(req, res, next) {
 //github.com/18F/fbopen/blob/esearch/loaders/test/test_attachment_load_and_search.sh
 app.post('/v0/opp/:doc_id/tags/:tags?', function(req, res) {
 
-	// 'opp/' + solnbr + '/tags/' + tags_serial
-	doc_id = req.params.doc_id;
+  // 'opp/' + solnbr + '/tags/' + tags_serial
+  doc_id = req.params.doc_id;
 
-	solr_doc = { 'id': doc_id };
+  solr_doc = {
+    'id': doc_id
+  };
 
-	tags = req.params.tags;
-	if (tags !==  undefined) {
-		// console.log('tags.length = ' + tags.length);
-		tags_array = tags.split(',');
-		content_tags_array = [];
-		content_tags_list = '{"set": ["' + tags_array.join('","') + '"]}';
-	} else {
-		content_tags_list = '{"set": [""]}';
-	}
+  tags = req.params.tags;
+  if (tags !== undefined) {
+    // console.log('tags.length = ' + tags.length);
+    tags_array = tags.split(',');
+    content_tags_array = [];
+    content_tags_list = '{"set": ["' + tags_array.join('","') + '"]}';
+  } else {
+    content_tags_list = '{"set": [""]}';
+  }
 
-	// console.log('content_tags_list = ' + content_tags_list);
-	solr_doc.content_tags = JSON.parse(content_tags_list);
+  // console.log('content_tags_list = ' + content_tags_list);
+  solr_doc.content_tags = JSON.parse(content_tags_list);
 
-	docs = [];
-	docs.push(solr_doc);
+  docs = [];
+  docs.push(solr_doc);
 
-	client.update(docs, function(err, obj) {
-		if (err) {
-			// console.log(err);
-			fail = {
-				'status': 'fail'
-				, 'message': 'client.UPDATE failed: ' + err
-			};
-			res.send(fail);
-		} else {
-			// console.log('updated: ' + JSON.stringify(obj));
-			success = {
-				'status': 'success'
-				, 'message': 'Ok'
-				, 'data': doc_id
-			};
-			res.send(success);
-		}
-	});
+  client.update(docs, function(err, obj) {
+    if (err) {
+      // console.log(err);
+      fail = {
+        'status': 'fail',
+        'message': 'client.UPDATE failed: ' + err
+      };
+      res.send(fail);
+    } else {
+      // console.log('updated: ' + JSON.stringify(obj));
+      success = {
+        'status': 'success',
+        'message': 'Ok',
+        'data': doc_id
+      };
+      res.send(success);
+    }
+  });
 });
 
 
 if (config.app.listen_http) {
-	http.createServer(app).listen(config.app.port);
+  http.createServer(app).listen(config.app.port);
 }
 
 if (config.app.listen_https) {
-	https.createServer(config.ssl, app).listen(config.ssl.port);
+  https.createServer(config.ssl, app).listen(config.ssl.port);
 }
