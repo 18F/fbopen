@@ -389,13 +389,16 @@
 
   dust.helpers.result_count = function(chunk, context, bodies, params) {
     var count = dust.helpers.tap(params.count, chunk, context);
+    var status_code = dust.helpers.tap(params.status, chunk, context);
     
     if (count > 1) {
       return chunk.write('<strong>' + count + '</strong> Search results');
     } else if (count == 1) {
       return chunk.write('<strong>1</strong> Search result');
-    } else {
+    } else if (status_code === 200) {
       return chunk.write('No results.');
+    } else {
+      return chunk.write('We\'re sorry, we\'ve encountered an error.');
     }
   }
 
