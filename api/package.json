@@ -6,6 +6,7 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "bunyan": "",
     "express": "",
     "serve-favicon": "",
     "body-parser": "",
