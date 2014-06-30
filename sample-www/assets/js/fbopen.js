@@ -58,7 +58,7 @@
 
   // re-fill query terms
   if (location.search != '') {
-    document.title = "Search Results for " + decodeURIComponent(getQueryVariable('q').replace(/\+/g,' ')) + " - " + document.title;
+
     form_params = ['q', 'fq', 'data_source', 'p'];
     for (i in form_params) {
       param_name = form_params[i];
@@ -205,6 +205,23 @@
       // NOTE: this call to render_error will catch issues with accessing the API
       error: render_error
     });
+      //Update Page Title
+    (function () {
+      var s = "Search Results";
+      var query = decodeURIComponent(getQueryVariable('q').replace(/\+/g,' '));
+      var datasource = decodeURIComponent(getQueryVariable('data_source').replace(/\+/g,' '));
+      if (query)
+      {
+        s+=" for " + query;
+      }
+      if (datasource)
+      {
+        var datasourceText = $("#data_source option[value='" + datasource + "']").text();
+        s+=" from " + datasourceText;
+      }
+      document.title = s + ' - ' + document.title;
+    })();
+    
 
   } // do_search()
 
@@ -519,7 +536,6 @@
     });
     return o;
   };
-
 
 
 }( window.fbopen = window.fbopen || {}, jQuery ));
