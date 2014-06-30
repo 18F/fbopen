@@ -31,7 +31,16 @@ class AttachmentDownloader(AttachmentsImporter):
         self.log.info("Done.")
 
     def download_files(self):
-        s = scrapelib.Scraper(requests_per_minute=self.req_per_min, follow_robots=False, retry_attempts=2)
+        s = scrapelib.Scraper(requests_per_minute=self.req_per_min, retry_attempts=2)
+       
+        #enable cache on scrapelib
+        cache_dir = os.path.join(os.getcwd(), 'cache')
+        if not cache_dir:
+            os.mkdir(cache_dir)
+
+        s.cache_storage = scrapelib.FileCache(cache_dir)
+        s.cache_write_only = False
+        # TODO : update scrapelib to check last modified header 
 
         with closing(shelve.open(os.path.join(self.import_dir, self.shelf_file))) as db:
             for key in db.keys():

@@ -25,7 +25,7 @@ class SourceDownloader(AttachmentsImporter):
 
     def run(self):
         self.log.info("Starting: Source Downloader")
-
+        
         self.grab_urls_from_file()
 
         self.get_sources()
@@ -81,4 +81,4 @@ class SourceDownloader(AttachmentsImporter):
         self.log.info("Resume download by adding --resume (-r) flag with last URL logged")
 
     def _new_scrape_session(self):
-        return scrapelib.Scraper(requests_per_minute=self.req_per_min, follow_robots=False)
+        return scrapelib.Scraper(requests_per_minute=self.req_per_min)
