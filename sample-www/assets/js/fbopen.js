@@ -58,7 +58,7 @@
 
   // re-fill query terms
   if (location.search != '') {
-
+    document.title = "Search Results for " + decodeURIComponent(getQueryVariable('q').replace(/\+/g,' ')) + " - " + document.title;
     form_params = ['q', 'fq', 'data_source', 'p'];
     for (i in form_params) {
       param_name = form_params[i];
