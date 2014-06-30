@@ -1,12 +1,12 @@
-#!/bin/ksh
+#!/bin/sh
 
+set -e
 # fbo-nightly.sh [YYYYMMDD]
-
 # download the nightly file
-
 # get/require a date. yesterday by default.
 if [[ $# -eq 0 ]]
 then
+    set  +e
 	date --version >/dev/null 2>&1
 	# check return code
 	if [[ $? -eq 0 ]]
@@ -17,8 +17,10 @@ then
 		# try this instead
 		download_date=$(date -v -1d +"%Y%m%d")
 	fi
+    set -e
 elif [[ $1 -ne "" ]]
 then
+    set +e 
 	date -d $1
 	if [[ $? -eq 1 ]]
 	then
@@ -26,6 +28,7 @@ then
 	else
 		download_date=$1
 	fi
+    set -e
 fi
 
 FBOPEN_URI=${FBOPEN_URI:-"localhost:9200"}
@@ -49,6 +52,7 @@ else
 	echo "(already downloaded $nightly_download_file)"
 fi
 
+echo "converting nightly file into JSON"
 # process the nightly file into JSON
 cat $nightly_download_file | node $FBOPEN_ROOT/loaders/fbo.gov/xml2json.js > $nightly_download_file.json
 
@@ -57,19 +61,19 @@ prepped_json_notices_file=$nightly_dir/prepped_notices.$download_date.json
 cat $nightly_download_file.json | node $FBOPEN_ROOT/loaders/fbo.gov/process_notices.js > $prepped_json_notices_file
 
 # extract links
+echo "Extracting links"
 nightly_links_file=$nightly_dir/links.$download_date.txt
 cat $prepped_json_notices_file | json -ga listing_url > $nightly_links_file
 
+echo "Converting notices to Elasticsearch bulk format"
 # convert notices to Elasticsearch's bulk format, adding -a flag to append descriptions in MODs
 bulk_notices_file=$nightly_dir/notices.$download_date.bulk
 cat $prepped_json_notices_file | node $FBOPEN_ROOT/loaders/common/format-bulk.js -a > $bulk_notices_file
 
 # load into Elasticsearch
+echo "Loading into Elasticsearch"
 curl -s -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @$bulk_notices_file; echo
 
-echo "Starting attachment scrape/load. See ~/log/fbo_attach.log for more info..."
-cd $FBOPEN_ROOT/loaders/attachments
-python fbo.py run --file $nightly_links_file
 
 echo "fbo-nightly done."
 

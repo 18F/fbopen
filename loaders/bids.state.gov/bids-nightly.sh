@@ -1,8 +1,7 @@
-#!/bin/bash
-
+#!/bin/bash  
+set -e 
 
 json_output_file='workfiles/notices.json'
-links_output_file='workfiles/listings-links.txt'
 bulk_output_file='workfiles/notices.bulk'
 raw_json='workfiles/download.json'
 
@@ -15,7 +14,6 @@ echo "FBOPEN_INDEX = $FBOPEN_INDEX"
 mkdir -p workfiles
 
 echo "JSON raw file is " $raw_json
-echo "list of links is " $links_output_file
 
 if [ -f $raw_json ];
 then
@@ -24,17 +22,18 @@ then
     diff=`expr $today - $modified`
     if  (($diff > 43200));
     then 
-        echo "file older than 12 hours, redownloading ..."
-        wget $BIDS_URL -O $raw_json $json_output_file
-    else
-        echo "File exists and is recent, skipping download..."
+        #echo "file older than 12 hours, redownloading ..."
+        wget -O $raw_json $BIDS_URL
+
+#   else
+ #       echo "File exists and is recent, skipping download..."
     fi
 else 
     echo "Downloading JSON dump..."
-    wget $BIDS_URL -O $raw_json
+    wget -O $raw_json $BIDS_URL
 fi
 
-#echo "Converting to JSON..." 
+echo "Converting to JSON..."
 node process_bids.js $raw_json
 
 echo "Converting JSON to Elasticsearch bulk format..."
@@ -43,10 +42,7 @@ cat $json_output_file | node $FBOPEN_ROOT/loaders/common/format-bulk.js -a > $bu
 
 # load into Elasticsearch
 echo "Loading into Elasticsearch..."
-curl -s -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @$bulk_output_file;
+curl -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @$bulk_output_file 
  echo
 echo "Done loading into Elasticsearch."
-
-
 echo "bids.state.gov done."
-
