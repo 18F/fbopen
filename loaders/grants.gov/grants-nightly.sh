@@ -1,12 +1,13 @@
 #!/bin/bash
 # grants-nightly.sh
-
+set -e
 # download the nightly file
 # http://www.grants.gov/web/grants/xml-extract.html?p_p_id=xmlextract_WAR_grantsxmlextractportlet_INSTANCE_5NxW0PeTnSUa&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_cacheability=cacheLevelPage&p_p_col_id=column-1&p_p_col_pos=1&p_p_col_count=2&download=GrantsDBExtract20131108.zip
 
 # get/require a date. yesterday by default.
 if [[ $# -eq 0 ]]
 then
+    set +e
 	date --version >/dev/null 2>&1
 	# check return code
 	if [[ $? -eq 0 ]]
@@ -17,8 +18,10 @@ then
 		# try this instead
 		download_date=$(date -v -1d +"%Y%m%d")
 	fi
+    set -e
 elif [[ $1 -ne "" ]]
 then
+    set +e
 	date -d $1
 	if [[ $? -eq 1 ]]
 	then
@@ -26,6 +29,7 @@ then
 	else
 		download_date=$1
 	fi
+    set -e
 fi
 
 FBOPEN_URI=${FBOPEN_URI:-"localhost:9200"}
@@ -87,10 +91,11 @@ curl -s -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @$workfiles_dir/g
 
 echo "Extracting links"
 # the '-c "this.listing_url"' part filters the results to only lines where the listing_url is defined
+
 cat $workfiles_dir/grants.json | json -agc "this.listing_url" listing_url > $workfiles_dir/links.txt
 
-echo "Starting attachment scrape/load. See ~/log/grants_attach.log for more info..."
-cd $FBOPEN_ROOT/loaders/attachments
-python grants.py run --file $workfiles_dir/links.txt
-
 echo "Grants nightly done"
+
+
+
+

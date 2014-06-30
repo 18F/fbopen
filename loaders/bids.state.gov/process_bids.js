@@ -1,7 +1,6 @@
 var datasource_id = 'bids.state.gov';
 var fs = require('fs');
 var sha1 = require('sha1');
-
 var infile = process.argv[2] || 'workfiles/download.json';
 var outfile = process.argv[3] || 'workfiles/notices.json';
 var field_map = {
@@ -38,6 +37,6 @@ bids.forEach(function(bid){
     es_data.push(JSON.stringify(bid_obj));
 });
 
+console.log("Writing processed JSON file...");
 var text = es_data.join('\n');
 fs.writeFile(outfile, text);
-
