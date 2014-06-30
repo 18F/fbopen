@@ -64,7 +64,7 @@
       param_name = form_params[i];
       q_param = getQueryVariable(param_name);
       if (! S(q_param).isEmpty()) {
-        $('#' + param_name).val(decodeURIComponent(q_param.replace('+', ' ')));
+        $('#' + param_name).val(decodeURIComponent(q_param.replace(/\+/g, ' ')));
         search_params[param_name] = q_param;
       }
     }
