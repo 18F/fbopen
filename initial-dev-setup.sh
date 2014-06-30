@@ -1,10 +1,16 @@
+#################################################################################
+#  OSX-only script to get a basic FBOpen installation working locally 
+#  Usage:   
+#    $ FBOPEN_ROOT=~/fbopen/fbopen/ ./initial-dev-setup.sh
+#    
+#################################################################################
+
 # http://stackoverflow.com/a/3931779/94154
 command_exists () {
     type "$1" &> /dev/null ;
 }
 
 ES_VERSION=1.2.1
-FBOPEN_ROOT=`pwd`
 
 echo "Initial setup"
 ./setup.sh
@@ -19,7 +25,7 @@ else
 fi
 
 # install ES if it doesn't already exist
-if [ -d ../elasticsearch-$ES_VERSION.zip ]; then
+if [ -d ../elasticsearch-$ES_VERSION ]; then
   echo "Elasticsearch is already installed."
 else
   echo "Installing Elasticsearch"
@@ -32,6 +38,7 @@ fi
 cp elasticsearch/elasticsearch__dev.yml elasticsearch-$ES_VERSION/config/elasticsearch.yml
 # install mapper-attachments
 elasticsearch-$ES_VERSION/bin/plugin -install elasticsearch/elasticsearch-mapper-attachments/2.0.0
+
 
 echo "Starting Elasticsearch"
 osascript<<EOF
@@ -50,6 +57,8 @@ curl -XPUT localhost:9200/fbopen0 --data-binary @elasticsearch/init.json
 # API
 echo "Creating api/config.js from sample."
 cp api/config-sample_dev.js api/config.js
+mkdir -p api/log/
+touch api/log/api.log
 
 if command_exists node ; then
   echo
@@ -58,19 +67,45 @@ else
   exit 1
 fi
 
-npm install api/
-sudo mkdir -p /var/log/fbopen/api.log
+cd api
+sudo npm -g bunyan
+npm install
+cd ..
+
+
+echo "Starting node API server"
+osascript<<EOF
+tell application "System Events"
+  tell process "Terminal" to keystroke "t" using command down
+end
+tell application "Terminal"
+  activate
+  do script with command "(cd fbopen/fbopen/api && node app.js)" in window 1
+end tell
+EOF
+
+echo "Starting sample-www server"
+osascript<<EOF
+tell application "System Events"
+  tell process "Terminal" to keystroke "t" using command down
+end
+tell application "Terminal"
+  activate
+  do script with command "(cd fbopen/fbopen/sample-www && python -m SimpleHTTPServer)" in window 1
+end tell
+EOF
 
 # Loaders
 
+
 ## bids.state.gov
-npm install loaders/bids.state.gov/
-
-## common
-npm install loaders/common/
-
-# problems:
+#npm install loaders/bids.state.gov/
 cd loaders/bids.state.gov
-FBOPEN_ROOT=$FBOPEN_ROOT FBOPEN_URI=localhost:9200 FBOPEN_INDEX=fbopen ./bids-nightly.sh
+npm install
+(cd ../common/ && npm install)
+./bids-nightly.sh
 cd ../..
+
+# opens a web browser
+open http://localhost:8000
 
