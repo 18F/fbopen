@@ -16,6 +16,9 @@ class GrantsAttachmentsRunner(AttachmentsRunner):
     module_name = 'grants_attach'
 
     def __init__(self, *args, **kwargs):
+        
+        self.data_source = "grants.gov"
+
         super().__init__(*args, **kwargs)
 
         self.urls_file = kwargs.get('file')

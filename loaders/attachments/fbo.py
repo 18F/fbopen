@@ -16,6 +16,8 @@ class FBOAttachmentsRunner(AttachmentsRunner):
     module_name = 'fbo_attach'
 
     def __init__(self, *args, **kwargs):
+        self.data_source = 'fbo.gov'
+        
         super().__init__(*args, **kwargs)
 
         self.urls_file = kwargs.get('file')

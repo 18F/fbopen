@@ -67,7 +67,7 @@ class SourceDownloader(AttachmentsImporter):
             chunk_count += 1
 
             try:
-                filename, response = s.urlretrieve(url, dir=self.import_dir)
+                filename, response = s.urlretrieve(url, dir=self.import_dir, timeout=10)
                 self.log.debug("{} stored at {}".format(url, os.path.basename(filename)))
             except KeyboardInterrupt:
                 self._log_resume_info(url)

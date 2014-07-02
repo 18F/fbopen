@@ -36,4 +36,4 @@ class AttachmentsRunner(object):
 
     def current_import_dirname(self):
         now_str = datetime.now().strftime('%Y%m%d_%H%M')
-        return os.path.abspath("{}_{}".format('attach', now_str))
+        return os.path.abspath("{}_{}_{}".format(self.data_source, 'attach', now_str))
