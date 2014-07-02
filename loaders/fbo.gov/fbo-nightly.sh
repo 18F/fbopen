@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/bin/bash
 
 set -e
 # fbo-nightly.sh [YYYYMMDD]
