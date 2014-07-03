@@ -8,6 +8,8 @@ To install:
 * For production usage:
     * `cp config-sample.js config.js`
 * Install dependencies: `npm install`
+    * If your default version of Python is > 2, you will need to specify your path to Python 2.7 for npm to successfully install one of the Node packages.
+        * npm install --python=/usr/local/bin/python2.7
 
 To run: `node app.js` (or, say, [`nodemon app.js`](https://github.com/remy/nodemon))
 
