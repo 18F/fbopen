@@ -29,19 +29,29 @@
    * @param {String} type the severity of the message(ERROR, WARN, INFO, or DEBUG)
    * @public
    */
+
+   /*
+   * dust.log has been modified to support ie8.
+   * The loggingLevels array is now converted to a string with a join in order to use indexOf, which is only
+   * supported with string in ie8.
+   * Added a check for .call to only fire if the method is supported by the browser.
+   */
+   
   dust.log = function(message, type) {
     if(dust.isDebug && dust.debugLevel === NONE) {
-      logger.call(loggerContext, '[!!!DEPRECATION WARNING!!!]: dust.isDebug is deprecated.  Set dust.debugLevel instead to the level of logging you want ["debug","info","warn","error","none"]');
+      if (logger.call)
+        logger.call(loggerContext, '[!!!DEPRECATION WARNING!!!]: dust.isDebug is deprecated.  Set dust.debugLevel instead to the level of logging you want ["debug","info","warn","error","none"]');
       dust.debugLevel = INFO;
     }
 
     type = type || INFO;
-    if (loggingLevels.indexOf(type) >= loggingLevels.indexOf(dust.debugLevel)) {
+    if (loggingLevels.join(',').indexOf(type) >= loggingLevels.join(',').indexOf(dust.debugLevel)) {
       if(!dust.logQueue) {
         dust.logQueue = [];
       }
       dust.logQueue.push({message: message, type: type});
-      logger.call(loggerContext, '[DUST ' + type + ']: ' + message);
+      if (logger.call)
+        logger.call(loggerContext, '[DUST ' + type + ']: ' + message);
     }
 
     if (!dust.silenceErrors && type === ERROR) {
