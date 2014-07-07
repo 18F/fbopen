@@ -23,6 +23,7 @@
     "mocha": "*",
     "async": "*",
     "supertest": "*",
-    "express-bunyan-logger": "*"
+    "winston": "*",
+    "express-winston": "*"
   }
 }

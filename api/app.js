@@ -22,24 +22,17 @@ var express = require('express'),
   S = require('string'), // stringjs.com
   util = require('util'),
   _u = require('underscore'),
-  LogClass = require('./log_to_bunyan'),
+  LogClass = require('./log_setup'),
   serve_favicon = require('serve-favicon'),
   errorhandler = require('errorhandler'),
+  winston = require('winston'),
+  express_winston = require('express-winston'),
   morgan = require('morgan');
 
 var config = require('./config');
 
 var app = express();
 module.exports = app;
-
-app.use(require('express-bunyan-logger')({
-  name: 'api',
-  streams: [{
-    level: 'trace',
-    path: config.logger.path
-    // stream: process.stdout // for debugging
-  }]
-}));
 
 // http basic auth, if required in config
 if (config.app.require_http_basic_auth) {
@@ -455,6 +448,21 @@ app.post('/v0/opp/:doc_id/tags/:tags?', function(req, res) {
   });
 });
 
+// this needs to go after any calls to verbs
+app.use(express_winston.errorLogger({
+  transports: [
+    new winston.transports.Console({
+      json: true,
+        colorize: true
+    }),
+    new winston.transports.File({
+      filename: config.logger.path,
+      json: true,
+      maxsize: 10485760,
+      maxFiles: 5
+    })
+  ]
+}));
 
 if (config.app.listen_http) {
   http.createServer(app).listen(config.app.port);
