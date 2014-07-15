@@ -1,9 +1,15 @@
 cssselect==0.9.1
+elasticsearch==1.0.0
+ez-setup==0.9
 flake8==2.1.0
+gnureadline==6.3.3
+ipython==2.1.0
 lxml==3.3.3
 mccabe==0.2.1
 pep8==1.5.5
+psutil==2.1.1
 pyflakes==0.8.1
 pyquery==1.2.8
 requests==2.2.1
-scrapelib==0.9.1
+scrapelib==0.10.0-dev
+urllib3==1.8.2

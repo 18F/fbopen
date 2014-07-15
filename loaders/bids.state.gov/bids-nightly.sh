@@ -17,18 +17,6 @@ echo "JSON raw file is " $raw_json
 
 if [ -f $raw_json ];
 then
-    today=`date +%s`
-    modified=`stat -f "%m" $raw_json`
-    diff=`expr $today - $modified`
-    if  (($diff > 43200));
-    then 
-        #echo "file older than 12 hours, redownloading ..."
-        wget -O $raw_json $BIDS_URL
-
-#   else
- #       echo "File exists and is recent, skipping download..."
-    fi
-else 
     echo "Downloading JSON dump..."
     wget -O $raw_json $BIDS_URL
 fi
