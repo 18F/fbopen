@@ -23,7 +23,10 @@
                 "solnbr": {
                     "analyzer": "keyword-analyzer",
                     "type": "string"
-                
+                },
+                "ext.SETASIDE": {
+                    "analyzer": "keyword-analyzer",
+                    "type": "string"
                 }
             }
         },
