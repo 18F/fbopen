@@ -1,7 +1,9 @@
 # Installing and Configuring Elasticsearch for FBOpen
 
-* Install Elasticsearch 1.1.0 or greater. On OS X, this is as easy as `brew install elasticsearch`.
+* Install Elasticsearch 1.1.0 or greater. On OS X, we recommend using the downloaded binary, as opposed to brew.
 * Install the attachment mapper plugin. See directions here: https://github.com/elasticsearch/elasticsearch-mapper-attachments 
+* Move static scripts into place
+    * `sudo cp ./conf/scripts/* <YOUR_ES_SCRIPTS_DIR>/`
 * Restart Elasticsearch
 * Create an index on your Elasticsearch cluster with the proper field mappings and settings (relative path to mapping given from the FBOpen root):
     * `curl -XPUT localhost:9200/fbopen0 --data-binary @elasticsearch/init.json`
