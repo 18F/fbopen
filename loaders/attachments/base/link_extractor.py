@@ -44,11 +44,17 @@ class LinkExtractor(AttachmentsImporter):
             self.log.info("Continuing with next one...")
             return
 
-        solnbr = self.get_opp_solnbr(doc)
-        self.log.info("Pulled solicitation number (solnbr) {}".format(solnbr))
+        try:
+            solnbr = self.get_opp_solnbr(doc)
+            self.log.info("Pulled solicitation number (solnbr) {}".format(solnbr))
 
-        num_links = self.get_links(doc, solnbr, shelf)
-        self.log.info("Extracting and saving the attachment URLs and metadata. Found {}.".format(num_links))
+            num_links = self.get_links(doc, solnbr, shelf)
+            self.log.info("Extracting and saving the attachment URLs and metadata. Found {}.".format(num_links))
+
+        except AttributeError as a:
+            self.log.exception(a)
+            self.log.info("Tag may not exist, skipping...")
+            return
 
     def get_opp_solnbr(self, doc):
         return doc('#dnf_class_values_procurement_notice__solicitation_number__widget').text().strip()

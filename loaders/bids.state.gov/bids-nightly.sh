@@ -15,8 +15,16 @@ mkdir -p workfiles
 
 echo "JSON raw file is " $raw_json
 
+<<<<<<< HEAD
 echo "Downloading JSON dump..."
 wget $BIDS_URL -O $raw_json
+=======
+if [ -f $raw_json ];
+then
+    echo "Downloading JSON dump..."
+    wget -O $raw_json $BIDS_URL
+fi
+>>>>>>> bamboo
 
 echo "Converting to JSON..."
 node process_bids.js $raw_json
