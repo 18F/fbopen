@@ -1,4 +1,4 @@
-
+#!/bin/bash
 weekly_links_file="$FBOPEN_ROOT/loaders/fbo.gov/workfiles/listings-links.txt"
 
 echo "Starting attachment scrape/load. See ~/log/fbo_attach.log for more info..."
