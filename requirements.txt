@@ -7,3 +7,4 @@ pyflakes==0.8.1
 pyquery==1.2.8
 requests==2.2.1
 git+https://github.com/sunlightlabs/scrapelib.git#egg=scrapelib
+-e git+https://github.com/18f/dodsbir-scrape.git#egg=dodsbir-scrape
