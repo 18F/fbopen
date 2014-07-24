@@ -16,6 +16,8 @@ then
 	weekly_links_file=$1
 fi
 
+echo "Starting fbo-weekly `date`"
+
 FBO_WEEKLY_XML_FILE=${FBO_WEEKLY_XML_FILE:-"workfiles/FBOFullXML.xml"}
 FBOPEN_URI=${FBOPEN_URI:-"localhost:9200"}
 echo "FBOPEN_URI = $FBOPEN_URI"
@@ -59,5 +61,5 @@ echo "Starting attachment scrape/load. See ~/log/fbo_attach.log for more info...
 cd $FBOPEN_ROOT/loaders/attachments
 python fbo.py run --file $weekly_links_file
 
-echo "fbo-weekly done."
+echo "fbo-weekly done `date`"
 

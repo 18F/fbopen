@@ -1,6 +1,8 @@
 #!/bin/bash  
 set -e 
 
+echo "Starting bids-nightly `date`"
+
 json_output_file='workfiles/notices.json'
 bulk_output_file='workfiles/notices.bulk'
 raw_json='workfiles/download.json'
@@ -30,4 +32,5 @@ echo "Loading into Elasticsearch..."
 curl -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @$bulk_output_file 
 echo
 echo "Done loading into Elasticsearch."
-echo "bids.state.gov done."
+echo "bids-nightly `date` done."
+echo

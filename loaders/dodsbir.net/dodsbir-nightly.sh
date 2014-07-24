@@ -1,6 +1,7 @@
 #!/bin/bash  
 set -e 
 
+echo "Starting dodsibr-nightly `date`"
 raw_json='workfiles/rawtopics.json'
 processed_json='workfiles/topics.json'
 bulk_file='workfiles/notices.bulk'
@@ -25,4 +26,4 @@ echo "Loading into Elasticsearch..."
 curl -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @$bulk_file 
 echo
 echo "Done loading into Elasticsearch."
-echo "dodsbir.net done."
+echo "dodsbir-nightly `date` done."

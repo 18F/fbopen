@@ -32,6 +32,8 @@ then
     set -e
 fi
 
+echo "Starting grants-nightly $download_date"
+
 FBOPEN_URI=${FBOPEN_URI:-"localhost:9200"}
 echo "FBOPEN_URI = $FBOPEN_URI"
 FBOPEN_INDEX=${FBOPEN_INDEX:-"fbopen"}
@@ -94,8 +96,5 @@ echo "Extracting links"
 
 cat $workfiles_dir/grants.json | json -agc "this.listing_url" listing_url > $workfiles_dir/links.txt
 
-echo "Grants nightly done"
-
-
-
-
+echo "grants-nightly ${download_date} done."
+echo

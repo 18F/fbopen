@@ -31,6 +31,8 @@ then
     set -e
 fi
 
+echo "Starting fbo-nightly $download_date"
+
 FBOPEN_URI=${FBOPEN_URI:-"localhost:9200"}
 echo "FBOPEN_URI = $FBOPEN_URI"
 FBOPEN_INDEX=${FBOPEN_INDEX:-"fbopen"}
@@ -74,6 +76,6 @@ cat $prepped_json_notices_file | node $FBOPEN_ROOT/loaders/common/format-bulk.js
 echo "Loading into Elasticsearch"
 curl -s -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @$bulk_notices_file; echo
 
-
-echo "fbo-nightly done."
+echo "fbo-nightly ${download_date} done."
+echo
 
