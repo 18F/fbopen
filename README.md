@@ -11,10 +11,25 @@ Then someone realized we didn't have to limit this server to FBO data. There's a
 
 As of 2014-03-12, we're live at https://fbopen.gsa.gov .
 
-### How to get started
+### Quickstart (OSX-only) (experimental)
+
+This gets you a minimum viable setup:
+
+```sh
+$ cd fbopen
+$ FBOPEN_ROOT=~/your/root/to/fbopen ./inital-dev-setup.sh
+```
+
+To clean out any new files created from that script, as well as uninstall Elasticsearch, you can run:
+
+```sh
+$ ./initial-dev-uninstall.sh
+```
+
+### How to get started (manually)
 * Clone this repo.
 * This repo has an external dependency on another git repo, which needs to be populated at first, so `cd` to the repo and run: `git submodule update --init --recursive`.
-* Then install Elasticsearch. FBOpen requires at least version 1.0.0.
+* Then install Elasticsearch. FBOpen requires at least version 1.2.
 * Get the API server up and running. See the README.md in `/api`.
 * Load data into the search index using the import tools in `/loaders` -- or roll your own, ~~or use the API's POST `/v0/opp` to post opportunities one at a time~~ (POST functionality is temporarily disabled).
 * To run a simple query web page, try the sample app in `/sample-www`.

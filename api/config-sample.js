@@ -36,7 +36,7 @@ config.ssl = {
 
 // logger
 config.logger = {};
-config.logger.path = '/var/log/fbopen/api.log';
+config.logger.path = process.env.FBOPEN_ROOT + '/log/api.log';
 
 // elasticsearch
 config.elasticsearch = {};
