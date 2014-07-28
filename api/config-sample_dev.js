@@ -23,7 +23,7 @@ config.app.listen_https = false;
 
 // logger
 config.logger = {};
-config.logger.path = '/var/log/fbopen/api.log';
+config.logger.path = 'log/api.log'
 
 // elasticsearch
 config.elasticsearch = {};

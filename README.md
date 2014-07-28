@@ -11,6 +11,21 @@ Then someone realized we didn't have to limit this server to FBO data. There's a
 
 As of 2014-03-12, we're live at https://fbopen.gsa.gov .
 
+### Quickstart (OSX-only) (experimental)
+
+This gets you a minimum viable setup:
+
+```sh
+$ cd fbopen
+$ FBOPEN_ROOT=~/your/root/to/fbopen ./inital-dev-setup.sh
+```
+
+To clean out any new files created from that script, you can run:
+
+```sh
+$ ./uninstall.sh
+```
+
 ### How to get started
 * Clone this repo.
 * This repo has an external dependency on another git repo, which needs to be populated at first, so `cd` to the repo and run: `git submodule update --init --recursive`.
