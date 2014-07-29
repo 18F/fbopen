@@ -59,7 +59,7 @@ echo "Done loading into Elasticsearch."
 
 echo "Starting attachment scrape/load. See ~/log/fbo_attach.log for more info..."
 cd $FBOPEN_ROOT/loaders/attachments
-python fbo.py run --file $weekly_links_file
+python fbo.py run --file ../fbo.gov/$weekly_links_file
 
 echo "fbo-weekly done `date`"
 
