@@ -8,7 +8,7 @@
 
 json_output_file='workfiles/notices.json'
 open_json_output_file='workfiles/notices_open.json'
-weekly_links_file='workfiles/listings-links.txt'
+weekly_links_file='workfiles/links.txt'
 bulk_output_file='workfiles/notices.bulk'
 
 if [ $# -eq 1 ]

@@ -64,7 +64,7 @@ cat $nightly_download_file.json | node $FBOPEN_ROOT/loaders/fbo.gov/process_noti
 
 # extract links
 echo "Extracting links"
-nightly_links_file=$nightly_dir/links.$download_date.txt
+nightly_links_file=$nightly_dir/links.txt
 cat $prepped_json_notices_file | json -ga listing_url > $nightly_links_file
 
 echo "Converting notices to Elasticsearch bulk format"
