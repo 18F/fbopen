@@ -30,7 +30,7 @@ echo "JSON output file is " $json_output_file
 echo "list of links is " $weekly_links_file
 
 echo "Downloading weekly XML dump..."
-wget ftp://ftp.fbo.gov/datagov/FBOFullXML.xml -O $FBO_WEEKLY_XML_FILE
+wget -nv ftp://ftp.fbo.gov/datagov/FBOFullXML.xml -O $FBO_WEEKLY_XML_FILE
 # Note: if you want to resume a failed download, comment out the above and uncomment this line.
 #wget -c ftp://ftp.fbo.gov/datagov/FBOFullXML.xml -O $outfile
 
