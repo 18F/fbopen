@@ -61,7 +61,7 @@ then
 	echo "WARNING: file already exists: $json_file. NOT downloading."
 else
 	grant_url="http://www.grants.gov/grantsws/OppsSearch?jp={%22startRecordNum%22:0,%22rows%22:9999,%22oppStatuses%22:%22open%22,%22sortBy%22:%22openDate|desc%22}&_=1383778129749"
-	wget $grant_url -O $json_file
+	wget -nv $grant_url -O $json_file
 fi
 
 # download the zipped file
@@ -69,7 +69,7 @@ if [[ -s "$downloaded_zipped_file" ]]
 then
 	echo "WARNING: file already exists: $downloaded_zipped_file. NOT downloading."
 else
-	wget $download_url -O $downloaded_zipped_file
+	wget -nv $download_url -O $downloaded_zipped_file
 fi
 
 # unzip it
