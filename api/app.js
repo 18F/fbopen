@@ -294,6 +294,33 @@ app.get('/v0/opp/:id', function(req, res) {
   );
 });
 
+app.get('/v0/data_sources', function(req, res) {
+  client.search({
+    index: config.elasticsearch.index,
+    type: 'opp',
+    body: {
+      aggs: {
+        data_sources: {
+          terms: {
+            field: 'data_source'
+          }
+        }
+      }
+    }
+  }, function(err, body) {
+    if (err) {
+      res.json(err)
+    } else {
+      var buckets = body['aggregations']['data_sources']['buckets'];
+      var data_sources =_u.map(buckets, function(d) {
+        return d['key'];
+      });
+      res.json({data_sources: data_sources});
+    }
+  });
+
+});
+
 
 // Allow POST operations only according to configuration
 app.post('*', function(req, res, next) {
