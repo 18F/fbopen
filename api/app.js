@@ -294,7 +294,7 @@ app.get('/v0/opp/:id', function(req, res) {
   );
 });
 
-app.get('/v0/data_sources', function(req, res) {
+app.get('/v0/agg', function(req, res) {
   client.search({
     index: config.elasticsearch.index,
     type: 'opp',
