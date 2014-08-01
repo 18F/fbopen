@@ -304,18 +304,25 @@ app.get('/v0/agg', function(req, res) {
           terms: {
             field: 'data_source'
           }
+        },
+        notice_types: {
+          terms: {
+            field: 'notice_type'
+          }
         }
       }
     }
   }, function(err, body) {
     if (err) {
-      res.json(err)
+      res.json(err);
     } else {
-      var buckets = body['aggregations']['data_sources']['buckets'];
-      var data_sources =_u.map(buckets, function(d) {
+      var notice_types = _u.map(body['aggregations']['notice_types']['buckets'], function(n) {
+        return n['key'];
+      });
+      var data_sources =_u.map(body['aggregations']['data_sources']['buckets'], function(d) {
         return d['key'];
       });
-      res.json({data_sources: data_sources});
+      res.json({data_sources: data_sources, notice_types: notice_types});
     }
   });
 
