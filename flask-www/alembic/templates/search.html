@@ -1,0 +1,180 @@
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+
+  <title>Search Results for test - FBOpen (Pilot)</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+  <script src="static/js/jquery-1.10.2.js"></script>
+
+  <link href="//fonts.googleapis.com/css?family=Enriqueta:400,700|Roboto:100,300,400,700|Merriweather" rel="stylesheet" type="text/css">
+  
+
+  <link href="/static/bootstrap/css/bootstrap-1600.css" rel="stylesheet">
+  <link href="/static/bootstrap/css/navbar-fixed-top.css" rel="stylesheet">
+
+  <link href="/static/css/fbopen.css" rel="stylesheet">
+
+  <link rel="icon" type="image/png" href="/static/images/favicon.png">
+
+  <style type="text/css"></style>
+</head>
+<body>
+
+  <div class="container" id="outer-container">
+
+    <div id="main" class="row">
+
+      <div id="sidebar" class="col-sm-4 col-md-4">
+
+        <div class="container brand">
+          <a href="/" style="color: #333;"><h1>fbopen</h1></a>
+          <span>pilot</span>
+        </div>
+
+        <form name="fbopen-search-form" id="fbopen-search-form" role="form" class="form" method="POST" action="/search/">
+
+          <div class="form-group">
+            {{form.search(size=50)}}
+            <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
+          </div>
+
+          <a id="form-advanced-label" data-toggle="collapse" data-target="#form-advanced-options" class="collapsed">
+            <span class="filter-category-title advanced">ADVANCED</span>
+            <button id="advanced-toggle" type="button" class="btn">+</button>
+          </a>
+
+          <div id="form-advanced-options" class="in" style="height: 0px;">
+
+            <div class="checkbox">
+              <label class="filter-text">
+                {{form.show_closed}} Show closed listings
+              </label>
+            </div>
+
+            <div class="checkbox form-group-more">
+              <label class="filter-text">
+                {{form.show_noncompeted}} Show non-competed listings (sole source)
+              </label>
+            </div>
+            <div class="form-group form-group-more">
+              <label for="data_source" class="filter-text">Data Source:</label>
+              {{form.data_source}}
+
+             </div>
+
+            <button id="go" type="submit" class="btn btn-primary btn-block">Search</button>
+
+          </div>
+
+          <input id="parent_only" name="parent_only" type="hidden" value="">
+          <input id="p" name="p" type="hidden" value="">
+        </form></div>
+
+      <div class="col-sm-8 col-sm-offset-4 col-md-8 col-md-offset-4">
+
+        <div id="results-container" style="display: block;">
+        {% if docs %}
+          <div id="results-list">
+            <div id="results-topline" class="row">
+              <div id="result-count" class="col-md-6 col-sm-6"><strong>{{results.numFound}}</strong> Search results</div>
+              <div id="results-sorted-by" class="col-md-6 col-sm-6">Sorted by <span class="selected">relevance</span></div>
+            </div>
+            <div class="pagination-box">
+              <ul class="pagination">
+                {% if pagination.page.has_prev %}
+                  <li><a href="{{ url_for_other_page(pagination.page - 1)}}">&lt;</a></li>
+                {% else %}
+                  <li class="disabled"><a href="">&lt;</a></li>
+                {% endif %}
+                {% for page in pagination.iter_pages() %}
+                  {% if page %}
+                    {% if page !=pagination.page %}
+                      <a href="{{ url_for_other_page(page) }}">{{ page }}</a>
+                    {% else %}
+                      <li class="current"><span>{{ page }}</span></li>
+                    {% endif %}
+                  {% else %}
+                    <span class=ellipsis>…</span>
+                  {% endif %}
+                {% endfor %}
+                {% if pagination.page.has_next %}
+                  <li><a href="{{ url_for_other_page(pagination.page + 1)}}">&gt;</a></li>
+                {% else %}
+                  <li class="disabled"><a href="">&gt;</a></li>
+                {% endif %}
+              </ul>
+            </div>
+            {% for doc in docs%}
+            <div class="result-item" data-solr-id="{{doc.id}}" data-attachment-url="">
+              <div class="row listing-top"><div class="listing-top-left col-md-10 col-sm-10">
+                <h3 class="title"><a href="{{doc.listing_url}}" target="_blank">{{doc.title}}</a></h3>
+                <div class="agency-name">{{doc.agency}}</div></div>
+                <div class="listing-top-right col-md-2 col-sm-2">
+                  <div class="score">
+                    <div class="score-dots"><span class="score-dots"><span class="blackdot">●</span><span class="whitedot">○</span><span class="whitedot">○</span><span class="whitedot">○</span><span class="whitedot">○</span></span>
+                    </div>
+                  <div class="score-text"><strong>{{doc.score}}%</strong> RELEVANT</div>
+                </div>
+              </div>
+            </div>
+            <div class="row listing-main">
+              <div class="listing-left col-md-8 col-sm-8"><blockquote class="listing-text">
+                <div class="content-snippet">{% if doc.description %}{{doc.description}}{% else %}<em>No description is available.</em>{% endif %}</div></blockquote>
+              </div>
+              <div class="listing-right col-md-4 col-sm-4">
+                <div class="tags"></div>
+                <div class="listing-right-more">
+                  <div class="listing-id-box listing-data-box">
+                    <div class="listing-data-label">Opportunity #</div>
+                    <div class="listing-id listing-data">{{doc.solnbr}}</div>
+                  </div>
+                  <div class="listing-source-box listing-data-box"><span class="listing-data-label"><span class="glyphicon glyphicon-link"></span>Source: </span><span class="listing-data">{{doc.data_source}}</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="row listing-bottom">
+              <div class="listing-dates col-md-8 col-sm-8 row">
+                <div class="listing-due-box col-md-6 col-sm-6"><span class="glyphicon glyphicon-calendar"></span>Due: <span class="listing-due-date">{{doc.close_dt}}</span></div>
+                <div class="listing-posted-box col-md-6" col-sm-6=""><span class="glyphicon glyphicon-pushpin"></span>Posted: <span class="listing-posted-date">{{doc.posted_dt}}</span></div>
+              </div>
+              <div class="listing-actions col-md-4 col-sm-4"><a class="listing-save"><span class="glyphicon glyphicon-star-empty"></span>Save</a><a class="listing-more"><span class="glyphicon glyphicon-plus"></span>More detail</a></div>
+            </div>
+          </div>
+        {% endfor %}
+          <div class="pagination-box"><ul class="pagination">
+            <li class="disabled"><a href="">&lt;</a></li>
+            <li class="current"><span>1</span></li>
+            <li><a href="">&gt;</a></li></ul></div></div>
+        {%endif%}
+        </div><!-- results-container -->
+
+        <div id="results-raw-outer" style="display: block;">
+          <h5 data-toggle="collapse" data-target="#results-raw">Raw result (click to show/hide)</h5>
+          <div id="results-raw" class="collapse" style="height: 0px;"><pre>(raw results go here)</pre></div>
+        </div>
+
+      </div><!-- results column -->
+
+    </div><!-- row -->
+
+  </div><!-- outer-container -->
+
+  <div id="footer">
+    <div class="container">
+      <p class="landing-copy-small">
+        FBOpen and this sample application are joint projects of
+        <br>
+        <a href="https://18f.gsa.gov">18F</a>, the <a href="http://whitehouse.gov/innovationfellows">Presidential Innovation Fellows</a> and the <a href="http://www.gsa.gov/portal/content/105036">GSA Integrated Award Environment</a>.
+      </p>
+      <p>
+        <a id="github-link" href="https://github.com/18f/fbopen"></a>
+        <a id="twitter-link" href="https://twitter.com/fbopen"></a>
+        <a id="email-link" href="mailto:fbopen@gsa.gov"></a>
+      </p>
+    </div>
+  </div>
+
+</body></html>

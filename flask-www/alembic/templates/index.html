@@ -1,0 +1,53 @@
+<html lang="en"><head>
+  <meta charset="utf-8">
+
+  <title>FBOpen (Pilot)</title>
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="">
+  <meta name="author" content="">
+
+  <link href="//fonts.googleapis.com/css?family=Enriqueta:400,700|Roboto:100,300,400,700|Merriweather" rel="stylesheet" type="text/css">
+
+  <link href="/static/bootstrap/css/bootstrap-1600.css" rel="stylesheet">
+  <link href="/static/bootstrap/css/navbar-fixed-top.css" rel="stylesheet">
+
+  <link href="/static/css/fbopen.css" rel="stylesheet">
+
+  <link rel="icon" type="image/png" href="/static/images/favicon.png">
+  
+<style type="text/css"></style>
+</head>
+<body>
+
+  <div class="container" id="outer-container">
+
+    <div id="intro" style="display: block;">
+
+      <div class="container brand">
+        <a href="/" style="color: #333;"><span class="logo">fbopen</span></a>
+        <span>pilot</span>
+      </div>
+
+      <p class="landing-copy">
+        FBOpen helps small businesses search for opportunities to work with the U.S. government.
+      </p>
+      <p class="landing-copy">
+      <small>Developers, learn more at our <a href="https://github.com/18f/fbopen">github repo</a> and our <a href="http://docs.fbopen.apiary.io/">API documentation</a>.</small>
+      </p>
+
+        <form name="search" id="search" role="form" class="form" method="POST" action="/search/">
+          <div class="form-group">
+          {{form.search(size=50)}}
+          <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
+          </div>
+        </form>
+      </div>
+
+
+  <!-- misc helper libraries -->
+
+
+
+ 
+</body></html>
