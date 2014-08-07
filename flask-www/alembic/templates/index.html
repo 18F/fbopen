@@ -36,10 +36,11 @@
       <small>Developers, learn more at our <a href="https://github.com/18f/fbopen">github repo</a> and our <a href="http://docs.fbopen.apiary.io/">API documentation</a>.</small>
       </p>
 
-        <form name="search" id="search" role="form" class="form" method="POST" action="/search/">
+        <form name="fbopen-search-form" id="fbopen-search-form" role="form" class="form intro" method="get" action="/search/">
+
           <div class="form-group">
-          {{form.search(size=50)}}
-          <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
+            <input id="search" name="search" type="search" class="form-control intro" placeholder="Start searching">
+            <button type="submit" id="q-search"><span class="glyphicon glyphicon-search"></span></button>
           </div>
         </form>
       </div>

@@ -34,36 +34,46 @@
           <span>pilot</span>
         </div>
 
-        <form name="fbopen-search-form" id="fbopen-search-form" role="form" class="form" method="POST" action="/search/">
+        <form name="fbopen-search-form" id="fbopen-search-form" role="form" class="form" method="get" action="/search/">
 
           <div class="form-group">
-            {{form.search(size=50)}}
-            <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
+            <input id="search" name="search" type="search" class="form-control">
+            <button type="submit" id="q-search"><span class="glyphicon glyphicon-search"></span></button>
           </div>
 
-          <a id="form-advanced-label" data-toggle="collapse" data-target="#form-advanced-options" class="collapsed">
+          <a id="form-advanced-label" data-toggle="collapse" data-target="#form-advanced-options">
             <span class="filter-category-title advanced">ADVANCED</span>
             <button id="advanced-toggle" type="button" class="btn">+</button>
           </a>
 
-          <div id="form-advanced-options" class="in" style="height: 0px;">
+          <div id="form-advanced-options" class="in" style="height: auto;">
 
             <div class="checkbox">
               <label class="filter-text">
-                {{form.show_closed}} Show closed listings
+                <input id="show_closed" name="show_closed" type="checkbox"> Show closed listings
               </label>
             </div>
 
             <div class="checkbox form-group-more">
               <label class="filter-text">
-                {{form.show_noncompeted}} Show non-competed listings (sole source)
+                <input id="show_noncompeted" name="show_noncompeted" type="checkbox"> Show non-competed listings (sole source)
               </label>
             </div>
             <div class="form-group form-group-more">
               <label for="data_source" class="filter-text">Data Source:</label>
-              {{form.data_source}}
+              <select id="data_source" name="data_source" type="search" class="form-control">
+                <option value="">All</option>
+                <option value="FBO">FedBizOpps (fbo.gov)</option>
+                <option value="grants.gov">grants.gov</option>
+              </select>
 
              </div>
+
+            <div class="form-group form-group-more collapse">
+              <label for="naics">NAICS code:</label>
+              <input id="naics" name="naics" type="search" class="form-control">
+              <button type="button" class="close" data-close="naics" aria-hidden="true">×</button>
+            </div>
 
             <button id="go" type="submit" class="btn btn-primary btn-block">Search</button>
 
@@ -71,7 +81,8 @@
 
           <input id="parent_only" name="parent_only" type="hidden" value="">
           <input id="p" name="p" type="hidden" value="">
-        </form></div>
+        </form>
+      </div>
 
       <div class="col-sm-8 col-sm-offset-4 col-md-8 col-md-offset-4">
 
@@ -84,15 +95,15 @@
             </div>
             <div class="pagination-box">
               <ul class="pagination">
-                {% if pagination.page.has_prev %}
-                  <li><a href="{{ url_for_other_page(pagination.page - 1)}}">&lt;</a></li>
+                {% if pagination.has_prev %}
+                  <li><a href="/search/page/{{ pagination.page.prev }}{{ searchparams }}">&lt;</a></li>
                 {% else %}
                   <li class="disabled"><a href="">&lt;</a></li>
                 {% endif %}
-                {% for page in pagination.iter_pages() %}
+                {% for page in pagination.iter_pages(pagination.page) %}
                   {% if page %}
                     {% if page !=pagination.page %}
-                      <a href="{{ url_for_other_page(page) }}">{{ page }}</a>
+                      <a href="/search/page/{{page}}{{ searchparams }}">{{ page }}</a>
                     {% else %}
                       <li class="current"><span>{{ page }}</span></li>
                     {% endif %}
@@ -100,8 +111,8 @@
                     <span class=ellipsis>…</span>
                   {% endif %}
                 {% endfor %}
-                {% if pagination.page.has_next %}
-                  <li><a href="{{ url_for_other_page(pagination.page + 1)}}">&gt;</a></li>
+                {% if pagination.has_next %}
+                  <li><a href="/search/page/{{ pagination.page.next}}{{ searchparams }}">&gt;</a></li>
                 {% else %}
                   <li class="disabled"><a href="">&gt;</a></li>
                 {% endif %}
