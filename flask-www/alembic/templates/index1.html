@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<Html lang="en">
+<head>
+</head>
+<body>
+        <form name="search" class="form" action="/" method="POST">
+          <div class="form-group">
+          {{form.search(size=50)}}
+          <button type="submit"><span class="glyphicon glyphicon-search"></span></button>
+          </div>
+        </form>
+
+        {%if searchterm%}
+            <p>You searched for {{searchterm}}. Search isn't working yet. Have some results about 'testing' instead.</p>
+
+            <ul>
+                <li>Status: {{results.status}}</li>
+                <li>Count: {{results.numFound}}</li>
+                <li>Sorted By: {{results.sorted_by}}</li>
+            </ul>
+
+            {% if docs %}
+                {% for doc in docs%}
+                    <p>{{doc}}</p>
+                {% endfor %}
+            {%endif%}
+        {%endif%}
+</body>

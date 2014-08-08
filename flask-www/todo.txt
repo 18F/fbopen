@@ -1,0 +1,12 @@
+Todo:
+-[done] install fbopen-python from git
+-[done] add advanced search back in on /search/
+
+-import fbopen-python and make search go
+-Paginate results
+
+-get advanced search expand/collapse working again
+-make the score dots dynamic
+-format dates
+-'more detail' isn't working
+-paragraphs/linebreaks in description
