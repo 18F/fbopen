@@ -2,7 +2,6 @@ Flask==0.10.1
 Flask-WTF==0.10.0
 Jinja2==2.7.3
 MarkupSafe==0.23
-WTForms==2.0.1
 Werkzeug==0.9.6
 dotenv==0.0.2
 fbopen==0.0.1
