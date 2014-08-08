@@ -2,6 +2,7 @@ from alembic import app
 from flask import request, redirect, render_template
 from alembicconfig import API_KEY
 from util.pagination import Pagination
+import urllib
 
 from fbopen import fbopen
 
@@ -30,9 +31,7 @@ def searchpage(page):
         results = False, docs = False, pagination = False)
 
     #to save having to construct this in the template
-    searchparams = "?"
-    for key, value in advanced.items():
-        searchparams += "{}={}&".format(key,value)
+    searchparams = "?"+urllib.parse.urlencode(advanced)
 
     start = page * items_per_page
     advanced['start'] = start
