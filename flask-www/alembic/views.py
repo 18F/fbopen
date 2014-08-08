@@ -6,12 +6,8 @@ import urllib
 
 from fbopen import fbopen
 
-def search(searchterm, advanced={}):
-    fbos = fbopen.FBOpen
-
-    fbos.init(API_KEY)
-    results = fbos.Opp.search(searchterm, advanced)
-    return results
+fbos = fbopen.FBOpen
+fbos.init(API_KEY)
 
 @app.route('/')
 def index():
@@ -36,7 +32,7 @@ def searchpage(page):
     start = page * items_per_page
     advanced['start'] = start
 
-    results = search(searchterm, advanced)
+    results = fbos.Opp.search(searchterm, advanced)
 
     try:
         docs = results.opps
