@@ -4,6 +4,6 @@ Jinja2==2.7.3
 MarkupSafe==0.23
 Werkzeug==0.9.6
 dotenv==0.0.2
-fbopen==0.0.1
+git+https://github.com/18F/fbopen-python.git@master
 itsdangerous==0.24
 requests==2.3.0
