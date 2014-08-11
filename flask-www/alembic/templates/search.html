@@ -96,13 +96,13 @@
             <div class="pagination-box">
               <ul class="pagination">
                 {% if pagination.has_prev %}
-                  <li><a href="/search/page/{{ pagination.page.prev }}{{ searchparams }}">&lt;</a></li>
+                  <li><a href="/search/page/{{ pagination.prev }}{{ searchparams }}">&lt;</a></li>
                 {% else %}
                   <li class="disabled"><a href="">&lt;</a></li>
                 {% endif %}
                 {% for page in pagination.iter_pages(pagination.page) %}
                   {% if page %}
-                    {% if page !=pagination.page %}
+                    {% if page != pagination.page %}
                       <a href="/search/page/{{page}}{{ searchparams }}">{{ page }}</a>
                     {% else %}
                       <li class="current"><span>{{ page }}</span></li>
@@ -112,7 +112,7 @@
                   {% endif %}
                 {% endfor %}
                 {% if pagination.has_next %}
-                  <li><a href="/search/page/{{ pagination.page.next}}{{ searchparams }}">&gt;</a></li>
+                  <li><a href="/search/page/{{ pagination.next}}{{ searchparams }}">&gt;</a></li>
                 {% else %}
                   <li class="disabled"><a href="">&gt;</a></li>
                 {% endif %}
@@ -155,10 +155,31 @@
             </div>
           </div>
         {% endfor %}
-          <div class="pagination-box"><ul class="pagination">
-            <li class="disabled"><a href="">&lt;</a></li>
-            <li class="current"><span>1</span></li>
-            <li><a href="">&gt;</a></li></ul></div></div>
+            <div class="pagination-box">
+              <ul class="pagination">
+                {% if pagination.has_prev %}
+                  <li><a href="/search/page/{{ pagination.prev }}{{ searchparams }}">&lt;</a></li>
+                {% else %}
+                  <li class="disabled"><a href="">&lt;</a></li>
+                {% endif %}
+                {% for page in pagination.iter_pages(pagination.page) %}
+                  {% if page %}
+                    {% if page != pagination.page %}
+                      <a href="/search/page/{{page}}{{ searchparams }}">{{ page }}</a>
+                    {% else %}
+                      <li class="current"><span>{{ page }}</span></li>
+                    {% endif %}
+                  {% else %}
+                    <span class=ellipsis>…</span>
+                  {% endif %}
+                {% endfor %}
+                {% if pagination.has_next %}
+                  <li><a href="/search/page/{{ pagination.next}}{{ searchparams }}">&gt;</a></li>
+                {% else %}
+                  <li class="disabled"><a href="">&gt;</a></li>
+                {% endif %}
+              </ul>
+            </div>
         {%endif%}
         </div><!-- results-container -->
 
