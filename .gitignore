@@ -28,3 +28,4 @@ build
 *.env
 *.pyc
 loaders/attachments/attach*
+flask-www/alembicconfig.py
