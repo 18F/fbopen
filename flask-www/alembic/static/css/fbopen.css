@@ -236,6 +236,7 @@ highlight {
 	margin: 0 1px;
 }
 .pagination > li.current > span {
+  float: none;
 	background-color: #EA461F;
 	color: #FFFFFF;
 }

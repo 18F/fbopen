@@ -1,3 +1,4 @@
+{% import 'macros.html' as macros %}
 <html lang="en">
 <head>
   <meta charset="utf-8">
@@ -93,31 +94,7 @@
               <div id="result-count" class="col-md-6 col-sm-6"><strong>{{results.numFound}}</strong> Search results</div>
               <div id="results-sorted-by" class="col-md-6 col-sm-6">Sorted by <span class="selected">relevance</span></div>
             </div>
-            <div class="pagination-box">
-              <ul class="pagination">
-                {% if pagination.has_prev %}
-                  <li><a href="/search/page/{{ pagination.prev }}{{ searchparams }}">&lt;</a></li>
-                {% else %}
-                  <li class="disabled"><a href="">&lt;</a></li>
-                {% endif %}
-                {% for page in pagination.iter_pages(pagination.page) %}
-                  {% if page %}
-                    {% if page != pagination.page %}
-                      <a href="/search/page/{{page}}{{ searchparams }}">{{ page }}</a>
-                    {% else %}
-                      <li class="current"><span>{{ page }}</span></li>
-                    {% endif %}
-                  {% else %}
-                    <span class=ellipsis>…</span>
-                  {% endif %}
-                {% endfor %}
-                {% if pagination.has_next %}
-                  <li><a href="/search/page/{{ pagination.next}}{{ searchparams }}">&gt;</a></li>
-                {% else %}
-                  <li class="disabled"><a href="">&gt;</a></li>
-                {% endif %}
-              </ul>
-            </div>
+            {{ macros.paginationblock(pagination, searchparams) }}
             {% for doc in docs%}
             <div class="result-item" data-solr-id="{{doc.id}}" data-attachment-url="">
               <div class="row listing-top"><div class="listing-top-left col-md-10 col-sm-10">
@@ -133,7 +110,7 @@
             </div>
             <div class="row listing-main">
               <div class="listing-left col-md-8 col-sm-8"><blockquote class="listing-text">
-                <div class="content-snippet">{% if doc.description %}{{doc.description}}{% else %}<em>No description is available.</em>{% endif %}</div></blockquote>
+                <div class="content-snippet">{% if doc.description %}{{doc.description|truncate(512)}}{% else %}<em>No description is available.</em>{% endif %}</div></blockquote>
               </div>
               <div class="listing-right col-md-4 col-sm-4">
                 <div class="tags"></div>
@@ -155,31 +132,7 @@
             </div>
           </div>
         {% endfor %}
-            <div class="pagination-box">
-              <ul class="pagination">
-                {% if pagination.has_prev %}
-                  <li><a href="/search/page/{{ pagination.prev }}{{ searchparams }}">&lt;</a></li>
-                {% else %}
-                  <li class="disabled"><a href="">&lt;</a></li>
-                {% endif %}
-                {% for page in pagination.iter_pages(pagination.page) %}
-                  {% if page %}
-                    {% if page != pagination.page %}
-                      <a href="/search/page/{{page}}{{ searchparams }}">{{ page }}</a>
-                    {% else %}
-                      <li class="current"><span>{{ page }}</span></li>
-                    {% endif %}
-                  {% else %}
-                    <span class=ellipsis>…</span>
-                  {% endif %}
-                {% endfor %}
-                {% if pagination.has_next %}
-                  <li><a href="/search/page/{{ pagination.next}}{{ searchparams }}">&gt;</a></li>
-                {% else %}
-                  <li class="disabled"><a href="">&gt;</a></li>
-                {% endif %}
-              </ul>
-            </div>
+        {{ macros.paginationblock(pagination, searchparams) }}
         {%endif%}
         </div><!-- results-container -->
 
