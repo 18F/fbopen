@@ -26,8 +26,7 @@ var express = require('express'),
   serve_favicon = require('serve-favicon'),
   errorhandler = require('errorhandler'),
   winston = require('winston'),
-  express_winston = require('express-winston'),
-  morgan = require('morgan');
+  express_winston = require('express-winston');
 
 var config = require('./config');
 
@@ -80,7 +79,11 @@ app.options('*', function(req, res) {
 });
 
 
-app.get('/v0/', function(req, res) {
+app.get('/v0/?', function(req, res) {
+  // this route is used for server health checks, so it should always return 200
+  // this line will force Express not to tell the client to use cache by returning 304
+  req.headers['if-none-match'] = 'no-match-for-this';
+
   res.send('FBOpen API v0. See http://18f.github.io/fbopen for initial documentation.');
 });
 
@@ -88,7 +91,7 @@ app.get('/v0/hello', function(req, res) {
   client.ping({
     requestTimeout: 10000,
     hello: "elasticsearch!"
-  }, function(error) {
+  }, function (error) {
     if (error) {
       res.send('elasticsearch cluster is down!');
     } else {
