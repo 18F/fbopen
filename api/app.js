@@ -80,10 +80,6 @@ app.options('*', function(req, res) {
 
 
 app.get('/v0/?', function(req, res) {
-  // this route is used for server health checks, so it should always return 200
-  // this line will force Express not to tell the client to use cache by returning 304
-  req.headers['if-none-match'] = 'no-match-for-this';
-
   res.send('FBOpen API v0. See http://18f.github.io/fbopen for initial documentation.');
 });
 
@@ -93,13 +89,20 @@ app.get('/v0/hello', function(req, res) {
     hello: "elasticsearch!"
   }, function (error) {
     if (error) {
-      res.send('elasticsearch cluster is down!');
+      res.send('Elasticsearch cluster is not responding!');
     } else {
-      res.send('All is well');
+      res.send('All is well and Elasticsearch sends you its best wishes.');
     }
   });
 });
 
+app.get('/v0/status', function(req, res) {
+  // this route is used for server health checks, so it should always return 200
+  // this line will force Express not to tell the client to use cache by returning 304
+  req.headers['if-none-match'] = 'no-match-for-this';
+
+  res.send('API is up!');
+});
 
 // Queries
 app.get('/v0/opps', function(req, res) {
