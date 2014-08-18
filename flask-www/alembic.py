@@ -1,10 +1,17 @@
+import os
 from alembic import app
-from flask import request, redirect, render_template
+from flask import Flask, request, redirect, render_template, url_for
 from alembicconfig import API_KEY
-from util.pagination import Pagination
+from pagination import Pagination
 import urllib
 
 from fbopen import fbopen
+
+app = Flask(__name__)
+
+#Config variables are stored separately in alembbicconfig.py.
+#See alembicconfig.py.example.
+app.config.from_object('alembicconfig')
 
 fbos = fbopen.FBOpen
 fbos.init(API_KEY)
@@ -44,6 +51,13 @@ def searchpage(page):
         pagination = Pagination(page, items_per_page, count)
     else: pagination = False
 
+    if pagination and pagination.pages < page:
+        return redirect(url_for('searchpage', page=pagination.pages,
+                        request=request))
+
     return render_template('search.html', searchterm = searchterm,
                             searchparams = searchparams, results = results,
                             docs = docs, pagination = pagination) 
+
+if __name__ == '__main__':
+    app.run()

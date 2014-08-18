@@ -234,6 +234,7 @@ highlight {
 	font-size: 12px;
 	font-weight: bold;
 	margin: 0 1px;
+  float: none;
 }
 .pagination > li.current > span {
   float: none;
