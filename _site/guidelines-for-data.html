@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>FBOpen Docs</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <link href="//maxcdn.bootstrapcdn.com/font-awesome/4.1.0/css/font-awesome.min.css" rel="stylesheet">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <a href="/fbopen-docs">
+        <img src="/fbopen-docs/assets/fbopen.png"><br/><br/>
+        <h1>FBOpen Docs</h1>
+      </a>
+        <p>FBOpen helps small businesses search for opportunities to work with the U.S. government.</p>
+
+<!--
+        <ul>
+          <li><a href="https://github.com/leahbannon/fbd/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/leahbannon/fbd/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/leahbannon/fbd">View On <strong>GitHub</strong></a></li>
+        </ul>
+-->
+      </header>
+      <section>
+
+    
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+      
+      <h3 id="guidelines-for-contributing-data-to-fbopen">Guidelines for Contributing Data to FBOpen</h3>
+
+<p>FBOpen’s mission is to help small businesses search for opportunities to work with the U.S. government. Two important ways that we are accomplishing this is by offering a better search engine and aggregating data about opportunities in one place, so we welcome additional sources of data about opportunities. This document outlines guidelines for contributing data to FBOpen.</p>
+
+<p><strong>Basic requirements:</strong></p>
+
+<ul>
+  <li>The data should be opportunities to work with U.S. federal, state, or local government, or with an organization that is working with the government (for example, subcontracts).</li>
+  <li>The data should be structured, machine readable data.</li>
+  <li>You should ensure that your data can be shared with the public.</li>
+  <li>FBOpen does not fulfill your FAR reporting requirements or system of record requirements, so the opportunity’s metadata must include the URL of a listing-of-record for the opportunity</li>
+</ul>
+
+<p><strong>Required Core Metadata Fields</strong></p>
+
+<p>The data should include the following core metadata fields, or you should provide documentation explaining which fields in your data map to these. All other data will be placed in a nested key specific to the data source.</p>
+
+<ul>
+  <li><code>title</code>: the opportunity’s title</li>
+  <li><code>listing_url</code>: as described above, the link to the listing-of-record for this opportunity</li>
+  <li><code>close_dt</code>: “2013-12-01T17:00:00Z”, date/time when applications are due (month precedes day)</li>
+  <li><code>posted_dt</code>: “2013-11-06T00:00:00Z”, date/time when this opportunity was made public (month precedes day), (optional if <code>open_dt</code> is present)</li>
+  <li><code>open_dt</code>: “2013-11-09T00:00:00Z”, first date/time when applications may be submitted (month precedes day), (optional if <code>posted_dt</code> is present)</li>
+  <li><code>agency</code>: “General Services Administration”</li>
+  <li><code>office</code>: “Presidential Innovation Fellows”, (optional)</li>
+  <li><code>location</code>: “1800 F Street, Washington, DC”, (optional)</li>
+  <li><code>zipcode</code>: “20008”, (optional)</li>
+  <li><code>summary</code>: “A short executive summary of the opportunity goes here.”, (optional)</li>
+  <li><code>description</code>: “More details about the opportunity might be included here”,</li>
+</ul>
+
+<p>We also welcome suggestions of resources available on the web that we could scrape, but we need to access the resources without special registration or IP whitelisting.</p>
+
+      
+      </section>
+    </div>
+    
+      </section>
+      <footer>
+        <p>
+          <font size="14">
+            <a href="http://twitter.com/fbopen"><i class="fa fa-twitter-square"></i></a>&nbsp;
+            <a href="http://github.com/18f/fbopen"><i class="fa fa-github-square"></i></a>&nbsp;
+            <a href="mailto:fbopen@gsa.gov"><i class="fa fa-envelope-square"></i></a>
+          </font>
+        </p>
+        <p>FBOpen is an <a href="https://18f.gsa.gov">18F</a> project, a startup within GSA that builds effective, user-centric digital services focused on the interaction between government and the people and businesses it serves.</p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-47244317-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
+
