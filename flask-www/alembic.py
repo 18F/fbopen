@@ -11,7 +11,7 @@ app = Flask(__name__)
 
 #Config variables are stored separately in alembbicconfig.py.
 #See alembicconfig.py.example.
-app.config.from_object('alembicconfig')
+app.config.from_object('config')
 
 fbos = fbopen.FBOpen
 fbos.init(API_KEY)
