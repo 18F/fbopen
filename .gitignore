@@ -28,4 +28,3 @@ build
 *.env
 *.pyc
 loaders/attachments/attach*
-alembicconfig.py
