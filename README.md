@@ -1,6 +1,6 @@
 # FBOpen Docs
 
-This is a staging repo for larger FBOpen docs site.
+This is the readme for the FBOpen project's documentation site. We welcome questions, comments, and suggestions through [github issues](https://github.com/18F/fbopen/issues/new) or [email](mailto:fbopen@gsa.gov). You can also find the main FBOpen project readme and guidance for contributing to that project [here](https://github.com/18F/fbopen/blob/master/README.md).
 
 ### Forking and contributing
 
