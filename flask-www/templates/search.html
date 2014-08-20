@@ -88,52 +88,57 @@
       <div class="col-sm-8 col-sm-offset-4 col-md-8 col-md-offset-4">
 
         <div id="results-container" style="display: block;">
-        {% if docs %}
           <div id="results-list">
+          {% if docs %}
             <div id="results-topline" class="row">
               <div id="result-count" class="col-md-6 col-sm-6"><strong>{{results.numFound}}</strong> Search results</div>
               <div id="results-sorted-by" class="col-md-6 col-sm-6">Sorted by <span class="selected">relevance</span></div>
             </div>
             {{ macros.paginationblock(pagination, searchparams) }}
             {% for doc in docs%}
-            <div class="result-item" data-solr-id="{{doc.id}}" data-attachment-url="">
-              <div class="row listing-top"><div class="listing-top-left col-md-10 col-sm-10">
-                <h3 class="title"><a href="{{doc.listing_url}}" target="_blank">{{doc.title}}</a></h3>
-                <div class="agency-name">{{doc.agency}}</div></div>
-                <div class="listing-top-right col-md-2 col-sm-2">
-                  <div class="score">
-                    <div class="score-dots"><span class="score-dots"><span class="blackdot">●</span><span class="whitedot">○</span><span class="whitedot">○</span><span class="whitedot">○</span><span class="whitedot">○</span></span>
-                    </div>
-                  <div class="score-text"><strong>{{doc.score}}%</strong> RELEVANT</div>
-                </div>
-              </div>
-            </div>
-            <div class="row listing-main">
-              <div class="listing-left col-md-8 col-sm-8"><blockquote class="listing-text">
-                <div class="content-snippet">{% if doc.description %}{{doc.description|truncate(512)}}{% else %}<em>No description is available.</em>{% endif %}</div></blockquote>
-              </div>
-              <div class="listing-right col-md-4 col-sm-4">
-                <div class="tags"></div>
-                <div class="listing-right-more">
-                  <div class="listing-id-box listing-data-box">
-                    <div class="listing-data-label">Opportunity #</div>
-                    <div class="listing-id listing-data">{{doc.solnbr}}</div>
+              <div class="result-item" data-solr-id="{{doc.id}}" data-attachment-url="">
+                <div class="row listing-top"><div class="listing-top-left col-md-10 col-sm-10">
+                  <h3 class="title"><a href="{{doc.listing_url}}" target="_blank">{{doc.title}}</a></h3>
+                  <div class="agency-name">{{doc.agency}}</div></div>
+                  <div class="listing-top-right col-md-2 col-sm-2">
+                    <div class="score">
+                      <div class="score-dots"><span class="score-dots"><span class="blackdot">●</span><span class="whitedot">○</span><span class="whitedot">○</span><span class="whitedot">○</span><span class="whitedot">○</span></span>
+                      </div>
+                    <div class="score-text"><strong>{{doc.score}}%</strong> RELEVANT</div>
                   </div>
-                  <div class="listing-source-box listing-data-box"><span class="listing-data-label"><span class="glyphicon glyphicon-link"></span>Source: </span><span class="listing-data">{{doc.data_source}}</span></div>
                 </div>
               </div>
-            </div>
-            <div class="row listing-bottom">
-              <div class="listing-dates col-md-8 col-sm-8 row">
-                <div class="listing-due-box col-md-6 col-sm-6"><span class="glyphicon glyphicon-calendar"></span>Due: <span class="listing-due-date">{{doc.close_dt}}</span></div>
-                <div class="listing-posted-box col-md-6" col-sm-6=""><span class="glyphicon glyphicon-pushpin"></span>Posted: <span class="listing-posted-date">{{doc.posted_dt}}</span></div>
+              <div class="row listing-main">
+                <div class="listing-left col-md-8 col-sm-8"><blockquote class="listing-text">
+                  <div class="content-snippet">{% if doc.description %}{{doc.description|truncate(512)}}{% else %}<em>No description is available.</em>{% endif %}</div></blockquote>
+                </div>
+                <div class="listing-right col-md-4 col-sm-4">
+                  <div class="tags"></div>
+                  <div class="listing-right-more">
+                    <div class="listing-id-box listing-data-box">
+                      <div class="listing-data-label">Opportunity #</div>
+                      <div class="listing-id listing-data">{{doc.solnbr}}</div>
+                    </div>
+                    <div class="listing-source-box listing-data-box"><span class="listing-data-label"><span class="glyphicon glyphicon-link"></span>Source: </span><span class="listing-data">{{doc.data_source}}</span></div>
+                  </div>
+                </div>
               </div>
-              <div class="listing-actions col-md-4 col-sm-4"><a class="listing-save"><span class="glyphicon glyphicon-star-empty"></span>Save</a><a class="listing-more"><span class="glyphicon glyphicon-plus"></span>More detail</a></div>
+              <div class="row listing-bottom">
+                <div class="listing-dates col-md-8 col-sm-8 row">
+                  <div class="listing-due-box col-md-6 col-sm-6"><span class="glyphicon glyphicon-calendar"></span>Due: <span class="listing-due-date">{{doc.close_dt}}</span></div>
+                  <div class="listing-posted-box col-md-6" col-sm-6=""><span class="glyphicon glyphicon-pushpin"></span>Posted: <span class="listing-posted-date">{{doc.posted_dt}}</span></div>
+                </div>
+                <div class="listing-actions col-md-4 col-sm-4"><a class="listing-save"><span class="glyphicon glyphicon-star-empty"></span>Save</a><a class="listing-more"><span class="glyphicon glyphicon-plus"></span>More detail</a></div>
+              </div>
             </div>
-          </div>
-        {% endfor %}
-        {{ macros.paginationblock(pagination, searchparams) }}
-        {%endif%}
+            {% endfor %}
+          {{ macros.paginationblock(pagination, searchparams) }} 
+          {% else %}
+            <div id="results-topline" class="row">
+              <div id="result-count" class="col-md-6 col-sm-6">{% if error %}<strong>{{error}}</strong>{% else %}No Results Found.{% endif %}</div>
+              <div id="results-sorted-by" class="col-md-6 col-sm-6">Sorted by <span class="selected">relevance</span></div>
+            </div>
+          {% endif %}
         </div><!-- results-container -->
 
         <div id="results-raw-outer" style="display: block;">
