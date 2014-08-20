@@ -1,7 +1,6 @@
 import os
-from alembic import app
 from flask import Flask, request, redirect, render_template, url_for
-from alembicconfig import API_KEY
+from config import API_KEY
 from pagination import Pagination
 import urllib
 
@@ -9,8 +8,8 @@ from fbopen import fbopen
 
 app = Flask(__name__)
 
-#Config variables are stored separately in alembbicconfig.py.
-#See alembicconfig.py.example.
+#Config variables are stored separately in config.py.
+#See config.py.example.
 app.config.from_object('config')
 
 fbos = fbopen.FBOpen
