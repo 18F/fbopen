@@ -3,7 +3,7 @@ from flask import Flask, request, redirect, render_template, url_for
 from config import API_KEY
 from pagination import Pagination
 import urllib
-
+from html import unescape
 from fbopen import fbopen
 
 app = Flask(__name__)
@@ -39,7 +39,7 @@ def searchpage(page):
     advanced['start'] = start
 
     results = fbos.Opp.search(searchterm, advanced)
-
+    
     try:
         docs = results.opps
     except:
@@ -48,6 +48,10 @@ def searchpage(page):
     if docs:
         count = results.numFound
         pagination = Pagination(page, items_per_page, count)
+        #Formatting opportunities
+        for doc in docs:
+            doc.title = doc.title.title()
+            doc.description = unescape(doc.description)
     else: pagination = False
 
     if pagination and pagination.pages < page:

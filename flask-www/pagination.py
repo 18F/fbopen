@@ -10,7 +10,10 @@ class Pagination(object):
 
     @property
     def pages(self):
-        return int(floor(self.total_count / float(self.per_page)))
+        if self.total_count < self.per_page:
+            return 1
+        else:
+            return int(floor(self.total_count / float(self.per_page)))
 
     @classmethod
     def offset(self, page, per_page):
