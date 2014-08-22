@@ -194,7 +194,7 @@ app.get('/v0/opps', function(req, res) {
     if (status_code !== 200) {
       results_out.error = error;
       return res.json(results_out);
-    };
+    }
 
     if (_u.has(body, 'hits') && _u.has(body.hits, 'total')) {
       results_out.numFound = body.hits.total;
@@ -295,11 +295,96 @@ app.get('/v0/opp/:id', function(req, res) {
       _id: req.params.id
     },
     function(err, body) {
-      res.json(body)
+      res.json(body);
     }
   );
 });
 
+app.get('/v0/agg/data_source', function(req, res) {
+  client.search({
+    index: config.elasticsearch.index,
+    type: 'opp',
+    body: {
+      aggs: {
+        data_sources: {
+          terms: {
+            field: 'data_source'
+          }
+        }
+      }
+    }
+  }, function(err, body) {
+    if (err) {
+      res.json(err);
+    } else {
+      var data_sources =_u.map(body.aggregations.data_sources.buckets, function(d) {
+        return d.key;
+      });
+      res.json({data_sources: data_sources});
+    }
+  });
+});
+
+app.get('/v0/agg/notice_type', function(req, res) {
+  client.search({
+    index: config.elasticsearch.index,
+    type: 'opp',
+    body: {
+      aggs: {
+        notice_types: {
+          terms: {
+            field: 'notice_type'
+          }
+        }
+      }
+    }
+  }, function(err, body) {
+    if (err) {
+      res.json(err);
+    } else {
+      var notice_types = _u.map(body.aggregations.notice_types.buckets, function(n) {
+        return n.key;
+      });
+      res.json({notice_types: notice_types});
+    }
+  });
+});
+
+app.get('/v0/agg/data_source/notice_type', function(req, res) {
+  client.search({
+    index: config.elasticsearch.index,
+    type: 'opp',
+    body: {
+      aggs: {
+        data_sources: {
+          terms: {
+            field: 'data_source'
+          },
+          aggs: {
+            notice_types: {
+              terms: {
+                field: 'notice_type'
+              }
+            }
+          }
+        }
+      }
+    }
+  }, function(err, body) {
+    if (err) {
+      res.json(err);
+    } else {
+      data = {};
+
+      _u.map(body.aggregations.data_sources.buckets, function (n) {
+        data[n.key] = _u.map(n.notice_types.buckets, function (m) {
+          return m.key;
+        });
+      });
+      res.json({data_sources: data});
+    }
+  });
+});
 
 // Allow POST operations only according to configuration
 app.post('*', function(req, res, next) {
