@@ -22,7 +22,14 @@ then
 elif [[ $1 -ne "" ]]
 then
     set +e
-	date -d $1
+	date --version >/dev/null 2>&1
+    if [[ $? -eq 'gnu' ]]
+    then
+        date -d $1
+    else
+        gdate -d $1
+    fi
+
 	if [[ $? -eq 1 ]]
 	then
 		echo "Usage: grants-nightly.sh [YYYYMMDD]"

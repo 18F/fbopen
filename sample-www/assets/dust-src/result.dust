@@ -1,6 +1,6 @@
 <div id="results-topline" class="row">
 	<div id="result-count" class="col-md-6 col-sm-6">
-		{@result_count count="{numFound}" /}
+		{@result_count count="{numFound}" status="{status}" /}
 	</div>
 	<div id="results-sorted-by" class="col-md-6 col-sm-6">
 		Sorted by 
