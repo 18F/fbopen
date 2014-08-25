@@ -4,6 +4,7 @@ FBOPEN_ROOT=/home/fbopen/fbopen
 PATH=/home/fbopen/.virtualenvs/fbopen/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin:/usr/games:/usr/local/games
 
 # m h dom mon dow cmd
+14 6 * * * source /home/fbopen/.bash_profile && source $FBOPEN_ROOT/.env && cd $FBOPEN_ROOT/loaders/attachments && python cleanup.py &>> /home/fbopen/log/cleanup.log
 15 6 * * * source /home/fbopen/.bash_profile && source $FBOPEN_ROOT/.env && cd $FBOPEN_ROOT/loaders/fbo.gov && ./fbo-nightly-w-attachments.sh &>> /home/fbopen/log/fbo.log
 16 6 * * * source /home/fbopen/.bash_profile && source $FBOPEN_ROOT/.env && cd $FBOPEN_ROOT/loaders/grants.gov && ./grants-nightly-w-attachments.sh &>> /home/fbopen/log/grants.log
 17 6 * * * source /home/fbopen/.bash_profile && source $FBOPEN_ROOT/.env && cd $FBOPEN_ROOT/loaders/bids.state.gov && ./bids-nightly.sh &>> /home/fbopen/log/bids.log
