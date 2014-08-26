@@ -38,7 +38,7 @@
         <form name="fbopen-search-form" id="fbopen-search-form" role="form" class="form" method="get" action="/search">
 
           <div class="form-group">
-            <input id="search" name="search" type="search" class="form-control">
+            <input id="search" name="search" type="search" class="form-control" value="{{request.args.get('search')}}">
             <button type="submit" id="q-search"><span class="glyphicon glyphicon-search"></span></button>
           </div>
 
@@ -51,13 +51,13 @@
 
             <div class="checkbox">
               <label class="filter-text">
-                <input id="show_closed" name="show_closed" type="checkbox"> Show closed listings
+                  <input id="show_closed" name="show_closed" type="checkbox"{% if request.args.get('show_closed') %} checked{% endif %}> Show closed listings
               </label>
             </div>
 
             <div class="checkbox form-group-more">
               <label class="filter-text">
-                <input id="show_noncompeted" name="show_noncompeted" type="checkbox"> Show non-competed listings (sole source)
+                <input id="show_noncompeted" name="show_noncompeted" type="checkbox"{% if request.args.get('show_noncompeted') %} checked{% endif %}> Show non-competed listings (sole source)
               </label>
             </div>
             <div class="form-group form-group-more">
