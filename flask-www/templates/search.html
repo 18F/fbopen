@@ -35,7 +35,7 @@
           <span>pilot</span>
         </div>
 
-        <form name="fbopen-search-form" id="fbopen-search-form" role="form" class="form" method="get" action="/search/">
+        <form name="fbopen-search-form" id="fbopen-search-form" role="form" class="form" method="get" action="/search">
 
           <div class="form-group">
             <input id="search" name="search" type="search" class="form-control">
@@ -94,7 +94,7 @@
               <div id="result-count" class="col-md-6 col-sm-6"><strong>{{results.numFound}}</strong> Search results</div>
               <div id="results-sorted-by" class="col-md-6 col-sm-6">Sorted by <span class="selected">relevance</span></div>
             </div>
-            {{ macros.paginationblock(pagination, searchparams) }}
+            {{ macros.pagination_block(pagination) }}
             {% for doc in docs%}
               <div class="result-item" data-solr-id="{{doc.id}}" data-attachment-url="">
                 <div class="row listing-top"><div class="listing-top-left col-md-10 col-sm-10">
@@ -132,7 +132,7 @@
               </div>
             </div>
             {% endfor %}
-          {{ macros.paginationblock(pagination, searchparams) }} 
+          {{ macros.pagination_block(pagination) }} 
           {% else %}
             <div id="results-topline" class="row">
               <div id="result-count" class="col-md-6 col-sm-6">{% if error %}<strong>{{error}}</strong>{% else %}No Results Found.{% endif %}</div>

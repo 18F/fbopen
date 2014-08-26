@@ -1,28 +1,23 @@
-{% macro paginationblock(pagination, searchparams) %}
-{% set pagerange = pagination.pagerange() %}
+{% macro pagination_block(pagination) %}
 <div class="pagination-box">
   <ul class="pagination">
-    {% if pagination.has_prev %}
-      <li><a href="/search/page/{{ pagination.prev }}{{ searchparams }}">&lt;</a></li>
-      <a href="/search/page/1{{ searchparams }}">1</a>
-      {% if pagerange[0] > 2 %}<span class=ellipsis>…</span>{% endif %}
-    {% else %}
-      <li class="disabled"><a href="">&lt;</a></li>
-    {% endif %}
-    {% for page in pagerange %}
+    <li{% if not pagination.has_prev %} class="disabled"{% endif %}>
+        <a href="{{ url_for_other_page(pagination.page - 1) }}">&lt;</a>
+    </li>
+  {%- for page in pagination.iter_pages() %}
+    {% if page %}
       {% if page != pagination.page %}
-        <a href="/search/page/{{page}}{{ searchparams }}">{{ page }}</a>
+        <li><a href="{{ url_for_other_page(page) }}">{{ page }}</a></li>
       {% else %}
-        <li class="current"><span>{{ page }}</span></li>
+        <li class="active"><a href="#">{{ page }}</a></li>
       {% endif %}
-    {% endfor %}
-    {% if pagination.has_next %}
-      {% if pagerange[-1] < pagination.pages -1 %}<span class=ellipsis>…</span>{% endif %}
-      <a href="/search/page/{{ pagination.pages}}{{ searchparams }}">{{pagination.pages}}</a>
-      <li><a href="/search/page/{{ pagination.next}}{{ searchparams }}">&gt;</a></li>
     {% else %}
-      <li class="disabled"><a href="">&gt;</a></li>
+      <span class=ellipsis>…</span>
     {% endif %}
+  {%- endfor %}
+    <li{% if not pagination.has_next %} class="disabled"{% endif %}>
+        <a href="{{ url_for_other_page(pagination.page + 1) }}">&gt;</a>
+    </li>
   </ul>
 </div>
 {% endmacro %}

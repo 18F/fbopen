@@ -43,18 +43,13 @@ class Pagination(object):
     def has_next(self):
         return self.page < self.pages
 
-    def pagerange(self, leftside=2, rightside=2):
-        if self.page == 1:
-            left = 1
-        elif self.page - leftside > 1:
-            left = self.page - leftside
-        else:
-            left = 2
-        if self.page == self.pages:
-            right = self.pages
-        elif self.page + rightside < self.pages -1:
-            right = self.page + rightside
-        else:
-            right = self.pages -1
-
-        return [page for page in range(left,right+1)]
+    def iter_pages(self, left_edge=2, left_current=2, right_current=5, right_edge=2):
+        last = 0
+        for num in range(1, self.pages + 1):
+            if num <= left_edge or \
+               (num > self.page - left_current - 1 and num < self.page + right_current) or \
+               num > self.pages - right_edge:
+                if last + 1 != num:
+                    yield None
+                yield num
+                last = num
