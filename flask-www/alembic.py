@@ -1,19 +1,20 @@
-import os
+import urllib
+
 from flask import Flask, request, redirect, render_template, url_for
 from config import API_KEY
 from pagination import Pagination
-import urllib
-from html import unescape
 from fbopen import fbopen
+
 
 app = Flask(__name__)
 
-#Config variables are stored separately in config.py.
-#See config.py.example.
+# Config variables are stored separately in config.py.
+# See config.py.example.
 app.config.from_object('config')
 
 fbos = fbopen.FBOpen
 fbos.init(API_KEY)
+
 
 @app.route('/')
 def index():
