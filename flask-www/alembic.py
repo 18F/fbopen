@@ -32,6 +32,7 @@ def searchpage():
     args['start'] = start
 
     results = fbos.Opp.search(searchterm, args)
+    raw = fbos.Opp.last_response
 
     try:
         docs = results.opps
@@ -40,7 +41,7 @@ def searchpage():
 
     pagination = Pagination(page, items_per_page, results.numFound)
 
-    return render_template('search.html', results=results, docs=docs, pagination=pagination)
+    return render_template('search.html', results=results, docs=docs, pagination=pagination, raw=raw)
 
 
 def url_for_other_page(page):
