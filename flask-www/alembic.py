@@ -15,6 +15,14 @@ app.config.from_object('config')
 fbos = fbopen.FBOpen
 fbos.init(API_KEY)
 
+DATA_SOURCES = {
+        '': 'All',
+        'fbo.gov': 'FedBizOpps (fbo.gov)',
+        'grants.gov': 'grants.gov',
+        'dodsbir.net': 'DoD SBIR',
+        'bids.state.gov': 'bids.state.gov',
+}
+
 
 @app.route('/')
 def index():
@@ -41,7 +49,7 @@ def searchpage():
 
     pagination = Pagination(page, items_per_page, results.numFound)
 
-    return render_template('search.html', results=results, docs=docs, pagination=pagination, raw=raw)
+    return render_template('search.html', results=results, docs=docs, pagination=pagination, raw=raw, data_sources=DATA_SOURCES)
 
 
 def url_for_other_page(page):
