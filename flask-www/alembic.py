@@ -36,7 +36,7 @@ def searchpage():
     page = int(args.pop('page', 1))
     searchterm = args.pop('search', False)
 
-    start = page * items_per_page
+    start = (page - 1) * items_per_page
     args['start'] = start
 
     results = fbos.Opp.search(searchterm, args)
