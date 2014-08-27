@@ -14,7 +14,7 @@ class AlembicTestCase(unittest.TestCase):
 
     def test_noresultsdisplay(self):
         # If there are no results, are we telling the user?
-        page = self.app.get('/search/?search="I+am+by+birth+a+Genevese"')
+        page = self.app.get('/search?search="I+am+by+birth+a+Genevese"')
         assert 'No Results Found' in str(page.data)
         assert '<div class="result-item" data-solr-id="' not in str(page.data)
         # if this search ever returns a result, the responsible KO deserves
@@ -22,7 +22,7 @@ class AlembicTestCase(unittest.TestCase):
 
     def test_resultsdisplay(self):
         # Are we displaying results for queries that return them?
-        page = self.app.get('/search/?search=test')
+        page = self.app.get('/search?search=test')
         pdata = str(page.data)
         assert 'Search results' in pdata
         assert 'No Results Found' not in pdata
