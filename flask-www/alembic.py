@@ -4,7 +4,7 @@ from flask import Flask, request, redirect, render_template, url_for
 from config import API_KEY
 from pagination import Pagination
 from fbopen import fbopen
-
+import re
 
 app = Flask(__name__)
 
@@ -42,10 +42,15 @@ def searchpage():
     results = fbos.Opp.search(searchterm, args)
     raw = fbos.Opp.last_response
 
-    try:
-        docs = results.opps
-    except:
-        docs = False
+    docs = getattr(results, 'opps', [])
+
+    # highlighting search terms in the description.
+    for doc in docs:
+        if doc.description:
+            for term in searchterm.split():
+                doc.description = re.sub(term,
+                                        '<highlight>'+term+'</highlight>',
+                                        doc.description)
 
     pagination = Pagination(page, items_per_page, results.numFound)
 
