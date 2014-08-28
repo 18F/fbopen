@@ -3,6 +3,7 @@ import alembic
 from pagination import Pagination
 import unittest
 import tempfile
+from bs4 import BeautifulSoup
 
 class AlembicTestCase(unittest.TestCase):
 
@@ -47,6 +48,17 @@ class AlembicTestCase(unittest.TestCase):
         page = self.app.get('/search?search=test')
         pdata = str(page.data)
         assert 'id="form-advanced-options" class="collapse"' in pdata
+
+    def test_resultsorder(self):
+        # Are we displaying results in descending order of relevance?
+        page = self.app.get('/search?search=test')
+        pdata = page.data
+        soup = BeautifulSoup(pdata)
+        scores = soup.find_all("div", class_="score-text")
+        # get the score numbers out of the score-text div.
+        scores = [int(x.get_text().split('%')[0]) for x in scores]
+        scores_descending = sorted(scores, reverse = True)
+        assert scores == scores_descending
 
     def test_pagecount(self):
         # Is pagination returning the correct number of pages?
