@@ -4,7 +4,6 @@ from flask import Flask, request, redirect, render_template, url_for
 from config import API_KEY
 from pagination import Pagination
 from fbopen import fbopen
-import re
 
 app = Flask(__name__)
 
@@ -35,6 +34,7 @@ def searchpage():
     args = request.args.to_dict()
     page = int(args.pop('page', 1))
     searchterm = args.pop('search', False)
+    advanced = bool({k:v for k, v in args.items() if v})
 
     start = (page - 1) * items_per_page
     args['start'] = start
@@ -46,7 +46,7 @@ def searchpage():
 
     pagination = Pagination(page, items_per_page, results.numFound)
 
-    return render_template('search.html', results=results, docs=docs, pagination=pagination, raw=raw, data_sources=DATA_SOURCES)
+    return render_template('search.html', advanced=advanced, results=results, docs=docs, pagination=pagination, raw=raw, data_sources=DATA_SOURCES)
 
 
 def url_for_other_page(page):

@@ -47,7 +47,7 @@
             <button id="advanced-toggle" type="button" class="btn">+</button>
           </a>
 
-          <div id="form-advanced-options" class="collapse" style="height: auto;">
+          <div id="form-advanced-options" {%if advanced %}class="in"{% else %}class="collapse"{% endif %} style="height: auto;">
 
             <div class="checkbox">
               <label class="filter-text">
