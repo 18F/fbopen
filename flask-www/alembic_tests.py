@@ -28,6 +28,14 @@ class AlembicTestCase(unittest.TestCase):
         assert 'No Results Found' not in pdata
         assert '<div class="result-item" data-solr-id="' in pdata
 
+    def test_rememberoptions(self):
+        # Is the form retaining options from the current search?
+        page = self.app.get('/search?search=test&show_closed=on')
+        pdata = str(page.data)
+        assert 'type="search" class="form-control" value="test"' in pdata
+        assert 'name="show_closed" type="checkbox" checked' in pdata
+        assert 'name="show_noncompeted" type="checkbox" checked' not in pdata
+
     def test_pagecount(self):
         # Is pagination returning the correct number of pages?
         test_counts = [(42, 4), (1, 1), (100, 10)]
