@@ -44,14 +44,6 @@ def searchpage():
 
     docs = getattr(results, 'opps', [])
 
-    # highlighting search terms in the description.
-    for doc in docs:
-        if doc.description:
-            for term in searchterm.split():
-                doc.description = re.sub(term,
-                                        '<highlight>'+term+'</highlight>',
-                                        doc.description)
-
     pagination = Pagination(page, items_per_page, results.numFound)
 
     return render_template('search.html', results=results, docs=docs, pagination=pagination, raw=raw, data_sources=DATA_SOURCES)

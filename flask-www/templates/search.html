@@ -111,10 +111,7 @@
               </div>
               <div class="row listing-main">
                 <div class="listing-left col-md-8 col-sm-8"><blockquote class="listing-text">
-                        <div class="content-snippet">{% if doc.description %}
-                          {{doc.description|truncate(512)|safe}}
-                          {% else %}<em>No description is available.</em>{% endif %}
-                          {% if doc.highlight and doc.highlight.description %}{% for desc in doc.highlight.description %}<p>&hellip;{{desc|safe}}&hellip;</p>{% endfor %}{% endif %}</div></blockquote>
+                        <div class="content-snippet">{% if doc.highlight and doc.highlight.description %}{% for desc in doc.highlight.description %}<p>&hellip;{{desc|safe}}&hellip;</p>{% endfor %}{%elif doc.description %}{{doc.description|truncate(512)|safe}}{% else %} <em>No description is available.</em> {% endif %}</div></blockquote>
                 </div>
                 <div class="listing-right col-md-4 col-sm-4">
                   <div class="tags"></div>
