@@ -103,7 +103,18 @@
                   <div class="agency-name">{{doc.agency}}</div></div>
                   <div class="listing-top-right col-md-2 col-sm-2">
                     <div class="score">
-                      <div class="score-dots"><span class="score-dots"><span class="blackdot">●</span><span class="whitedot">○</span><span class="whitedot">○</span><span class="whitedot">○</span><span class="whitedot">○</span></span>
+                      <div class="score-dots"><span class="score-dots">
+                        {% if doc.score > 20 %}<span class="blackdot">●</span>
+                        {% else %}<span class="whitedot">○</span>{% endif %}
+                        {% if doc.score > 40 %}<span class="blackdot">●</span>
+                        {% else %}<span class="whitedot">○</span>{% endif %}
+                        {% if doc.score > 60 %}<span class="blackdot">●</span>
+                        {% else %}<span class="whitedot">○</span>{% endif %}
+                        {% if doc.score > 80 %}<span class="blackdot">●</span>
+                        {% else %}<span class="whitedot">○</span>{% endif %}
+                        {% if doc.score > 90 %}<span class="blackdot">●</span>
+                        {% else %}<span class="whitedot">○</span>{% endif %}
+                      </span>
                       </div>
                     <div class="score-text"><strong>{{doc.score}}%</strong> RELEVANT</div>
                   </div>
