@@ -33,7 +33,7 @@ def searchpage():
     items_per_page = 10
     args = request.args.to_dict()
     page = int(args.pop('page', 1))
-    searchterm = args.pop('search', False)
+    searchterm = args.pop('q', False)
     advanced = bool({k:v for k, v in args.items() if v})
 
     start = (page - 1) * items_per_page

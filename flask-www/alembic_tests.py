@@ -13,7 +13,7 @@ class AlembicTestCase(unittest.TestCase):
 
     def test_noresultsdisplay(self):
         # If there are no results, are we telling the user?
-        page = self.app.get('/search?search="I+am+by+birth+a+Genevese"')
+        page = self.app.get('/search?q="I+am+by+birth+a+Genevese"')
         assert 'No Results Found' in str(page.data)
         assert '<div class="result-item" data-solr-id="' not in str(page.data)
         # if this search ever returns a result, the responsible KO deserves
@@ -21,7 +21,7 @@ class AlembicTestCase(unittest.TestCase):
 
     def test_resultsdisplay(self):
         # Are we displaying results for queries that return them?
-        page = self.app.get('/search?search=test')
+        page = self.app.get('/search?q=test')
         pdata = str(page.data)
         assert 'Search results' in pdata
         assert 'No Results Found' not in pdata
@@ -29,7 +29,7 @@ class AlembicTestCase(unittest.TestCase):
 
     def test_rememberoptions(self):
         # Is the form retaining options from the current search?
-        page = self.app.get('/search?search=test&show_closed=on')
+        page = self.app.get('/search?q=test&show_closed=on')
         pdata = str(page.data)
         assert 'type="search" class="form-control" value="test"' in pdata
         assert 'name="show_closed" type="checkbox" checked' in pdata
@@ -38,20 +38,20 @@ class AlembicTestCase(unittest.TestCase):
     def test_showadvanced(self):
         # Is the advanced search expanded if advanced options
         # are selected on load?
-        page = self.app.get('/search?search=test&show_closed=on')
+        page = self.app.get('/search?q=test&show_closed=on')
         pdata = str(page.data)
         assert 'id="form-advanced-options" class="in"' in pdata
 
     def test_hideadvanced(self):
         # Is advanced search collapsed if advanced options are NOT
         # selected on load?
-        page = self.app.get('/search?search=test')
+        page = self.app.get('/search?q=test')
         pdata = str(page.data)
         assert 'id="form-advanced-options" class="collapse"' in pdata
 
     def test_resultsorder(self):
         # Are we displaying results in descending order of relevance?
-        page = self.app.get('/search?search=test')
+        page = self.app.get('/search?q=test')
         pdata = page.data
         soup = BeautifulSoup(pdata)
         scores = soup.find_all("div", class_="score-text")
