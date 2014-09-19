@@ -1,15 +1,15 @@
 import os
-import alembic
+import fbopenapp
 from pagination import Pagination
 import unittest
 import tempfile
 from bs4 import BeautifulSoup
 
-class AlembicTestCase(unittest.TestCase):
+class FbopenappTestCase(unittest.TestCase):
 
     def setUp(self):
-        alembic.app.config['TESTING'] = True
-        self.app = alembic.app.test_client()
+        fbopenapp.app.config['TESTING'] = True
+        self.app = fbopenapp.app.test_client()
 
     def test_noresultsdisplay(self):
         # If there are no results, are we telling the user?

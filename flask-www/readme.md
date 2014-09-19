@@ -2,7 +2,7 @@
 
 ### Getting started
 
-Alembic was written in python3. Compatibility with Python 2.x has not been tested.
+Fbopenapp was written in python3. Compatibility with Python 2.x has not been tested.
 
 -Install the included requirements.txt
 -Copy config.py:
@@ -15,23 +15,20 @@ Alembic was written in python3. Compatibility with Python 2.x has not been teste
 
 From the flask-www directory:
 
-    python alembic.py
+    python fbopenapp.py
 
 ### Deploy
 
-If the project is deployed using gunicorn, a wsgi.py is not needed--alembic.py already provides a wsgi application object. Simply install gunicorn:
+If the project is deployed using gunicorn, a wsgi.py is not needed--fbopenapp.py already provides a wsgi application object. Simply install gunicorn:
 
     pip install gunicorn
 
 Then start the server with:
 
-    gunicorn alembic:app
+    gunicorn fbopenapp:app
 
 ### Tests
 
-    python alembic_tests.py
+    python fbopenapp_tests.py
 
-### The Name
-
-An alembic is a two-part chemical still. Or, put another way, it's an apparatus that uses flasks to distill liquids, just as we're using Flask and elasticsearch to distill contract opportunities. More info: http://en.wikipedia.org/wiki/Alembic
 
