@@ -1,12 +1,36 @@
-This was written in python3. Backwards compatibility has not been tested.
+# FBOpen Sample Query App
 
-Getting started:
+### Getting started
 
--Get an api key from api.data.gov and add it to alembicconfig.py
--install the requirements from requirements.txt
--To meet the python-fbopen requirement, you'll need to install python-fbopen from github:
-	pip install git+https://github.com/18F/fbopen-python.git@master
+Alembic was written in python3. Compatibility with Python 2.x has not been tested.
 
-from the flask-www directory:
-	python runserver.py
+-Install the included requirements.txt
+-Copy config.py:
+
+    `cp config.py.example config.py`
+    
+-Add an api key from api.data.gov to config.py
+
+### Run
+
+From the flask-www directory:
+    `python alembic.py`
+
+### Deploy
+
+If the project is deployed using gunicorn, a wsgi.py is not needed--alembic.py already provides a wsgi application object. Simply install gunicorn:
+
+    `pip install gunicorn`
+
+Then start the server with:
+
+    `gunicorn alembic:app`
+
+### Tests
+
+    `python alembic_tests.py`
+
+### The Name
+
+An alembic is a two-part chemical still. Or, put another way, it's an apparatus that uses flasks to distill liquids, just as we're using Flask and elasticsearch to distill contract opportunities. More info: http://en.wikipedia.org/wiki/Alembic
 
