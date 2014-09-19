@@ -8,7 +8,7 @@
 
 json_output_file='workfiles/notices.json'
 open_json_output_file='workfiles/notices_open.json'
-weekly_links_file='workfiles/listings-links.txt'
+weekly_links_file='workfiles/links.txt'
 bulk_output_file='workfiles/notices.bulk'
 
 if [ $# -eq 1 ]
@@ -30,7 +30,7 @@ echo "JSON output file is " $json_output_file
 echo "list of links is " $weekly_links_file
 
 echo "Downloading weekly XML dump..."
-wget ftp://ftp.fbo.gov/datagov/FBOFullXML.xml -O $FBO_WEEKLY_XML_FILE
+wget -nv ftp://ftp.fbo.gov/datagov/FBOFullXML.xml -O $FBO_WEEKLY_XML_FILE
 # Note: if you want to resume a failed download, comment out the above and uncomment this line.
 #wget -c ftp://ftp.fbo.gov/datagov/FBOFullXML.xml -O $outfile
 
@@ -59,7 +59,7 @@ echo "Done loading into Elasticsearch."
 
 echo "Starting attachment scrape/load. See ~/log/fbo_attach.log for more info..."
 cd $FBOPEN_ROOT/loaders/attachments
-python fbo.py run --file $weekly_links_file
+python fbo.py run --file ../fbo.gov/$weekly_links_file
 
 echo "fbo-weekly done `date`"
 

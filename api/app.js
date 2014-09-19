@@ -26,19 +26,12 @@ var express = require('express'),
   serve_favicon = require('serve-favicon'),
   errorhandler = require('errorhandler'),
   winston = require('winston'),
-  express_winston = require('express-winston'),
-  morgan = require('morgan');
+  express_winston = require('express-winston');
 
 var config = require('./config');
 
 var app = express();
 module.exports = app;
-
-// http basic auth, if required in config
-if (config.app.require_http_basic_auth) {
-  var basic = http_auth.basic(config.app.http_basic_auth);
-  app.use(http_auth.connect(basic));
-}
 
 // Create Elasticsearch client
 //
@@ -62,6 +55,20 @@ if ('development' === process.env.NODE_ENV) {
   app.use(errorhandler());
 }
 
+app.get('/v0/status', function(req, res) {
+  // this route is used for server health checks, so it should always return 200
+  // this line will force Express not to tell the client to use cache by returning 304
+  req.headers['if-none-match'] = 'no-match-for-this';
+
+  res.send('API is up!');
+});
+
+// http basic auth, if required in config
+if (config.app.require_http_basic_auth) {
+  var basic = http_auth.basic(config.app.http_basic_auth);
+  app.use(http_auth.connect(basic));
+}
+
 // Allow cross-site queries (CORS)
 app.get('*', function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
@@ -80,7 +87,7 @@ app.options('*', function(req, res) {
 });
 
 
-app.get('/v0/', function(req, res) {
+app.get('/v0/?', function(req, res) {
   res.send('FBOpen API v0. See http://18f.github.io/fbopen for initial documentation.');
 });
 
@@ -88,15 +95,14 @@ app.get('/v0/hello', function(req, res) {
   client.ping({
     requestTimeout: 10000,
     hello: "elasticsearch!"
-  }, function(error) {
+  }, function (error) {
     if (error) {
-      res.send('elasticsearch cluster is down!');
+      res.send('Elasticsearch cluster is not responding!');
     } else {
-      res.send('All is well');
+      res.send('All is well and Elasticsearch sends you its best wishes.');
     }
   });
 });
-
 
 // Queries
 app.get('/v0/opps', function(req, res) {
@@ -188,7 +194,7 @@ app.get('/v0/opps', function(req, res) {
     if (status_code !== 200) {
       results_out.error = error;
       return res.json(results_out);
-    };
+    }
 
     if (_u.has(body, 'hits') && _u.has(body.hits, 'total')) {
       results_out.numFound = body.hits.total;
@@ -289,11 +295,96 @@ app.get('/v0/opp/:id', function(req, res) {
       _id: req.params.id
     },
     function(err, body) {
-      res.json(body)
+      res.json(body);
     }
   );
 });
 
+app.get('/v0/agg/data_source', function(req, res) {
+  client.search({
+    index: config.elasticsearch.index,
+    type: 'opp',
+    body: {
+      aggs: {
+        data_sources: {
+          terms: {
+            field: 'data_source'
+          }
+        }
+      }
+    }
+  }, function(err, body) {
+    if (err) {
+      res.json(err);
+    } else {
+      var data_sources =_u.map(body.aggregations.data_sources.buckets, function(d) {
+        return d.key;
+      });
+      res.json({data_sources: data_sources});
+    }
+  });
+});
+
+app.get('/v0/agg/notice_type', function(req, res) {
+  client.search({
+    index: config.elasticsearch.index,
+    type: 'opp',
+    body: {
+      aggs: {
+        notice_types: {
+          terms: {
+            field: 'notice_type'
+          }
+        }
+      }
+    }
+  }, function(err, body) {
+    if (err) {
+      res.json(err);
+    } else {
+      var notice_types = _u.map(body.aggregations.notice_types.buckets, function(n) {
+        return n.key;
+      });
+      res.json({notice_types: notice_types});
+    }
+  });
+});
+
+app.get('/v0/agg/data_source/notice_type', function(req, res) {
+  client.search({
+    index: config.elasticsearch.index,
+    type: 'opp',
+    body: {
+      aggs: {
+        data_sources: {
+          terms: {
+            field: 'data_source'
+          },
+          aggs: {
+            notice_types: {
+              terms: {
+                field: 'notice_type'
+              }
+            }
+          }
+        }
+      }
+    }
+  }, function(err, body) {
+    if (err) {
+      res.json(err);
+    } else {
+      data = {};
+
+      _u.map(body.aggregations.data_sources.buckets, function (n) {
+        data[n.key] = _u.map(n.notice_types.buckets, function (m) {
+          return m.key;
+        });
+      });
+      res.json({data_sources: data});
+    }
+  });
+});
 
 // Allow POST operations only according to configuration
 app.post('*', function(req, res, next) {

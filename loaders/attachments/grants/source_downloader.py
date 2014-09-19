@@ -61,7 +61,6 @@ class GrantsSourceDownloader(SourceDownloader):
 
             try:
                 opp_id = parse_qs(urlparse(url).query)['oppId'][0]
-                self.log.debug(opp_id)
 
                 filename, response = s.urlretrieve(''.join([self.base_url, opp_id]), dir=self.import_dir)
                 self.log.debug("{} stored at {}".format(url, os.path.basename(filename)))

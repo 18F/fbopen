@@ -412,7 +412,7 @@
       return chunk.write('<strong>' + count + '</strong> Search results');
     } else if (count == 1) {
       return chunk.write('<strong>1</strong> Search result');
-    } else if (status_code === 200) {
+    } else if (status_code == 200) {
       return chunk.write('No results.');
     } else {
       return chunk.write('We\'re sorry, we\'ve encountered an error.');

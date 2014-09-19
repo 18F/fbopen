@@ -3,7 +3,7 @@ FBOpen
 
 FBOpen is an open API server, data import tools, and sample apps to help small businesses search for opportunities to work with the U.S. government.
 
-The project began as an attempt to make it easier to search the content of [FBO.gov](http://www.fbo.gov), the U.S. government's system of record for opportunities to do business with the government. We downloaded the (XML) data from FBO's weekly data dump of opportunity listings, and loaded it into a [Elasticsearch](http://www.elasticsearch.org) search server. Then we used a primitive crawler to download listings' attachments and load them into Elasticsearch -- something Elasticsearch makes easy thanks to their [Mapper Attachments Type] plugin (https://github.com/elasticsearch/elasticsearch-mapper-attachments).
+The project began as an attempt to make it easier to search the content of [FBO.gov](http://www.fbo.gov), the U.S. government's system of record for opportunities to do business with the government. We downloaded the (XML) data from FBO's weekly data dump of opportunity listings, and loaded it into a [Elasticsearch](http://www.elasticsearch.org) search server. Then we used a primitive crawler to download listings' attachments and load them into Elasticsearch -- something Elasticsearch makes easy thanks to their [Mapper Attachments Type] (https://github.com/elasticsearch/elasticsearch-mapper-attachments) plugin.
 
 Underneath the Google-style query page (`/sample-www`), we built a simple REST API (really a thin layer over Elasticsearc's API) so you can build your own query tools.
 
@@ -46,5 +46,10 @@ This project is brand new and very incomplete. No guarantees of data completenes
 ### Who
 FBopen is a joint project of [18F](https://18f.gsa.gov), the [Presidential Innovation Fellowship](http://whitehouse.gov/innovationfellows), and the [GSA](http://www.gsa.gov) [Integrated Award Environment](http://www.gsa.gov/iae).
 
-### License
-This project constitutes an original work of the United States Government. This is free and unencumbered software released into the public domain. See the LICENSE file for more.
+### Public domain
+
+This project is in the worldwide [public domain](LICENSE.md). As stated in [CONTRIBUTING](CONTRIBUTING.md):
+
+> This project is in the public domain within the United States, and copyright and related rights in the work worldwide are waived through the [CC0 1.0 Universal public domain dedication](https://creativecommons.org/publicdomain/zero/1.0/).
+>
+> All contributions to this project will be released under the CC0 dedication. By submitting a pull request, you are agreeing to comply with this waiver of copyright interest.
