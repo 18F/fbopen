@@ -2,13 +2,14 @@
 
 source setup.sh
 
+echo "test_load_bulk_into_es__fbo.sh"; echo
 echo "Creating a test index"
-curl -XPUT 'http://localhost:9200/fbopen_test'
+curl -q -XPUT 'http://localhost:9200/fbopen_test'; echo
 
 echo "Indexing sample/fbo.bulk in ElasticSearch"
-curl -s -XPOST 'http://localhost:9200/fbopen_test/_bulk' --data-binary @sample/fbo.bulk; echo
+curl -q -s -XPOST 'http://localhost:9200/fbopen_test/_bulk' --data-binary @sample/fbo.bulk; echo
 
-echo "Waiting for indexing..."
+echo "Waiting for indexing..."; echo
 sleep 2
 
 # query ES via the multi get API
@@ -28,8 +29,7 @@ echo "Asserting output (/tmp/fbopen_output.tmp) equals expected (sample/output/f
 assert "diff -q /tmp/fbopen_output.tmp sample/output/fbo.json.tmp"
 assert_end
 
-echo "Dropping the test index"
-curl -XDELETE 'http://localhost:9200/fbopen_test'; echo
+curl -q -XDELETE 'http://localhost:9200/fbopen_test'; echo
 
 echo "Done."
 

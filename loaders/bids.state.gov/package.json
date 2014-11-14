@@ -3,7 +3,6 @@
   "version": "0.0.1",
   "description": "BIDS data loader",
   "dependencies": {
-    "sha1": "*",
-    "wget": "*"
+    "sha1": "*"
   }
 }

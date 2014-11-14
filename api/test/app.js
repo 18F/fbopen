@@ -51,7 +51,7 @@ describe("The FBOpen API", function() {
         }}, callback);
       }, function (callback) {
         console.log("Loading data with command...");
-        child_cmd = 'elasticdump --input ' + path.resolve('./test/data/20140401.sample.json') + ' --output=http://localhost:9200/'+index_name+' --limit=10';
+        child_cmd = 'elasticdump --input ' + path.resolve('./test/data/test_data.json') + ' --output=http://localhost:9200/'+index_name+' --limit=10';
         // NOTE: if you have trouble with the test loading data properly, run the elasticdump command separately.
         // Make sure elasticdump says it has WRITTEN the objects.
         console.log(child_cmd);
@@ -89,12 +89,12 @@ describe("The FBOpen API", function() {
     };
   };
 
-  it('should have 56 total opp records in the test index', function(done) {
+  it('should have 409 total opp records in the test index', function(done) {
     request(app)
     .get('/v0/opps?show_noncompeted=1&show_closed=1')
     .expect(200)
     .expect('Content-Type', /json/)
-    .expect(num_found(55))
+    .expect(num_found(409))
     .end(done)
   });
 
@@ -103,7 +103,7 @@ describe("The FBOpen API", function() {
     .get('/v0/opps')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(16))
+    .expect(num_found(359))
     .end(done)
   });
 
@@ -112,7 +112,7 @@ describe("The FBOpen API", function() {
     .get('/v0/opps?show_noncompeted=1')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(42))
+    .expect(num_found(377))
     .end(done)
   });
 
@@ -121,7 +121,7 @@ describe("The FBOpen API", function() {
     .get('/v0/opps?show_noncompeted=0')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(16))
+    .expect(num_found(359))
     .end(done)
   });
 
@@ -130,7 +130,7 @@ describe("The FBOpen API", function() {
     .get('/v0/opps?show_closed=1')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(19))
+    .expect(num_found(389))
     .end(done)
   });
 
@@ -139,7 +139,7 @@ describe("The FBOpen API", function() {
     .get('/v0/opps?show_closed=0')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(16))
+    .expect(num_found(359))
     .end(done)
   });
 
@@ -148,57 +148,57 @@ describe("The FBOpen API", function() {
     .get('/v0/opps?show_closed=1&show_noncompeted=1')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(55))
+    .expect(num_found(409))
     .end(done)
   });
 
-  it('should return competed, open opps about "satellite"', function(done) {
+  it('should return competed, open opps about "computer"', function(done) {
     request(app)
-    .get('/v0/opps?q=satellite')
+    .get('/v0/opps?q=computer')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(1))
-    .expect(/satellite/)
+    .expect(num_found(13))
+    .expect(/computer/)
     .end(done)
   });
 
-  it('should return competed, open opps, filtered to "Aberdeen"', function(done) {
+  it('should return competed, open opps, filtered to "air force"', function(done) {
     request(app)
-    .get('/v0/opps?fq=Aberdeen')
+    .get('/v0/opps?fq="air%20force"')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(1))
-    .expect(/Aberdeen/)
+    .expect(num_found(18))
+    .expect(/air force/i)
     .end(done)
   });
 
-  it('should return competed, open opps, filtered to "Aberdeen" and about "night vision"', function(done) {
+  it('should return competed, open opps, filtered to "air force" and about "safety"', function(done) {
     request(app)
-    .get('/v0/opps?fq=Aberdeen&q="night vision"')
+    .get('/v0/opps?fq="air%20force"&q="safety"')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(1))
-    .expect(/Aberdeen/)
-    .expect(/night vision/i)
+    .expect(/air force/i)
+    .expect(/safety/i)
     .end(done)
   });
 
   //TODO: we need data from more sources, or to mark some test data as being from other sources, to properly test this
   it('should return results from FBO', function(done) {
     request(app)
-    .get('/v0/opps?data_source=fbo&show_noncompeted=1&show_closed=1')
+    .get('/v0/opps?data_source=fbo.gov&show_noncompeted=1&show_closed=1')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(55))
+    .expect(num_found(187))
     .end(done)
   });
 
   it('should return results from FBO, case insensitively', function(done) {
     request(app)
-    .get('/v0/opps?data_source=FBO&show_noncompeted=1&show_closed=1')
+    .get('/v0/opps?data_source=FBO.gov&show_noncompeted=1&show_closed=1')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(55))
+    .expect(num_found(187))
     .end(done)
   });
 
@@ -216,11 +216,11 @@ describe("The FBOpen API", function() {
     .get('/v0/opps?limit=2')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(16))
+    .expect(num_found(359))
     .expect(num_returned(2))
     // that this record has moved to the front will be confirmed in the test
     // "should allow paging results"
-    .expect(record_with_field('solnbr', 1, 'vcvh14-101'))
+    .expect(record_with_field('solnbr', 1, 'DHS-14-MT-041-000-01'))
     .end(done)
   });
 
@@ -229,9 +229,9 @@ describe("The FBOpen API", function() {
     .get('/v0/opps?start=1&limit=2')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(16))
+    .expect(num_found(359))
     .expect(num_returned(2))
-    .expect(record_with_field('solnbr', 0, 'vcvh14-101'))
+    .expect(record_with_field('solnbr', 0, 'DHS-14-MT-041-000-01'))
     .end(done)
   });
 
@@ -240,9 +240,9 @@ describe("The FBOpen API", function() {
     .get('/v0/opps?p=2&limit=1')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(16))
+    .expect(num_found(359))
     .expect(num_returned(1))
-    .expect(record_with_field('solnbr', 0, 'vcvh14-101'))
+    .expect(record_with_field('solnbr', 0, 'DHS-14-MT-041-000-01'))
     .end(done)
   });
 
@@ -251,25 +251,32 @@ describe("The FBOpen API", function() {
     .get('/v0/opps?fl=solnbr,close_dt')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(16))
-    .expect(record_with_field('solnbr', 0, 'spmym414q0334'))
+    .expect(num_found(359))
+    .expect(record_with_field('solnbr', 0, 'ag-0355-s-14-0006'))
     .end(done)
   });
  it('should order results such that first result matches solicitation number exactly when filtering to solnbr', function(done) {
     request(app)
-    .get('/v0/opps?q=w91ytz-14-t-0046')
+    .get('/v0/opps?q=fa8571-14-r-0008')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(9))
-    .expect(record_with_field('solnbr', 0, 'w91ytz-14-t-0046'))
+    .expect(num_found(137))
+    .expect(record_with_field('solnbr', 0, 'fa8571-14-r-0008'))
     .end(done)
   });
  it('should allow users to return a single record by id', function(done) {
     request(app)
-    .get('/v0/opp/fbo.gov:PRESOL:w91ytz-14-t-0046')
+    .get('/v0/opp/fbo.gov:COMBINE:fa8571-14-r-0008')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(record_with_field('solnbr', 0, 'w91ytz-14-t-0046'))
+    .expect(record_with_field('solnbr', 0, 'fa8571-14-r-0008'))
+    .end(done)
+  });
+  it('should have results for bids.state.gov data', function(done){
+    request(app)
+    .get('/v0/opps?data_source=bids.state.gov')
+    .expect(200)
+    .expect(num_found(24))
     .end(done)
   });
 });

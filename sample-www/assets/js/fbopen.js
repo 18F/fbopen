@@ -64,7 +64,7 @@
       param_name = form_params[i];
       q_param = getQueryVariable(param_name);
       if (! S(q_param).isEmpty()) {
-        $('#' + param_name).val(decodeURIComponent(q_param.replace('+', ' ')));
+        $('#' + param_name).val(decodeURIComponent(q_param.replace(/\+/g, ' ')));
         search_params[param_name] = q_param;
       }
     }
@@ -205,6 +205,23 @@
       // NOTE: this call to render_error will catch issues with accessing the API
       error: render_error
     });
+      //Update Page Title
+    (function () {
+      var s = "Search Results";
+      var query = decodeURIComponent(getQueryVariable('q').replace(/\+/g,' '));
+      var datasource = decodeURIComponent(getQueryVariable('data_source').replace(/\+/g,' '));
+      if (query)
+      {
+        s+=" for " + query;
+      }
+      if (datasource)
+      {
+        var datasourceText = $("#data_source option[value='" + datasource + "']").text();
+        s+=" from " + datasourceText;
+      }
+      document.title = s + ' - ' + document.title;
+    })();
+    
 
   } // do_search()
 
@@ -389,13 +406,16 @@
 
   dust.helpers.result_count = function(chunk, context, bodies, params) {
     var count = dust.helpers.tap(params.count, chunk, context);
+    var status_code = dust.helpers.tap(params.status, chunk, context);
     
     if (count > 1) {
       return chunk.write('<strong>' + count + '</strong> Search results');
     } else if (count == 1) {
       return chunk.write('<strong>1</strong> Search result');
-    } else {
+    } else if (status_code == 200) {
       return chunk.write('No results.');
+    } else {
+      return chunk.write('We\'re sorry, we\'ve encountered an error.');
     }
   }
 
@@ -516,7 +536,6 @@
     });
     return o;
   };
-
 
 
 }( window.fbopen = window.fbopen || {}, jQuery ));

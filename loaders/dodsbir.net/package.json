@@ -1,0 +1,8 @@
+{
+  "name": "dodsbir.net",
+  "version": "0.0.1",
+  "description": "DODSBIR data loader",
+  "dependencies": {
+    "sha1": "*"
+  }
+}

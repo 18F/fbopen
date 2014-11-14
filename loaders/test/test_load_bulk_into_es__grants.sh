@@ -2,6 +2,8 @@
 
 source setup.sh
 
+echo "test_load_bulk_into_es__grants.sh"; echo
+
 echo "Creating a test index"
 curl -XPUT 'http://localhost:9200/fbopen_test'
 

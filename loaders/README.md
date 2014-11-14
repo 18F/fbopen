@@ -2,6 +2,7 @@ The loaders, right now, consist of a few different sets of scripts. There are th
 
 * `/loaders/fbo.gov`
 * `/loaders/grants.gov`
+* `/loaders/bids.state.gov`
 
 And there are the attachment loaders, the runner scripts for which all reside in `/loaders/attachments`.
 

@@ -1,7 +1,13 @@
+#Install Node and NPM
+class { "nodejs":
+  manage_repo => true
+}
+
 user {'fbopen':
   groups => ['sudo'],
   ensure => present,
-  shell => '/bin/false',  #prevent user from logging in?
+  managehome => true,
+  shell => '/bin/bash',
 }
 
 Exec {
@@ -9,10 +15,10 @@ Exec {
     timeout   => 0,
 }
 
-class { 'apt':
-  always_apt_update    => true,
-  update_timeout       => undef
-}
+#class { 'apt':
+#  always_apt_update    => true,
+#  update_timeout       => undef
+#}
 
 #Set system timezone to UTC
 class { "timezone":
@@ -33,34 +39,38 @@ package {['python3.4', 'python3.4-dev']:
   ensure  => 'installed',
 }
 
-#Install Node and NPM
-class { 'nodejs':
-    version => 'v0.10.25',
-    make_install => false,
-}
-
+#vcsrepo {'/home/fbopen/fbopen':
+#    ensure => present,
+#    provider => git,
+#    source => 'https://github.com/18F/fbopen.git',
+#    user => 'fbopen'
+#}->
+#exec {'repo_symlink':
+#  command => 'ln -s /vagrant /home/fbopen/fbopen'
+#}->
+exec { 'fbopen_setup':
+  command => 'bash setup.sh',
+  cwd     => '/home/fbopen/fbopen',
+  require => Package['nodejs']
+}->
 exec { 'npm_fbopen_install':
   command   => "npm install",
-  cwd       => "/vagrant/api",
-  require  => Class['nodejs'],
-}
-
-package {'grunt-cli':
-  provider    => 'npm',
-  require  => Class['nodejs'],
-}
-
-package {'forever':
-  provider  => 'npm',
-  require  => Class['nodejs'],
+  cwd       => "/home/fbopen/fbopen/api"
+}->
+file { '/var/log/fbopen':
+  ensure => directory
+}->
+file { '/home/fbopen/fbopen/api/config.js':
+  ensure => link,
+  target => '/home/fbopen/fbopen/api/config-sample_dev.js'
 }
 
 #Install and configure elasticsearch
 exec {"install_key":
   command         => 'wget -O - http://packages.elasticsearch.org/GPG-KEY-elasticsearch | apt-key add -',
 }->
-apt::source { 'elasticsearch_1.0stable':
-  location          => 'http://packages.elasticsearch.org/elasticsearch/1.0/debian',
+apt::source { 'elasticsearch_1.2stable':
+  location          => 'http://packages.elasticsearch.org/elasticsearch/1.2/debian',
   release           => 'stable',
   repos             => 'main',
   include_src       => false,
@@ -69,9 +79,28 @@ package {'elasticsearch':
   ensure    => 'installed',
 }
 
-exec { 'start':
-  command   => "forever start app.js",
-  cwd       => "/vagrant/api",
-  require   => Exec['npm_fbopen_install'],
-  unless    => "ps -ef | grep '[f]orever'"
+file { "api_upstart":
+  path => '/etc/init/fbopen_api.conf',
+  ensure => 'link',
+  target => '/home/fbopen/fbopen/api/fbopen_api.conf',
+}->
+exec { "upstart_conf_chmod":
+  command => "chmod 0644 /etc/init/fbopen_api.conf"
+}->
+exec { "upstart_reload":
+  command => "initctl reload-configuration"
+}->
+file { '/var/log/upstart/fbopen_api.log':
+  ensure => 'exists'
+}->
+service { 'fbopen_api':
+  provider => 'upstart',
+  ensure => 'running',
+  require => [ Exec['npm_fbopen_install'], Package['elasticsearch'] ]
+}
+
+exec { 'serve_web':
+  command => 'python3.4 -m http.server',
+  cwd => '/home/fbopen/fbopen/sample-www',
+  require => Exec['npm_fbopen_install']
 }

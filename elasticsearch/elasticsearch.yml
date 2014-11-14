@@ -137,6 +137,10 @@
 # Use the Index Status API (<http://localhost:9200/A/_status>) to inspect
 # the index status.
 
+################################### Scripting #################################
+#
+
+# script.disable_dynamic: false
 
 #################################### Paths ####################################
 

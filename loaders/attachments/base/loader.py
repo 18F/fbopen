@@ -6,6 +6,7 @@ import os
 import os.path
 import requests
 import shelve
+import sys
 
 
 class AttachmentLoader(AttachmentsImporter):
@@ -33,7 +34,11 @@ class AttachmentLoader(AttachmentsImporter):
         pre_count = self.get_count()
 
         self.log.info("Loading...")
-        load_count = self.load_attachments()
+        try:
+            load_count = self.load_attachments()
+        except:
+            self.log.exception('Something went wrong during the load_attachments step.')
+            sys.exit(1)
 
         self.log.info("Getting post-load count of attachments:")
         post_count = self.get_count()
@@ -63,7 +68,7 @@ class AttachmentLoader(AttachmentsImporter):
                     self.log.info("Loading attachment {} with data: {}".format(attach_id, a))
 
                     script_output = call([
-                        os.path.join(self.fbopen_root, '/loaders/common/load_attachment.sh'),
+                        os.path.join(self.fbopen_root, 'loaders/common/load_attachment.sh'),
                         a['local_file_path'],
                         attach_id,
                         key,
