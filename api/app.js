@@ -91,7 +91,7 @@ app.options('*', function(req, res) {
 
 
 app.get('/v0/', function(req, res) {
-	res.send('FBOpen API v0. See http://18f.github.io/fbopen for initial documentation.');
+	res.send('FBOpen API v0. See https://18f.github.io/fbopen for initial documentation.');
 });
 
 app.get('/v0/hello', function(req, res){
