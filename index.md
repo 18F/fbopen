@@ -7,13 +7,13 @@ published: true
 
 FBOpen is a search API of opportunities to work with the U.S. government.
 
-* Our API documentation is at [here](/fbopen/apidocs).
+* View our [API documentation](/fbopen/apidocs).
 * Visit the demo website: [fbopen.gsa.gov](https://fbopen.gsa.gov).
 * Learn more about the [data in FBOpen](/fbopen/data-sources). _We're currently indexing data from FedBizOpps (including attachments) and Grants.gov._
 
 ### About the FBOpen API
 
-FBOpen is a thin search RESTful API frontend by the awesome [api.data.gov](https://api.data.gov) and backend by a [search indexing server](https://www.elasticsearch.org). Visit our API documentation at [18f.github.io/fbopen](https://18f.github.io/fbopen/).
+FBOpen is a thin, RESTful search API, hosted by the awesome [api.data.gov](https://api.data.gov), and backed by the [search index server, Solr](hnttp://lucene.apache.org/solr/), soon to be updated to [Elasticsearch](https://www.elasticsearch.org). Visit our API documentation at [18f.github.io/fbopen](https://18f.github.io/fbopen/).
 
 We have used this approach, which we named Beckley, as a model for [other projects](http://18fblog.tumblr.com/post/85232393363/a-few-notes-on-notalone-gov). Beckley, which is implemented in nodeJS and ExpressJS, is [also available on GitHub](https://github.com/18f/beckley).
 
