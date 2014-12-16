@@ -54,6 +54,7 @@ a small {
 .wrapper {
   width:860px;
   margin:0 auto;
+  overflow: auto;
 }
 
 blockquote {
@@ -104,7 +105,7 @@ img {
 header {
   width:270px;
   float:left;
-  position:fixed;
+  position:relative;
 }
 
 header ul {
@@ -185,9 +186,23 @@ hr {
 footer {
   width:270px;
   float:left;
-  position:fixed;
-  bottom:50px;
+  position:relative;
+  margin-bottom:50px;
 }
+
+.clearfix:after {
+     visibility: hidden;
+     display: block;
+     font-size: 0;
+     content: " ";
+     clear: both;
+     height: 0;
+     }
+.clearfix { display: inline-block; }
+/* start commented backslash hack \*/
+* html .clearfix { height: 1%; }
+.clearfix { display: block; }
+/* close commented backslash hack */
 
 @media print, screen and (max-width: 960px) {
 
