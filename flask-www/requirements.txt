@@ -7,3 +7,4 @@ dotenv==0.0.2
 git+https://github.com/18F/fbopen-python.git@master
 itsdangerous==0.24
 requests==2.3.0
+gunicorn
