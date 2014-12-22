@@ -5,10 +5,8 @@
 * **MOD handling is limited.** Current behavior is to fully update the existing record with a MOD, while appending the new description to the old.
 * The attachment crawler/loader is still very primitive. It works for attachments uploaded to fbo.gov or to which the listing's synopsis links directly. Attachments that are more than one hop removed from the listing page are *not* retrieved, but we hope to improve the crawler to do this.
 
-## To do
-* load AWARD and other notices types
-* survey FBO listing archetypes to determine the algorithms for retrieving the relevant attachments for various types of notices, and implement that logic in the crawler/loader
-* better failure handling for the metadata loader, attachment crawler, and attachment loader
+## TODO
+* load AWARD and other notice types
 
 ## To install the loader
 * Install Elasticsearch. On OS X, this is as easy as `brew install elasticsearch`.
