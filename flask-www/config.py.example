@@ -2,4 +2,15 @@ import os
 
 DEBUG = False
 
-API_KEY = ''
+API_KEY = 'DEMO_KEY'
+
+FBOPEN_HOST = 'http://localhost:3000'
+FBOPEN_PATH = '/v0/opps'  # for api.data.gov, this should include the account and api name, ala: /gsa/fbopen-dev/v0/opps
+
+DATA_SOURCES = {
+    '': 'All',
+    'fbo.gov': 'FedBizOpps (fbo.gov)',
+    'grants.gov': 'grants.gov',
+    'dodsbir.net': 'DoD SBIR',
+    'bids.state.gov': 'bids.state.gov',
+}

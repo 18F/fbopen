@@ -38,7 +38,7 @@
         <form name="fbopen-search-form" id="fbopen-search-form" role="form" class="form" method="get" action="/search">
 
           <div class="form-group">
-            <input id="q" name="q" type="search" class="form-control" value="{{request.args.get('q')}}">
+            <input id="q" name="q" type="search" class="form-control" value="{{request.args.get('q', '')}}">
             <button type="submit" id="q-search"><span class="glyphicon glyphicon-search"></span></button>
           </div>
 
@@ -84,34 +84,36 @@
 
         <div id="results-container" style="display: block;">
           <div id="results-list">
-          {% if results.numFound %}
+          {% if count %}
             <div id="results-topline" class="row">
-              <div id="result-count" class="col-md-6 col-sm-6"><strong>{{results.numFound}}</strong> Search results</div>
+              <div id="result-count" class="col-md-6 col-sm-6"><strong>{{count}}</strong> Search results</div>
               <div id="results-sorted-by" class="col-md-6 col-sm-6">Sorted by <span class="selected">relevance</span></div>
             </div>
             {{ macros.pagination_block(pagination) }}
-            {% for doc in docs%}
+            {% for doc in results.docs%}
               <div class="result-item" data-solr-id="{{doc.id}}" data-attachment-url="">
                 <div class="row listing-top"><div class="listing-top-left col-md-10 col-sm-10">
                   <h3 class="title"><a href="{{doc.listing_url}}" target="_blank">{{doc.title|title}}</a></h3>
                   <div class="agency-name">{{doc.agency}}</div></div>
                   <div class="listing-top-right col-md-2 col-sm-2">
+                    {% if doc._score %}
                     <div class="score">
                       <div class="score-dots"><span class="score-dots">
-                        {% if doc.score > 20 %}<span class="blackdot">●</span>
+                        {% if doc._score > 0.20 %}<span class="blackdot">●</span>
                         {% else %}<span class="whitedot">○</span>{% endif %}
-                        {% if doc.score > 40 %}<span class="blackdot">●</span>
+                        {% if doc._score > 0.40 %}<span class="blackdot">●</span>
                         {% else %}<span class="whitedot">○</span>{% endif %}
-                        {% if doc.score > 60 %}<span class="blackdot">●</span>
+                        {% if doc._score > 0.60 %}<span class="blackdot">●</span>
                         {% else %}<span class="whitedot">○</span>{% endif %}
-                        {% if doc.score > 80 %}<span class="blackdot">●</span>
+                        {% if doc._score > 0.80 %}<span class="blackdot">●</span>
                         {% else %}<span class="whitedot">○</span>{% endif %}
-                        {% if doc.score > 90 %}<span class="blackdot">●</span>
+                        {% if doc._score > 0.90 %}<span class="blackdot">●</span>
                         {% else %}<span class="whitedot">○</span>{% endif %}
                       </span>
                       </div>
                     <div class="score-text"><strong>{{doc.score}}%</strong> RELEVANT</div>
                   </div>
+                  {% endif %}
                 </div>
               </div>
               <div class="row listing-main">
@@ -149,7 +151,7 @@
 
         <div id="results-raw-outer" style="display: block;">
           <h5 data-toggle="collapse" data-target="#results-raw">Raw result (click to show/hide)</h5>
-          <div id="results-raw" class="collapse" style="height: 0px;"><pre>{{ raw|pprint }}</pre></div>
+          <div id="results-raw" class="collapse" style="height: 0px;"><pre>{{ results|pprint }}</pre></div>
         </div>
 
       </div><!-- results column -->
