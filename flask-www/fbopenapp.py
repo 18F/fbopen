@@ -37,6 +37,11 @@ def searchpage():
     return render_template('search.html', count=count, advanced=advanced, pagination=pagination, results=results, data_sources=DATA_SOURCES)
 
 
+def join_if_list(value, separator):
+    if isinstance(value, list):
+        return separator.join(value)
+    else:
+        return value
 
 def url_for_other_page(page):
     args = request.args.copy()
@@ -51,6 +56,7 @@ def _get_results(raw):
 
 
 app.jinja_env.globals['url_for_other_page'] = url_for_other_page
+app.add_template_filter(join_if_list)
 
 
 if __name__ == '__main__':

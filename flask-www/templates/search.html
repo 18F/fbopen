@@ -94,7 +94,7 @@
               <div class="result-item" data-solr-id="{{doc.id}}" data-attachment-url="">
                 <div class="row listing-top"><div class="listing-top-left col-md-10 col-sm-10">
                   <h3 class="title"><a href="{{doc.listing_url}}" target="_blank">{{doc.title|title}}</a></h3>
-                  <div class="agency-name">{{doc.agency}}</div></div>
+                  <div class="agency-name">{{ doc.agency | join_if_list(', ') }}</div></div>
                   <div class="listing-top-right col-md-2 col-sm-2">
                     {% if doc._score %}
                     <div class="score">
