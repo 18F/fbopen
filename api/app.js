@@ -81,8 +81,8 @@ app.options('*', function(req, res) {
 });
 
 
-app.get('/v0/', function(req, res) {
-	res.send('FBOpen APi v0. See http://docs.fbopen.apiary.io for initial documentation.');
+app.get('/v0/?', function(req, res) {
+  res.send('FBOpen API v0. See https://pages.18f.gov/fbopen for initial documentation.');
 });
 
 app.get('/v0/hello', function(req, res){
