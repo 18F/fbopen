@@ -34,15 +34,9 @@ var app = express();
 module.exports = app;
 
 // Create Elasticsearch client
-//
-// Leaving these here for debug logging when needed:
-// console.log("Elasticsearch host from within app:");
-// console.log(config.elasticsearch.host);
-// console.log("Elasticsearch index from within app:");
-// console.log(config.elasticsearch.index);
 
 var client = es.Client({
-  host: config.elasticsearch.host + ':' + config.elasticsearch.port,
+  host: config.elasticsearch.uri,
   log: LogClass,
   api_version: '1.1'
 });

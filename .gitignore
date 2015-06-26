@@ -1,7 +1,6 @@
 www-sails
 solr-4.5.1
 sftp-config*.json
-config.js
 config.py
 node_modules
 .DS_Store
