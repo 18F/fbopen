@@ -4,17 +4,17 @@
 To install:
 * First [install Elasticsearch](https://github.com/18f/fbopen/tree/master/elasticsearch) if you haven't already.
 * For local usage:
-    * `cp config-sample_dev.js config.js`
+    * `$ cp config-sample_dev.js config.js`
 * For production usage:
-    * `cp config-sample.js config.js`
-* Install dependencies: `npm install`
+    * `$ cp config-sample.js config.js`
+* Install dependencies: `$ npm install`
     * If your default version of Python is > 2, you will need to specify your path to Python 2.7 for npm to successfully install one of the Node packages.
-        * npm install --python=/usr/local/bin/python2.7
+        * `$ npm install --python=/usr/local/bin/python2.7`
 
 To run: `node app.js` (or, say, [`nodemon app.js`](https://github.com/remy/nodemon))
 
 ### API Documentation and Examples
-There's some very rough, basic documentation of this APi at [https://pages.18f.gov/fbopen/](https://pages.18f.gov/fbopen/) , but here are a couple quick sample queries to get you started:
+Documentation for this API is at [https://pages.18f.gov/fbopen/](https://pages.18f.gov/fbopen/), but here are a couple quick sample queries to get you started:
 
 To query for the first page (i.e., numbers 0 through 9) of opportunities that mention software development:
 [http://localhost:3000/v0/opps?q=software+development](http://localhost:3000/v0/opps?q=software+development)
@@ -32,18 +32,9 @@ There is also, currently commented out, a nascent POST method for tagging a reco
 ### Tests
 To run the tests (located in `api/test/app.js`), run:
 
-```
     $ make test
-```
 You'll need to install elasticdump globally as well:
 
-```
-npm install -g elasticdump
-```
+    $ npm install -g elasticdump
 
 Several aspects of the test run can be changed in the `Makefile`, such as the timeout, hostname, index name and test reporter.
-
-### To do
-* add authentication
-* restore and improve POST /opp and POST /opp/:doc_id/tags/
-* ?
