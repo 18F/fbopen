@@ -1,0 +1,15 @@
+---
+applications:
+- name: api
+  host: fbopen-dev-api
+  command: node app.js
+  path: ./api
+- name: web
+  host: fbopen-dev-web
+  command: python fbopenapp.py
+  # TODO: ^^ change this to gunicorn
+  path: ./flask-www
+  services:
+    - creds
+    # ^^ provides API_KEY
+

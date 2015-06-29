@@ -1,6 +1,0 @@
----
-applications:
-- name: api
-  memory: 512M
-  host: fbopen-dev-api
-  command: node app.js
