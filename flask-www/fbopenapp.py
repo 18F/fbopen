@@ -1,8 +1,7 @@
-import urllib
 import requests
 
 from flask import Flask, request, redirect, render_template, url_for
-from config import API_KEY, FBOPEN_HOST, FBOPEN_PATH, DATA_SOURCES
+from config import FBOPEN_HOST, FBOPEN_PATH, DATA_SOURCES
 from pagination import Pagination
 
 app = Flask(__name__)
@@ -27,7 +26,8 @@ def searchpage():
     start = (page - 1) * items_per_page
     args['start'] = start
     args['limit'] = items_per_page
-    args['api_key'] = API_KEY
+    if not args['api_key']:
+        args['api_key'] = os.getenv('API_KEY')
 
     results = requests.get(_fbopen_uri(), params=args).json()
     count = results.get('numFound', 0)
