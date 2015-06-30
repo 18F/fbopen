@@ -30,7 +30,7 @@ config.logger = {};
 config.logger.path = process.env.FBOPEN_ROOT + '/log/api.log';
 
 // settings from cloud foundry env
-cf_services = JSON.parse(process.env.VCAP_SERVICES);
+cf_services = JSON.parse(process.env.VCAP_SERVICES, '{}');
 
 // elasticsearch
 config.elasticsearch = cf_services.elasticsearch15[0].credentials;
