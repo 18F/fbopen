@@ -1,8 +1,13 @@
+import logging
 import requests
+import os
+import urllib.parse
 
 from flask import Flask, request, redirect, render_template, url_for
-from config import FBOPEN_HOST, FBOPEN_PATH, DATA_SOURCES
+from config import DATA_SOURCES, DEBUG, API_KEY, FBOPEN_API_HOST, FBOPEN_API_PATH
 from pagination import Pagination
+
+logging.basicConfig(level=logging.DEBUG)
 
 app = Flask(__name__)
 
@@ -26,8 +31,7 @@ def searchpage():
     start = (page - 1) * items_per_page
     args['start'] = start
     args['limit'] = items_per_page
-    if not args['api_key']:
-        args['api_key'] = os.getenv('API_KEY')
+    args['api_key'] = os.getenv('API_KEY')
 
     results = requests.get(_fbopen_uri(), params=args).json()
     count = results.get('numFound', 0)
@@ -49,7 +53,7 @@ def url_for_other_page(page):
     return url_for(request.endpoint, **args)
 
 def _fbopen_uri():
-    return "{}{}".format(FBOPEN_HOST, FBOPEN_PATH)
+    return urllib.parse.urljoin(FBOPEN_API_HOST, FBOPEN_API_PATH)
 
 def _get_results(raw):
     return raw.get('docs')
@@ -60,4 +64,4 @@ app.add_template_filter(join_if_list)
 
 
 if __name__ == '__main__':
-    app.run()
+    app.run(host='0.0.0.0', port=int(os.getenv('PORT', '5000')))
