@@ -1,11 +1,11 @@
 import logging
 import requests
 import os
-import urllib.parse
 
 from flask import Flask, request, redirect, render_template, url_for
 from config import DATA_SOURCES, DEBUG, API_KEY, FBOPEN_API_HOST, FBOPEN_API_PATH
 from pagination import Pagination
+from urllib.parse import urljoin
 
 logging.basicConfig(level=logging.DEBUG)
 
@@ -53,7 +53,7 @@ def url_for_other_page(page):
     return url_for(request.endpoint, **args)
 
 def _fbopen_uri():
-    return urllib.parse.urljoin(FBOPEN_API_HOST, FBOPEN_API_PATH)
+    return urljoin(FBOPEN_API_HOST, FBOPEN_API_PATH)
 
 def _get_results(raw):
     return raw.get('docs')
