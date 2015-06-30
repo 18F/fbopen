@@ -2,14 +2,16 @@
 applications:
 - name: api
   host: fbopen-dev-api
-  command: node app.js
   path: ./api
+  command: node app.js
 - name: web
   host: fbopen-dev-web
-  command: python fbopenapp.py
-  # TODO: ^^ change this to gunicorn
   path: ./flask-www
+  command: python fbopenapp.py
+  buildpack: python_buildpack
   services:
     - creds
-    # ^^ provides API_KEY
+  env:
+    FBOPEN_API_HOST: http://fbopen-dev-api.cf.18f.us/
+    FBOPEN_API_PATH: /v0/opps
 
