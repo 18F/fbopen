@@ -17,4 +17,15 @@ applications:
   env:
     FBOPEN_API_HOST: http://fbopen-dev-api.cf.18f.us/
     FBOPEN_API_PATH: /v0/opps
-
+- name: cron
+  no-route: true
+  disk_quota: 256M
+  memory: 128M
+  path: ./cf-cron
+  env:
+    CF_CREDS: es-idx
+    PREP_JOB: "/bin/bash, prep.sh, creds.uri"
+    CRON_JOB: "/bin/bash, job.sh, creds.uri"
+    CRON_SCHEDULE: "* * * * * *"
+  services:
+    - es-idx
