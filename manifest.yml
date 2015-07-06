@@ -4,6 +4,9 @@ applications:
   host: fbopen-dev-api
   path: ./api
   command: node app.js
+  env:
+    # this is the canonical CF service name, not what you name it when it is initialized
+    ES_SERVICE_NAME: elasticsearch15
 - name: web
   host: fbopen-dev-web
   path: ./flask-www

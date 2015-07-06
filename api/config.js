@@ -33,7 +33,7 @@ config.logger.path = process.env.FBOPEN_ROOT + '/log/api.log';
 cf_services = JSON.parse(process.env.VCAP_SERVICES, '{}');
 
 // elasticsearch
-config.elasticsearch = cf_services.elasticsearch15[0].credentials;
+config.elasticsearch = cf_services[process.env.ES_SERVICE_NAME][0].credentials;
 // the above defines the following keys: [ hostname, password, port, uri, username ]
 
 config.elasticsearch.index = process.env.ELASTICSEARCH_INDEX || 'fbopen';
