@@ -78,7 +78,7 @@ var bulkify_data = function (data) {
             description = _delete(data, 'description');
             // we may need to figure out how to bypass this for grants
             descrip_obj = {};
-            descrip_obj['script'] = "loaders_append_desc";
+            descrip_obj['script'] = "fbopen_append_desc";
             descrip_obj['params'] = { "description": description, "posted_dt": data['posted_dt'] };
 
             lines.push(JSON.stringify(update_command(id)));
