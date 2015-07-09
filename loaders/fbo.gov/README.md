@@ -5,20 +5,17 @@
 * **MOD handling is limited.** Current behavior is to fully update the existing record with a MOD, while appending the new description to the old.
 * The attachment crawler/loader is still very primitive. It works for attachments uploaded to fbo.gov or to which the listing's synopsis links directly. Attachments that are more than one hop removed from the listing page are *not* retrieved, but we hope to improve the crawler to do this.
 
-## TODO
-* load AWARD and other notice types
-
 ## To install the loader
-* Install Elasticsearch. On OS X, this is as easy as `brew install elasticsearch`.
-* Install the attachment mapper plugin. See directions here: https://github.com/elasticsearch/elasticsearch-mapper-attachments 
-* Restart Elasticsearch
-* Create an index on your Elasticsearch cluster with the proper field mappings and settings (relative path to mapping given from the FBOpen root):
-    * `curl -XPUT localhost:9200/fbopen --data-binary @elasticsearch/init.json`
-* In the loaders/fbo.gov/ directory:
-	* `sudo npm install`
-        * (note: `sudo` is required so that the json package can be installed globally.)
-* In the loaders/common/ directory:
-    * `npm install`
+
+Install Elasticsearch. See that [README](../elasticsearch/README.md).
+
+To run the grants loader, you'll need to install the Node.js dependencies and initialize some directories.
+
+From this directory (note: `sudo` is required on the first step so that the `json` package can be installed globally):
+
+    $ sudo npm install
+    $ cd ../common
+    $ npm install
 
 ## To import FedBizOpps data
 After install, first load a full set of data using the one-time/weekly loader. Then you can simply run nightly updates.
