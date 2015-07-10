@@ -12,7 +12,7 @@ describe("The FBOpen API", function() {
   var expect = chai.expect;
 
   before(function(done) {
-    console.log(process.env['ELASTICSEARCH_HOST']);
+    console.log(process.env.ELASTICSEARCH_HOST);
     var index_name = 'fbopen_api_test';
 
     client = new elasticsearch.Client({
@@ -95,7 +95,7 @@ describe("The FBOpen API", function() {
     .expect(200)
     .expect('Content-Type', /json/)
     .expect(num_found(409))
-    .end(done)
+    .end(done);
   });
 
   it('should return all competed, open opps', function(done) {
@@ -104,7 +104,7 @@ describe("The FBOpen API", function() {
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(359))
-    .end(done)
+    .end(done);
   });
 
   it('should return all open opps', function(done) {
@@ -113,7 +113,7 @@ describe("The FBOpen API", function() {
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(377))
-    .end(done)
+    .end(done);
   });
 
   it('should return all competed, open opps', function(done) {
@@ -122,7 +122,7 @@ describe("The FBOpen API", function() {
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(359))
-    .end(done)
+    .end(done);
   });
 
   it('should return all competed opps, whether open or closed', function(done) {
@@ -131,7 +131,7 @@ describe("The FBOpen API", function() {
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(389))
-    .end(done)
+    .end(done);
   });
 
   it('should return all competed, open opps', function(done) {
@@ -140,7 +140,7 @@ describe("The FBOpen API", function() {
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(359))
-    .end(done)
+    .end(done);
   });
 
   it('should return **all** opps', function(done) {
@@ -149,7 +149,7 @@ describe("The FBOpen API", function() {
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(409))
-    .end(done)
+    .end(done);
   });
 
   it('should return competed, open opps about "computer"', function(done) {
@@ -159,7 +159,7 @@ describe("The FBOpen API", function() {
     .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(13))
     .expect(/computer/)
-    .end(done)
+    .end(done);
   });
 
   it('should return competed, open opps, filtered to "air force"', function(done) {
@@ -169,7 +169,7 @@ describe("The FBOpen API", function() {
     .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(18))
     .expect(/air force/i)
-    .end(done)
+    .end(done);
   });
 
   it('should return competed, open opps, filtered to "air force" and about "safety"', function(done) {
@@ -180,7 +180,7 @@ describe("The FBOpen API", function() {
     .expect(num_found(1))
     .expect(/air force/i)
     .expect(/safety/i)
-    .end(done)
+    .end(done);
   });
 
   //TODO: we need data from more sources, or to mark some test data as being from other sources, to properly test this
@@ -190,7 +190,7 @@ describe("The FBOpen API", function() {
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(187))
-    .end(done)
+    .end(done);
   });
 
   it('should return results from FBO, case insensitively', function(done) {
@@ -199,7 +199,7 @@ describe("The FBOpen API", function() {
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(187))
-    .end(done)
+    .end(done);
   });
 
   it('should not return any results for missing dataset', function(done) {
@@ -208,7 +208,7 @@ describe("The FBOpen API", function() {
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(0))
-    .end(done)
+    .end(done);
   });
 
   it('should allow limiting results', function(done) {
@@ -221,7 +221,7 @@ describe("The FBOpen API", function() {
     // that this record has moved to the front will be confirmed in the test
     // "should allow paging results"
     .expect(record_with_field('solnbr', 1, 'DHS-14-MT-041-000-01'))
-    .end(done)
+    .end(done);
   });
 
   it('should allow paging results with start/limit', function(done) {
@@ -232,7 +232,7 @@ describe("The FBOpen API", function() {
     .expect(num_found(359))
     .expect(num_returned(2))
     .expect(record_with_field('solnbr', 0, 'DHS-14-MT-041-000-01'))
-    .end(done)
+    .end(done);
   });
 
   it('should allow paging results with p', function(done) {
@@ -243,7 +243,7 @@ describe("The FBOpen API", function() {
     .expect(num_found(359))
     .expect(num_returned(1))
     .expect(record_with_field('solnbr', 0, 'DHS-14-MT-041-000-01'))
-    .end(done)
+    .end(done);
   });
 
   it('should accept a whitelist of fields to return', function(done) {
@@ -253,7 +253,7 @@ describe("The FBOpen API", function() {
     .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(359))
     .expect(record_with_field('solnbr', 0, 'ag-0355-s-14-0006'))
-    .end(done)
+    .end(done);
   });
  it('should order results such that first result matches solicitation number exactly when filtering to solnbr', function(done) {
     request(app)
@@ -262,7 +262,7 @@ describe("The FBOpen API", function() {
     .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(num_found(137))
     .expect(record_with_field('solnbr', 0, 'fa8571-14-r-0008'))
-    .end(done)
+    .end(done);
   });
  it('should allow users to return a single record by id', function(done) {
     request(app)
@@ -270,13 +270,13 @@ describe("The FBOpen API", function() {
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
     .expect(record_with_field('solnbr', 0, 'fa8571-14-r-0008'))
-    .end(done)
+    .end(done);
   });
   it('should have results for bids.state.gov data', function(done){
     request(app)
     .get('/v0/opps?data_source=bids.state.gov')
     .expect(200)
     .expect(num_found(24))
-    .end(done)
+    .end(done);
   });
 });
