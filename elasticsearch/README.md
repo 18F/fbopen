@@ -12,19 +12,24 @@
 # 18F/Cloud Foundry Elasticsearch Configuration
 
 Create an Elasticsearch service instance.
+    
     $ cf create-service elasticsearch15 free es-idx
 
 Set the `elasticsearch_service_name` to equal the (official) service name as above, in api/config.js.
+    
     elasticsearch_service_name = 'elasticsearch15';
 
 Bind it to the `api` and `cron` apps by adding it under `services` in manifest.yml, or manually ala:
+    
     $ cf bind-service api es-idx
     $ cf bind-service cron es-idx
 
 Reference the name of the service in the cron env:
+    
     $ cf set-env cron CF_CREDS es-idx
 
 Then, either push or restage both apps as needed:
+    
     $ cf restage api && cf restage cron
 
 The 18F `elasticsearch15` service image already has the custom script and necessary plugins baked in.
