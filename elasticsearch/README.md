@@ -13,11 +13,11 @@
 
 Create an Elasticsearch service instance.
     
-    $ cf create-service elasticsearch15 free es-idx
+    $ cf create-service elasticsearch-new free es-idx
 
 Set the `elasticsearch_service_name` to equal the (official) service name as above, in api/config.js.
     
-    elasticsearch_service_name = 'elasticsearch15';
+    elasticsearch_service_name = 'elasticsearch-new';
 
 Bind it to the `api` and `cron` apps by adding it under `services` in manifest.yml, or manually ala:
     
@@ -32,7 +32,7 @@ Then, either push or restage both apps as needed:
     
     $ cf restage api && cf restage cron
 
-The 18F `elasticsearch15` service image already has the custom script and necessary plugins baked in.
+The 18F `elasticsearch-new` service image already has the custom script and necessary plugins baked in.
 
 # System Level Config
 
