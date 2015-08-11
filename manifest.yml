@@ -6,7 +6,9 @@ applications:
   command: node app.js
   env:
     # this is the canonical CF service name, not what you name it when it is initialized
-    ES_SERVICE_NAME: elasticsearch15
+    ES_SERVICE_NAME: elasticsearch-new
+  services:
+    - es-idx
 - name: web
   host: fbopen-dev-web
   path: ./flask-www
