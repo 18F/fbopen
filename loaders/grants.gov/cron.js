@@ -47,7 +47,7 @@ var spawnLoader = function (callback) {
 }
 
 var cronjob = new CronJob({
-    cronTime: '*/30 * * * * *',
+    cronTime: '30 12 * * *',
     onTick: grantsNightly,
     timeZone: 'America/New_York'
 });
