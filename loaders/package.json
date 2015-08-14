@@ -21,6 +21,6 @@
     "xml-splitter": "^1.2.1"
   },
   "engines": {
-    "node": "^0.12.7"
+    "node": "0.12.x"
   }
 }
