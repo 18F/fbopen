@@ -1,6 +1,7 @@
 #!/bin/bash
 # grants-nightly.sh
 set -e
+set -x
 # download the nightly file
 # http://www.grants.gov/web/grants/xml-extract.html?p_p_id=xmlextract_WAR_grantsxmlextractportlet_INSTANCE_5NxW0PeTnSUa&p_p_lifecycle=2&p_p_state=normal&p_p_mode=view&p_p_cacheability=cacheLevelPage&p_p_col_id=column-1&p_p_col_pos=1&p_p_col_count=2&download=GrantsDBExtract20131108.zip
 
@@ -46,7 +47,7 @@ echo "FBOPEN_URI = $FBOPEN_URI"
 FBOPEN_INDEX=${FBOPEN_INDEX:-"fbopen"}
 echo "FBOPEN_INDEX = $FBOPEN_INDEX"
 
-PWD=$FBOPEN_ROOT/loaders/grants.gov
+PWD=$PWD/grants.gov
 
 zipped_basename="GrantsDBExtract$download_date" # .zip
 download_dir="$PWD/downloads"
@@ -85,7 +86,10 @@ then
 	unzip -n $download_dir/$zipped_basename -d $download_dir/
 	if [[ -s "$xml_file" ]]
 	then
-		node $PWD/grants-nightly.js -f $xml_file -j $json_file -o $workfiles_dir/grants.json
+        wc -l $xml_file
+        echo "PWD:"
+        echo $PWD
+		$HOME/$NODE_PATH_REL $PWD/grants-nightly.js -f $xml_file -j $json_file -o $workfiles_dir/grants.json
 	else
 		echo "ERROR: cannot find $xml_file."
 	fi
@@ -94,7 +98,7 @@ else
 fi
 
 echo "Converting JSON to Elasticsearch bulk JSON format"
-cat $workfiles_dir/grants.json | node $FBOPEN_ROOT/loaders/common/format-bulk.js > $workfiles_dir/grants.bulk
+cat $workfiles_dir/grants.json | $HOME/$NODE_PATH_REL $HOME/common/format-bulk.js > $workfiles_dir/grants.bulk
 
 curl -s -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @$workfiles_dir/grants.bulk; echo
 

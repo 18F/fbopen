@@ -31,3 +31,17 @@ applications:
     CRON_SCHEDULE: "* * * * * *"
   services:
     - es-idx
+- name: grants
+  no-route: true
+  disk_quota: 1GB
+  memory: 1GB
+  path: ./loaders
+  command: node ./grants.gov/cron.js
+  buildpack: nodejs_buildpack
+  env:
+    # this is the canonical CF service name, not what you name it when it is initialized
+    ES_SERVICE_NAME: es-idx
+    FBOPEN_INDEX: fbopen
+    NODE_PATH_REL: vendor/node/bin/node
+  services:
+    - es-idx

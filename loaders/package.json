@@ -1,9 +1,10 @@
 {
   "name": "loaders-grants.gov",
-  "version": "0.1.0",
+  "version": "0.0.1",
   "description": "Parses nightly grants.gov data dumps and loads them into Elasticsearch.",
-  "main": "cron.js",
-  "files": [ "grants-nightly.js", "grants-loader-config.js", "loader.js" ],
+  "scripts": {
+      "start": "node ./grants.gov/app.js"
+  },
   "dependencies": {
     "string": "*"
     , "underscore": "*"
@@ -12,7 +13,15 @@
     , "xml-splitter": "*"
     , "optimist": "*"
     , "moment": "*"
+    , "event-stream": "*"
     , "date-format-lite": "*"
     , "wget": "*"
+    , "cron": "*"
+    , "cfenv": "*"
+    , "daemon-pid": "*"
+    , "loaders-grants.gov": "./grants.gov"
+  },
+  "engines": {
+      "node": "0.12.x"
   }
 }
