@@ -1,27 +1,26 @@
 {
   "name": "loaders-grants.gov",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Parses nightly grants.gov data dumps and loads them into Elasticsearch.",
   "scripts": {
-      "start": "node ./grants.gov/app.js"
+    "start": "node ./grants.gov/app.js"
   },
   "dependencies": {
-    "string": "*"
-    , "underscore": "*"
-    , "big-xml": "*"
-    , "request": "*"
-    , "xml-splitter": "*"
-    , "optimist": "*"
-    , "moment": "*"
-    , "event-stream": "*"
-    , "date-format-lite": "*"
-    , "wget": "*"
-    , "cron": "*"
-    , "cfenv": "*"
-    , "daemon-pid": "*"
-    , "loaders-grants.gov": "./grants.gov"
+    "big-xml": "^0.7.0",
+    "cfenv": "^1.0.0",
+    "cron": "^1.0.9",
+    "date-format-lite": "^0.7.4",
+    "event-stream": "^3.3.1",
+    "loaders-grants.gov": "./grants.gov",
+    "moment": "^2.10.6",
+    "optimist": "^0.6.1",
+    "request": "^2.60.0",
+    "string": "^3.3.1",
+    "underscore": "^1.8.3",
+    "wget": "^0.0.1",
+    "xml-splitter": "^1.2.1"
   },
   "engines": {
-      "node": "0.12.x"
+    "node": "^0.12.7"
   }
 }
