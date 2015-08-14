@@ -43,5 +43,9 @@ applications:
     ES_SERVICE_NAME: es-idx
     FBOPEN_INDEX: fbopen
     NODE_PATH_REL: vendor/node/bin/node
+    NEW_RELIC_APP_NAME: Loaders-grants.gov (dev)
+    # NEW_RELIC_LICENSE_KEY: use cf set-env
+    # use trace while debugging and getting client running, later info
+    NEW_RELIC_LOG_LEVEL: trace
   services:
     - es-idx

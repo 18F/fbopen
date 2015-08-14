@@ -1,3 +1,5 @@
+require('newrelic');
+
 var CronJob = require('cron').CronJob,
   config = require('../config'),
   spawn = require('child_process').spawn,
