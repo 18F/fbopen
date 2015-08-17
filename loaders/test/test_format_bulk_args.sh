@@ -2,17 +2,15 @@
 
 source setup.sh
 
-sample='{"this":"is a sample doc"}'
+echo "Formatting standard JSON into Elasticsearch bulk format JSON, without the -a (append) arg (for FBO)"
+sample_in='{"this":"is a sample doc"}'
 
-echo $sample | node $FBOPEN_ROOT/loaders/common/format-bulk.js > /tmp/fbopen_output
+echo $sample_in | node $FBOPEN_ROOT/loaders/common/format-bulk.js > /tmp/fbopen_output
 
-echo "Note this test is just a stub for now."
-assert "echo \"{}\" | diff -q - /tmp/fbopen_output" ""
-# TODO: trying to work out if i can embed a multi-line result in the assert...
-#assert "echo << END_TEST
-#{"index":{"_type":"opp"}}
-#{"this":"is a sample doc"}
+sample_out='{"index":{"_type":"opp"}}\n{"this":"is a sample doc"}'
+echo '{"index":{"_type":"opp"}}' > /tmp/fbopen_sample_out
+echo '{"this":"is a sample doc"}' >> /tmp/fbopen_sample_out
+
+assert "diff -q /tmp/fbopen_sample_out /tmp/fbopen_output" ""
 
 assert_end
-
-
