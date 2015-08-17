@@ -1,5 +1,9 @@
 #!/bin/bash
 
+cd "$(dirname "$0")"
+
+./test_jsonify_xml__grants.sh; echo
+echo
 ./test_format_bulk__fbo.sh; echo
 echo
 ./test_format_bulk__grants.sh; echo
