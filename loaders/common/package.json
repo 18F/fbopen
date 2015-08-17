@@ -2,6 +2,7 @@
   "name": "loaders-common",
   "version": "0.0.1",
   "description": "Common utilities for parsing and loading data into FBOpen.",
+  "private": true,
   "repository": {
       "type": "git",
       "url": "https://github.com/18F/fbopen.git"

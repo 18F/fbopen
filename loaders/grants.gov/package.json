@@ -2,6 +2,7 @@
   "name": "loaders-grants.gov",
   "version": "0.1.0",
   "description": "Parses nightly grants.gov data dumps and loads them into Elasticsearch.",
+  "private": true,
   "repository": {
       "type": "git",
       "url": "https://github.com/18F/fbopen.git"
