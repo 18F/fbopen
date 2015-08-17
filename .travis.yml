@@ -4,5 +4,8 @@ install: make npm-install
 script: make test
 services: elasticsearch
 sudo: false
+node:
+    - "0.12"
+    - "node"
 env:
   - FBOPEN_ROOT=$TRAVIS_BUILD_DIR
