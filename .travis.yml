@@ -3,5 +3,6 @@ pre_install: ./setup.sh
 install: make npm-install
 script: make test
 services: elasticsearch
+sudo: false
 env:
   - FBOPEN_ROOT=$TRAVIS_BUILD_DIR
