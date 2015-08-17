@@ -1,2 +1,4 @@
 language: bash
 script: make test
+env:
+  - FBOPEN_ROOT=$TRAVIS_BUILD_DIR
