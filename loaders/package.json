@@ -23,7 +23,6 @@
     "request": "^2.60.0",
     "string": "^3.3.1",
     "underscore": "^1.8.3",
-    "wget": "^0.0.1",
     "xml-splitter": "^1.2.1"
   },
   "engines": {
