@@ -1,5 +1,5 @@
 {
-  "name": "FBOpen Loaders",
+  "name": "fbopen-loaders",
   "version": "0.0.2",
   "description": "Parses nightly grants.gov data dumps and loads them into Elasticsearch.",
   "repository": {
