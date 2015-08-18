@@ -1,10 +1,10 @@
-language: bash
-pre_install: ./setup.sh
+language: node_js
+before_install: ./setup.sh
 install: make npm-install
 script: make test
 services: elasticsearch
 sudo: false
 node_js:
-    - "node"
+    - "0.12.7"
 env:
   - FBOPEN_ROOT=$TRAVIS_BUILD_DIR
