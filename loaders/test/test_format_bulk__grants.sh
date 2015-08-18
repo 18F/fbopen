@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source setup.sh
+source ./setup.sh
 
 echo "Formatting standard JSON into Elasticsearch bulk format JSON (for grants.gov)"
 # http://www.elasticsearch.org/guide/en/elasticsearch/reference/current/docs-bulk.html

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source setup.sh
+source ./setup.sh
 
 echo "Delete index so we can start out clean"
 curl -XDELETE 'http://localhost:9200/fbopen_test'

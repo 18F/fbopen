@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source setup.sh
+source ./setup.sh
 
 echo "test_load_bulk_into_es__grants.sh"; echo
 

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source setup.sh
+source ./setup.sh
 
 echo "Converting XML into JSON (for grants.gov)"
 touch /tmp/fbopen_output

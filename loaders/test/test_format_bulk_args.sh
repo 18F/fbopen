@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source setup.sh
+source ./setup.sh
 
 echo "Formatting standard JSON into Elasticsearch bulk format JSON, without the -a (append) arg (for FBO)"
 sample_in='{"this":"is a sample doc"}'
