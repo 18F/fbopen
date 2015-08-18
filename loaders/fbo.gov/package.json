@@ -7,9 +7,6 @@
       "type": "git",
       "url": "https://github.com/18F/fbopen.git"
   },
-  "scripts": {
-	  "preinstall": "sudo npm i -g json"
-  },
   "dependencies": {
     "string": "*"
     , "xml-splitter": "*"
