@@ -3,7 +3,7 @@ before_install: make travis-setup
 install: make npm-install
 script: make test
 services: elasticsearch
-sudo: false
+#sudo: false
 node_js:
     - "0.12.7"
 env:
