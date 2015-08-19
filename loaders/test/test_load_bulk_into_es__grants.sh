@@ -27,10 +27,6 @@ cat sample/output/grants.json | json -ag hits > sample/output/grants.json.tmp
 
 echo "Asserting output (/tmp/fbopen_output.tmp) equals expected (sample/output/grants.json.tmp)"
 assert "diff -q /tmp/fbopen_output.tmp sample/output/grants.json.tmp"
-assert_end
-
 echo "Dropping the test index"
 curl -XDELETE 'http://localhost:9200/fbopen_test'; echo
-
-echo "Done."
-
+assert_end load_bulk_grants

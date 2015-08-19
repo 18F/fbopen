@@ -10,4 +10,4 @@ assert "wc -l /tmp/fbopen_output | xargs echo" "3 /tmp/fbopen_output"
 
 assert "diff -q /tmp/fbopen_output sample/output/grants_from_xml.json"
 
-assert_end
+assert_end xml_conversion

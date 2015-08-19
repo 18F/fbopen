@@ -13,4 +13,4 @@ echo '{"this":"is a sample doc"}' >> /tmp/fbopen_sample_out
 
 assert "diff -q /tmp/fbopen_sample_out /tmp/fbopen_output" ""
 
-assert_end
+assert_end bulk_format_args

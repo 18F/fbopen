@@ -12,4 +12,4 @@ assert "wc -l /tmp/fbopen_output | xargs echo" "18 /tmp/fbopen_output"
 # then check contents are correct
 assert "diff -q /tmp/fbopen_output sample/output/fbo.bulk"
 
-assert_end
+assert_end bulk_format_fbo

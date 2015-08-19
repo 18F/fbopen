@@ -27,9 +27,6 @@ cat sample/output/fbo.json | json -ag hits > sample/output/fbo.json.tmp
 # assert return contents
 echo "Asserting output (/tmp/fbopen_output.tmp) equals expected (sample/output/fbo.json.tmp)"
 assert "diff -q /tmp/fbopen_output.tmp sample/output/fbo.json.tmp"
-assert_end
 
 curl -q -XDELETE 'http://localhost:9200/fbopen_test'; echo
-
-echo "Done."
-
+assert_end load_bulk_fbo

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-. setup.sh
+. ./setup.sh
 
 echo "Create test index"
 curl -XPUT 'localhost:9200/fbopen_test'
@@ -21,9 +21,7 @@ cat /tmp/fbopen_output | json -ag hits.hits > /tmp/fbopen_output.json
 # make sure it looks like we expect
 assert "diff -q /tmp/fbopen_output.json sample/output/fbo_mod_loaded.json"
 
-assert_end
-
 echo "Dropping the test index"
 curl -XDELETE 'http://localhost:9200/fbopen_test'; echo
 
-echo "Done."
+assert_end mod_loading

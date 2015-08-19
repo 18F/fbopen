@@ -1,7 +1,7 @@
 test: | test-loaders
 
 test-loaders:
-	./loaders/test/test_all.sh
+	./loaders/test/test_all.sh -x
 
 npm-install:
 	cd loaders; npm install

@@ -12,4 +12,4 @@ assert "wc -l /tmp/fbopen_output | xargs echo" "10 /tmp/fbopen_output"
 
 assert "diff -q /tmp/fbopen_output sample/output/grants.bulk"
 
-assert_end
+assert_end bulk_format_grants
