@@ -8,32 +8,47 @@
   },
   "hits" : {
     "total" : 5,
-    "max_score" : 1.0,
+    "max_score" : null,
     "hits" : [ {
       "_index" : "fbopen_test",
       "_type" : "opp",
-      "_id" : "FBO:PRESOL:fa4890-14-q-0007",
-      "_score" : 1.0
+      "_id" : "FBO:PRESOL:fa4890-14-q-0006",
+      "_score" : null,
+      "sort": [
+        null
+      ]
     }, {
       "_index" : "fbopen_test",
       "_type" : "opp",
-      "_id" : "FBO:PRESOL:fa4890-14-q-0006",
-      "_score" : 1.0
+      "_id" : "FBO:PRESOL:fa4890-14-q-0007",
+      "_score" : null,
+      "sort": [
+        null
+      ]
     }, {
       "_index" : "fbopen_test",
       "_type" : "opp",
       "_id" : "FBO:PRESOL:14-0004",
-      "_score" : 1.0
+      "_score" : null,
+      "sort": [
+        null
+      ]
     }, {
       "_index" : "fbopen_test",
       "_type" : "opp",
       "_id" : "FBO:PRESOL:ag-4604-s-14-0001",
-      "_score" : 1.0
+      "_score" : null,
+      "sort": [
+        null
+      ]
     }, {
       "_index" : "fbopen_test",
       "_type" : "opp",
       "_id" : "FBO:SRCSGT:fa4890rfi120413",
-      "_score" : 1.0
+      "_score" : null,
+      "sort": [
+        null
+      ]
     } ]
   }
 }

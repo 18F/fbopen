@@ -81,4 +81,6 @@ curl 'localhost:9200/fbopen_test/opp/_search?pretty=true' -d '{
     }
 }'
 
+curl -XDELETE localhost:9200/fbopen_test
+
 echo "Done."
