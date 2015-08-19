@@ -2,6 +2,7 @@ travis-setup:
 	./setup.sh
 	curl localhost:9200
 	sudo plugin install elasticsearch/elasticsearch-mapper-attachments/2.4.3
+	sudo cp -R ./elasticsearch/conf/scripts /usr/share/elasticsearch/config/
 
 test: | test-loaders
 
