@@ -4,7 +4,7 @@ travis-setup:
 	sudo dpkg -i elasticsearch-1.6.0.deb
 	./setup.sh
 	sudo plugin install elasticsearch/elasticsearch-mapper-attachments/2.6.0
-	sudo cp -R ./elasticsearch/conf/scripts/ /usr/share/elasticsearch/config/
+	sudo cp -R ./elasticsearch/conf/scripts /usr/local/etc/elasticsearch
 	sudo service elasticsearch start
 
 test: | test-loaders
