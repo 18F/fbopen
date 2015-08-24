@@ -1,10 +1,11 @@
 #!/bin/bash
 
+cd "$(dirname "$0")"
 source ./setup.sh
 
 echo "test_load_bulk_into_es__fbo.sh"; echo
-echo "Creating a test index"
-curl -q -XPUT 'http://localhost:9200/fbopen_test'; echo
+echo "Recreating a test index"
+curl -q -XDELETE localhost:9200/fbopen_test; curl -q -XPUT localhost:9200/fbopen_test; echo
 
 echo "Indexing sample/fbo.bulk in ElasticSearch"
 curl -q -s -XPOST 'http://localhost:9200/fbopen_test/_bulk' --data-binary @sample/fbo.bulk; echo

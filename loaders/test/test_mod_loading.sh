@@ -1,12 +1,13 @@
 #!/bin/bash
 
-. ./setup.sh
+cd "$(dirname "$0")"
+source ./setup.sh
 
 echo "Create test index"
 curl -XPUT 'localhost:9200/fbopen_test'
 
 echo "Load bulk file into Elasticsearch"
-curl -XPOST 'localhost:9200/fbopen_test/_bulk' --data-binary @sample/fbo_mod.bulk; echo
+curl -XPOST 'localhost:9200/fbopen_test/_bulk?verbose=true' --data-binary @sample/fbo_mod.bulk; echo
 
 echo "Waiting for indexing..."
 sleep 2

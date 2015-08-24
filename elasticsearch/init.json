@@ -21,11 +21,11 @@
         "opp": {
             "properties": {
                 "solnbr": {
-                    "analyzer": "keyword-analyzer",
+                    "index": "not_analyzed",
                     "type": "string"
                 },
                 "ext.SETASIDE": {
-                    "analyzer": "keyword-analyzer",
+                    "index": "not_analyzed",
                     "type": "string"
                 }
             }
