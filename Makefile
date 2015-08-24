@@ -6,6 +6,10 @@ travis-setup:
 	sudo plugin install elasticsearch/elasticsearch-mapper-attachments/2.6.0
 	sudo cp -R ./elasticsearch/conf/scripts /usr/local/etc/elasticsearch
 	sudo service elasticsearch start
+	sleep 2
+	ps aux | grep elasticsearch
+	ls /etc/elasticsearch
+	cat /etc/elasticsearch/elasticsearch.yml
 
 test: | test-loaders
 
