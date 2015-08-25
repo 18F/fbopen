@@ -23,7 +23,7 @@ var fs = require("fs")
   , tools = require('../common/tools')
 	;
 
-var config = require('./grants-loader-config.js');
+var config = require('./config.js');
 
 var log_file = config.log_file || 'grants-nightly.log';
 var datasource_id = config.datasource_id || 'grants.gov';
@@ -100,7 +100,7 @@ var notices_written = 0;
 
 reader.on('record', function(record) {
 	// if (notice_idx < 5) { // TESTING
-	if (notice_idx % 1000 == 0) console.log('processed ' + notice_idx + ' records so far, written = ' + notices_written);
+	if (notice_idx % 1000 === 0) console.log('processed ' + notice_idx + ' records so far, written = ' + notices_written);
 	process_notice(record, notice_idx++);
 	// } // TESTING
 });
@@ -130,7 +130,7 @@ function process_notice(notice, notice_idx) {
 
   var es_obj = { 'ext': {} };
 	// collect fields and reformat them for Solr ingestion
-	var notice_values = new Array(); // clean values
+	var notice_values = []; // clean values
 	var notice_fields = new Array(); // formatted fields for Solr-friendly XML
 	var el, el_tag, el_value, solnbr, solnbr_raw, link_url, s_out, notice_type;
 	var email_tag, email_child_el;
