@@ -1,12 +1,14 @@
 {
   "name": "loaders-fbo.gov",
-  "version": "0.0.1",
-  "description": "parses FBO FTP weekly data dumps and loads them into Elasticsearch, including attachments",
+  "version": "0.1.0",
+  "description": "Parses FBO FTP data dumps and loads them into Elasticsearch.",
   "private": true,
   "repository": {
       "type": "git",
       "url": "https://github.com/18F/fbopen.git"
   },
+  "main": "cron.js",
+  "files": [ "process_notices.js", "xml2json.js "],
   "dependencies": {
     "string": "*"
     , "xml-splitter": "*"
