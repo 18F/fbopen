@@ -8,7 +8,7 @@
       "url": "https://github.com/18F/fbopen.git"
   },
   "main": "cron.js",
-  "files": [ "grants-nightly.js", "grants-loader-config.js", "loader.js" ],
+  "files": [ "grants-nightly.js", "config.js" ],
   "dependencies": {
     "string": "*"
     , "underscore": "*"

@@ -43,9 +43,7 @@ fi
 echo "Starting grants-nightly $download_date"
 
 FBOPEN_URI=${FBOPEN_URI:-"localhost:9200"}
-echo "FBOPEN_URI = $FBOPEN_URI"
 FBOPEN_INDEX=${FBOPEN_INDEX:-"fbopen"}
-echo "FBOPEN_INDEX = $FBOPEN_INDEX"
 
 PWD=$PWD/grants.gov
 
@@ -87,8 +85,6 @@ then
 	if [[ -s "$xml_file" ]]
 	then
         wc -l $xml_file
-        echo "PWD:"
-        echo $PWD
 		$HOME/$NODE_PATH_REL $PWD/grants-nightly.js -f $xml_file -j $json_file -o $workfiles_dir/grants.json
 	else
 		echo "ERROR: cannot find $xml_file."
@@ -98,7 +94,7 @@ else
 fi
 
 echo "Converting JSON to Elasticsearch bulk JSON format"
-cat $workfiles_dir/grants.json | $HOME/$NODE_PATH_REL $HOME/common/format-bulk.js > $workfiles_dir/grants.bulk
+cat $workfiles_dir/grants.json | $HOME/$NODE_PATH_REL $PWD/../common/format-bulk.js > $workfiles_dir/grants.bulk
 
 curl -s -XPOST "$FBOPEN_URI/$FBOPEN_INDEX/_bulk" --data-binary @$workfiles_dir/grants.bulk; echo
 

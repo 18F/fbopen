@@ -7,16 +7,15 @@
       "type": "git",
       "url": "https://github.com/18F/fbopen.git"
   },
-  "scripts": {
-    "start": "node ./grants.gov/app.js"
-  },
   "dependencies": {
     "big-xml": "^0.7.0",
     "cfenv": "^1.0.0",
     "cron": "^1.0.9",
     "date-format-lite": "^0.7.4",
     "event-stream": "^3.3.1",
+    "json": "^9.0.3",
     "loaders-grants.gov": "./grants.gov",
+    "loaders-fbo.gov": "./fbo.gov",
     "moment": "^2.10.6",
     "newrelic": "^1.21.2",
     "optimist": "^0.6.1",
