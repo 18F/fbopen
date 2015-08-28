@@ -5,6 +5,13 @@
   "scripts": {
     "start": "node app.js"
   },
+  "devDependencies": {
+    "chai": "*",
+    "mocha": "*",
+    "async": "*",
+    "supertest": "*",
+    "chai-as-promised": "*"
+  },
   "dependencies": {
     "express": "",
     "serve-favicon": "",
@@ -19,10 +26,6 @@
     "string": ">=1.8.1",
     "http-auth": "*",
     "underscore": "*",
-    "chai": "*",
-    "mocha": "*",
-    "async": "*",
-    "supertest": "*",
     "winston": "*",
     "express-winston": "*"
   }
