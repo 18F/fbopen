@@ -57,11 +57,11 @@ describe("The FBOpen API", function() {
         console.log(child_cmd);
         child_process.exec(child_cmd, callback);
       }, function (err, resp) {
-        console.log(resp);
-        console.log(err);
-        done();
+        //console.log(resp);
+        if (err) console.log(err);
       }
     ]);
+    done();
   });
 
   var num_found = function(num) {
