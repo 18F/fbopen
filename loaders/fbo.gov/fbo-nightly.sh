@@ -45,8 +45,12 @@ echo "FBOPEN_URI = $FBOPEN_URI"
 FBOPEN_INDEX=${FBOPEN_INDEX:-"fbopen"}
 echo "FBOPEN_INDEX = $FBOPEN_INDEX"
 
+# always change to this script's own directory
+cd "$(dirname "$0")"
+echo "PWD: "; echo $PWD
+
 # mkdir -p will ensure the workfiles dir is in place, but won't fail if it already exists
-workfiles_dir="$FBOPEN_ROOT/loaders/fbo.gov/workfiles"
+workfiles_dir="$PWD/workfiles"
 mkdir -p $workfiles_dir
 
 # download the nightly file, if not downloaded already
@@ -62,11 +66,11 @@ fi
 
 echo "converting nightly file into JSON"
 # process the nightly file into JSON
-cat $nightly_download_file | node $FBOPEN_ROOT/loaders/fbo.gov/xml2json.js > $nightly_download_file.json
+cat $nightly_download_file | node $PWD/xml2json.js > $nightly_download_file.json
 
 # prep the JSON further
 prepped_json_notices_file=$workfiles_dir/prepped_notices.$download_date.json
-cat $nightly_download_file.json | node $FBOPEN_ROOT/loaders/fbo.gov/process_notices.js > $prepped_json_notices_file
+cat $nightly_download_file.json | node $PWD/process_notices.js > $prepped_json_notices_file
 
 # extract links
 echo "Extracting links"
@@ -76,7 +80,7 @@ cat $prepped_json_notices_file | json -ga listing_url > $nightly_links_file
 echo "Converting notices to Elasticsearch bulk format"
 # convert notices to Elasticsearch's bulk format, adding -a flag to append descriptions in MODs
 bulk_notices_file=$workfiles_dir/notices.$download_date.bulk
-cat $prepped_json_notices_file | node $FBOPEN_ROOT/loaders/common/format-bulk.js -a > $bulk_notices_file
+cat $prepped_json_notices_file | node $PWD/../common/format-bulk.js -a > $bulk_notices_file
 
 # load into Elasticsearch
 echo "Loading into Elasticsearch"

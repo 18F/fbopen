@@ -3,7 +3,6 @@ require('newrelic');
 var CronJob = require('cron').CronJob,
   config = require('../config'),
   spawn = require('child_process').spawn,
-  running = require('is-running'),
   fs = require('fs'),
   path = require('path'),
   child_running = false;
@@ -29,7 +28,7 @@ var spawnLoader = function (callback) {
     env: {
       HOME: process.env.HOME,
       FBOPEN_URI: config.elasticsearch.uri,
-      NODE_PATH_REL: process.env.NODE_PATH_REL,
+      PATH: process.env.PATH,
     }
   });
   // child.stdout.on('data', function(data) { console.log(data.toString()); });

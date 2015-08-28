@@ -28,7 +28,7 @@ var spawnLoader = function (callback) {
     env: {
       HOME: process.env.HOME,
       FBOPEN_URI: config.elasticsearch.uri,
-      NODE_PATH_REL: process.env.NODE_PATH_REL,
+      PATH: process.env.PATH,
     }
   });
   child.stdout.on('data', function(data) { console.log(data.toString()); });
