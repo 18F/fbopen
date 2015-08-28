@@ -1,4 +1,5 @@
 // Create config.js, in this directory, based on this sample file.
+var appEnv = require('cfenv').getAppEnv();
 
 fs = require('fs');
 
@@ -30,11 +31,22 @@ config.logger = {};
 config.logger.path = process.env.FBOPEN_ROOT + '/log/api.log';
 
 // settings from cloud foundry env
-cf_services = JSON.parse(process.env.VCAP_SERVICES, '{}');
+cf_services = JSON.parse((process.env.VCAP_SERVICES || '{}'));
 
 // elasticsearch
-config.elasticsearch = cf_services[process.env.ES_SERVICE_NAME][0].credentials;
+config.elasticsearch = appEnv.getServiceCreds(process.env.ES_SERVICE_NAME);
 // the above defines the following keys: [ hostname, password, port, uri, username ]
+
+// if running locally
+if (!config.elasticsearch) {
+  config.elasticsearch = {
+    uri: 'http://localhost:9200',
+    hostname: 'localhost',
+    port: 9200
+  };
+}
+
+console.log('[API] Discovered elasticsearch config: ', config.elasticsearch);
 
 config.elasticsearch.index = process.env.ELASTICSEARCH_INDEX || 'fbopen';
 // this is used to adjust the date math that's used for searching within the (statically-dated) test data
