@@ -65,3 +65,21 @@ applications:
     PATH: $HOME/vendor/node/bin/:$PATH
   services:
     - es-idx
+- name: bids
+  no-route: true
+  disk_quota: 1GB
+  memory: 1GB
+  path: ./loaders
+  command: node ./bids.state.gov/cron.js
+  buildpack: nodejs_buildpack
+  env:
+    # this is the canonical CF service name, not what you name it when it is initialized
+    ES_SERVICE_NAME: es-idx
+    FBOPEN_INDEX: fbopen
+    NEW_RELIC_APP_NAME: loaders-bids.state.gov (dev)
+    # NEW_RELIC_LICENSE_KEY: use cf set-env
+    # use trace while debugging and getting client running, later info
+    NEW_RELIC_LOG_LEVEL: trace
+    PATH: $HOME/vendor/node/bin/:$PATH
+  services:
+    - es-idx

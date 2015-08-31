@@ -3,9 +3,12 @@ set -e
 
 echo "Starting bids-nightly `date`"
 
-json_output_file='workfiles/notices.json'
-bulk_output_file='workfiles/notices.bulk'
-raw_json='workfiles/download.json'
+# always change to this script's own directory
+cd "$(dirname "$0")"
+
+json_output_file="$PWD/workfiles/notices.json"
+bulk_output_file="$PWD/workfiles/notices.bulk"
+raw_json="$PWD/workfiles/download.json"
 
 BIDS_URL="http://bids.state.gov/geoserver/opengeo/ows?service=WFS&version=1.0.0&request=GetFeature&typeName=opengeo%3ADATATABLE&outputformat=json"
 FBOPEN_URI=${FBOPEN_URI:-"localhost:9200"}
@@ -24,7 +27,7 @@ echo "Converting to JSON..."
 node process_bids.js $raw_json
 
 echo "Converting JSON to Elasticsearch bulk format..."
-cat $json_output_file | node $FBOPEN_ROOT/loaders/common/format-bulk.js -a > $bulk_output_file
+cat $json_output_file | node $PWD/../common/format-bulk.js -a > $bulk_output_file
 
 
 # load into Elasticsearch
