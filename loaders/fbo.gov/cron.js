@@ -1,20 +1,23 @@
-require('newrelic');
 
 var CronJob = require('cron').CronJob,
   config = require('../config'),
   spawn = require('child_process').spawn,
   fs = require('fs'),
   path = require('path'),
+  nr = require('newrelic'),
   child_running = false;
 
 var loaderNightly = function () {
   if (!child_running) {
       child_running = true;
-      spawnLoader(function(err) {
-        if (err) {
-          child_running = false;
-          console.error(err);
-        }
+      nr.createBackgroundTransaction('spawn:fbo-nightly', function() {
+        spawnLoader(function(err) {
+          if (err) {
+            child_running = false;
+            console.error(err);
+          }
+          nr.endTransaction();
+        });
       });
   } else {
     console.log('Still running...');
