@@ -27,23 +27,23 @@ var loaderNightly = function () {
 var spawnLoader = function (callback) {
   var child = spawn(path.join(__dirname, 'fbo-nightly.sh'), [], {
     detached: true,
-    stdio: 'pipe',
+    stdio: 'inherit',
     env: {
       HOME: process.env.HOME,
       FBOPEN_URI: config.elasticsearch.uri,
       PATH: process.env.PATH,
     }
   });
-  child.stdout.on('data', function(data) { console.log(data.toString()); });
-  child.stderr.on('data', function(data) { console.error(data.toString()); });
+  // child.stdout.on('data', function(data) { console.log(data.toString()); });
+  // child.stderr.on('data', function(data) { console.error(data.toString()); });
   // these never seem to be called with this script
-  child.on('error', function(err) { callback(err); });
-  child.on('exit', function(code, signal) { callback(); });
+  // child.on('error', function(err) { callback(err); });
+  // child.on('exit', function(code, signal) { callback(); });
   child.on('close', function(code) {
     if (code !== 0) {
       callback('Script returned non-zero exit status');
     } else {
-      callback()
+      callback();
     }
   });
 
