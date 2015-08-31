@@ -12,10 +12,10 @@ then
 	if [[ $? -eq 0 ]]
 	then
 		# GNU date format
-		download_date=`date --date yesterday +"%Y%m%d"`
+		download_date=`TZ=US/Eastern date --date yesterday +"%Y%m%d"`
 	else
 		# try this instead
-		download_date=$(date -v -1d +"%Y%m%d")
+		download_date=$(TZ=US/Eastern date -v -1d +"%Y%m%d")
 	fi
     set -e
 elif [[ $1 -ne "" ]]
