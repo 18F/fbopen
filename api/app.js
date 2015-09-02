@@ -242,8 +242,8 @@ app.get('/v0/opps', function(req, res) {
   var sorts = [];
   if (S(q).isEmpty()) {
     queries.should(ejs.MatchAllQuery());
-    sorts.push(ejs.Sort('close_dt').asc());
-    sorts.push(ejs.Sort('solnbr'));
+    sorts.push({ close_dt: { order: 'asc', unmapped_type: 'date' }});
+    sorts.push({ solnbr: { order: 'asc' }});
   } else {
     var qsq = ejs.QueryStringQuery(decodeURIComponent(q));
     var child_query = ejs.HasChildQuery(qsq, "opp_attachment");
@@ -270,6 +270,10 @@ app.get('/v0/opps', function(req, res) {
 
   if (sorts.length > 0) request.sort(sorts);
   if (fieldlist) request.fields = fieldlist;
+
+  request_json = request.toJSON();
+
+  if (sorts.length > 0) request_json.sort = sorts;
 
   // console.log(util.inspect(request.query().bool.should, null));
 
