@@ -89,7 +89,7 @@ describe("The FBOpen API", function() {
     };
   };
 
-  it('should have 409 total opp records in the test index', function(done) {
+  it('should have 409 total opp records in the test index (including closed and sole source)', function(done) {
     request(app)
     .get('/v0/opps?show_noncompeted=1&show_closed=1')
     .expect(200)
@@ -98,7 +98,7 @@ describe("The FBOpen API", function() {
     .end(done);
   });
 
-  it('should return all competed, open opps', function(done) {
+  it('should return all competed, open opps (default filter set)', function(done) {
     request(app)
     .get('/v0/opps')
     .expect(200)
@@ -107,7 +107,7 @@ describe("The FBOpen API", function() {
     .end(done);
   });
 
-  it('should return all open opps', function(done) {
+  it('should return only open opps (including non-competed)', function(done) {
     request(app)
     .get('/v0/opps?show_noncompeted=1')
     .expect(200)
@@ -189,7 +189,7 @@ describe("The FBOpen API", function() {
     .get('/v0/opps?data_source=fbo.gov&show_noncompeted=1&show_closed=1')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(187))
+    .expect(num_found(186))
     .end(done);
   });
 
@@ -198,7 +198,7 @@ describe("The FBOpen API", function() {
     .get('/v0/opps?data_source=FBO.gov&show_noncompeted=1&show_closed=1')
     .expect(200)
     .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(187))
+    .expect(num_found(186))
     .end(done);
   });
 
