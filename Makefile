@@ -28,6 +28,7 @@ npm-install:
 	cd loaders/grants.gov; npm install
 	cd loaders/fbo.gov; npm install
 	cd loaders/bids.state.gov; npm install
+	cd api; npm install
 
 load-fbo:
 	./loaders/fbo.gov/fbo-nightly.sh
