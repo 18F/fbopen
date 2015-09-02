@@ -1,28 +1,28 @@
 {
-  "name": "application-name",
-  "version": "0.0.1",
+  "name": "fbopen-api",
+  "version": "0.1.0",
   "private": true,
   "scripts": {
     "start": "node app.js"
   },
   "devDependencies": {
-    "chai": "*",
-    "mocha": "*",
-    "async": "*",
-    "supertest": "*",
-    "chai-as-promised": "*"
+    "chai": "^3.2.0",
+    "mocha": "^2.3.0",
+    "async": "^1.4.2",
+    "supertest": "^1.1.0",
+    "chai-as-promised": "^5.1.0"
   },
   "dependencies": {
-    "express": "",
-    "serve-favicon": "",
-    "body-parser": "",
-    "method-override": "",
+    "express": "^4.13.3",
+    "serve-favicon": "^2.3.0",
+    "body-parser": "^1.13.3",
+    "method-override": "^2.3.5",
     "errorhandler": "",
     "morgan": "",
     "jade": "*",
+    "cfenv": "^1.0.0",
     "request": "*",
     "elasticsearch": "*",
-    "moment": "*",
     "string": ">=1.8.1",
     "http-auth": "*",
     "underscore": "*",
