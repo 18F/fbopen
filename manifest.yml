@@ -67,8 +67,8 @@ applications:
     - es-idx
 - name: bids
   no-route: true
-  disk_quota: 1GB
-  memory: 1GB
+  disk_quota: 512MB
+  memory: 512MB
   path: ./loaders
   command: node ./bids.state.gov/cron.js
   buildpack: nodejs_buildpack
