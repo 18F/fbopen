@@ -103,8 +103,8 @@ app.get('/v0/opps', function(req, res) {
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Content-Type', 'application/json;charset=utf-8');
 
-  var q = req.params.q;
-  var fq = req.params.fq;
+  var q = req.query.q;
+  var fq = req.query.fq;
 
   var queries = ejs.BoolQuery();
   var filters = ejs.AndFilter([]);
@@ -113,7 +113,7 @@ app.get('/v0/opps', function(req, res) {
   // special fields
   //
 
-  if (!(req.params.show_noncompeted && S(req.params.show_noncompeted).toBoolean())) {
+  if (!(req.query.show_noncompeted && S(req.query.show_noncompeted).toBoolean())) {
     // omit non-competed listings unless otherwise specified
     non_competed_bool_query = ejs.BoolQuery().should([
       ejs.MatchQuery('_all', 'single source').type('phrase'),
@@ -128,7 +128,7 @@ app.get('/v0/opps', function(req, res) {
 
   // omit or include closed listings
   // if it's not defined or it's false, add this filter
-  if (!req.params.show_closed || S(req.params.show_closed).toBoolean() === false) {
+  if (!req.query.show_closed || S(req.query.show_closed).toBoolean() === false) {
     var show_closed = ejs.OrFilter([
       ejs.QueryFilter(ejs.MatchQuery("ext.Status", "Pipeline")), //bids.stat.gov data has no close date, only status field
       ejs.AndFilter([
@@ -145,16 +145,16 @@ app.get('/v0/opps', function(req, res) {
   }
 
   // filter by data source
-  var data_source = req.params.data_source;
+  var data_source = req.query.data_source;
   if (!S(data_source).isEmpty()) {
     filters.filters(ejs.TermFilter('data_source', data_source.toLowerCase()));
   }
 
   // pagination
   var size = 10;
-  if (req.params.limit) {
-    if (parseInt(req.params.limit) <= config.app.max_rows) {
-      size = req.params.limit;
+  if (req.query.limit) {
+    if (parseInt(req.query.limit) <= config.app.max_rows) {
+      size = req.query.limit;
     } else {
       res.json(400, {
         error: 'Sorry, param "limit" must be <= ' + config.app.max_rows
@@ -165,18 +165,18 @@ app.get('/v0/opps', function(req, res) {
 
   // default to using 'p' if present, as that will come from the webclient
   // calculate 'start' from 'p' and 'limit'
-  var p = req.params.p;
+  var p = req.query.p;
   var start;
   if (!p) {
-    start = req.params.start || 0;
+    start = req.query.start || 0;
   } else {
     start = (p - 1) * size;
   }
 
   // specify fields to be included in results
   var fieldlist;
-  if (req.params.fl) {
-    fieldlist = req.params.fl.split(',');
+  if (req.query.fl) {
+    fieldlist = req.query.fl.split(',');
   }
 
   var results_callback = function(error, body, status_code) {
@@ -395,10 +395,12 @@ app.use(express_winston.errorLogger({
   ]
 }));
 
-if (config.app.listen_http) {
-  http.createServer(app).listen(config.app.port);
-}
+express();
 
-if (config.app.listen_https) {
-  https.createServer(config.ssl, app).listen(config.ssl.port);
-}
+//if (config.app.listen_http) {
+//  http.createServer(app).listen(config.app.port);
+//}
+//
+//if (config.app.listen_https) {
+//  https.createServer(config.ssl, app).listen(config.ssl.port);
+//}
