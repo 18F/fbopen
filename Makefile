@@ -29,5 +29,14 @@ npm-install:
 	cd loaders/fbo.gov; npm install
 	cd loaders/bids.state.gov; npm install
 
+load-fbo:
+	./loaders/fbo.gov/fbo-nightly.sh
 
-.PHONY: test test-api test-loaders npm-install travis-setup
+load-grants:
+	./loaders/grants.gov/grants-nightly.sh
+
+load-bids:
+	./loaders/bids.state.gov/bids-nightly.sh
+
+
+.PHONY: test test-api test-loaders npm-install travis-setup load-fbo load-grants load-bids
