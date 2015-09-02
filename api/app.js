@@ -10,8 +10,6 @@
  */
 
 var express = require('express'),
-  http = require('http'),
-  https = require('https'),
   path = require('path'),
   http_auth = require('http-auth'),
 
@@ -399,12 +397,9 @@ app.use(express_winston.errorLogger({
   ]
 }));
 
-express();
+var server = app.listen(config.app.port, function() {
+  var host = server.address().address;
+  var port = server.address().port;
 
-//if (config.app.listen_http) {
-//  http.createServer(app).listen(config.app.port);
-//}
-//
-//if (config.app.listen_https) {
-//  https.createServer(config.ssl, app).listen(config.ssl.port);
-//}
+  console.log('FBOpen API listening at http://%s:%s', host, port);
+});

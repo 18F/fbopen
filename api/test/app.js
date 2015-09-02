@@ -9,21 +9,20 @@ var request = require('supertest'),
 
 describe("The FBOpen API", function() {
   var client;
+  var index_name;
   var expect = chai.expect;
 
   before(function(done) {
     console.log(process.env.ELASTICSEARCH_HOST);
-    var index_name = 'fbopen_api_test';
+    index_name = 'fbopen_api_test';
 
     client = new elasticsearch.Client({
       host: 'localhost:9200',
-      log: 'trace'
+      log: 'warning'
     });
     async.series([
       function (callback) {
-        client.indices.delete({index: index_name}, callback);
-      }, function (callback) {
-        client.indices.create({index: index_name, body: {
+         client.indices.create({index: index_name, body: {
           "settings": { "index": { "analysis": { "analyzer": { "default": { "type": "snowball" }, "keyword-analyzer":{"tokenizer": "keyword", "filter":"lowercase" } } } } }
         }}, callback);
       }, function (callback) {
@@ -61,9 +60,9 @@ describe("The FBOpen API", function() {
       }], function (err, resp) {
         //console.log(resp);
         if (err) console.log(err);
+        done();
       }
-    ]);
-    done();
+    );
   });
 
   var num_found = function(num) {
@@ -280,5 +279,19 @@ describe("The FBOpen API", function() {
     .expect(200)
     .expect(num_found(24))
     .end(done);
+  });
+
+  after(function(done) {
+    console.log(process.env.ELASTICSEARCH_HOST);
+
+    async.series([
+      function (callback) {
+        client.indices.delete({index: index_name}, callback);
+      }], function (err, resp) {
+        //console.log(resp);
+        if (err) console.log(err);
+        done();
+      }
+    );
   });
 });
