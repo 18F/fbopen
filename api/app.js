@@ -266,7 +266,6 @@ app.get('/v0/opps', function(req, res) {
     .query(queries)
     .filter(filters);
 
-  if (sorts.length > 0) request.sort(sorts);
   if (fieldlist) request.fields = fieldlist;
 
   request_json = request.toJSON();
