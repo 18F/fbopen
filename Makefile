@@ -1,3 +1,10 @@
+TESTS=api/test/*.js
+
+test-api:
+	mkdir -p log/
+	touch log/api.log
+	ELASTICSEARCH_NOW=2014-04-05 ELASTICSEARCH_INDEX=fbopen_api_test ELASTICSEARCH_HOST=localhost mocha --bail --timeout 8000 --reporter nyan $(TESTS)
+
 travis-setup:
 	sudo service elasticsearch stop
 	wget https://download.elasticsearch.org/elasticsearch/elasticsearch/elasticsearch-1.6.0.deb
@@ -10,7 +17,7 @@ travis-setup:
 	ps aux | grep elasticsearch
 	ls /etc/elasticsearch
 
-test: | test-loaders
+test: | test-loaders test-api
 
 test-loaders:
 	./loaders/test/test_all.sh -x
@@ -22,4 +29,5 @@ npm-install:
 	cd loaders/fbo.gov; npm install
 	cd loaders/bids.state.gov; npm install
 
-.PHONY: test test-loaders npm-install travis-setup
+
+.PHONY: test test-api test-loaders npm-install travis-setup
