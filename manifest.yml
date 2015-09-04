@@ -1,3 +1,4 @@
+domain: 18f.gov
 ---
 applications:
 - name: api
@@ -38,7 +39,6 @@ applications:
   command: node ./grants.gov/cron.js
   buildpack: nodejs_buildpack
   env:
-    # this is the canonical CF service name, not what you name it when it is initialized
     ES_SERVICE_NAME: es-idx
     FBOPEN_INDEX: fbopen
     NEW_RELIC_APP_NAME: Loaders-grants.gov (dev)
@@ -55,7 +55,6 @@ applications:
   command: node ./fbo.gov/cron.js
   buildpack: nodejs_buildpack
   env:
-    # this is the canonical CF service name, not what you name it when it is initialized
     ES_SERVICE_NAME: es-idx
     FBOPEN_INDEX: fbopen
     NEW_RELIC_APP_NAME: Loaders-fbo.gov (dev)
@@ -73,7 +72,6 @@ applications:
   command: node ./bids.state.gov/cron.js
   buildpack: nodejs_buildpack
   env:
-    # this is the canonical CF service name, not what you name it when it is initialized
     ES_SERVICE_NAME: es-idx
     FBOPEN_INDEX: fbopen
     NEW_RELIC_APP_NAME: loaders-bids.state.gov (dev)
