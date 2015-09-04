@@ -1,1 +1,3 @@
 config*sample*.js
+node_modules
+test
