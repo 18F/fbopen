@@ -36,12 +36,13 @@ applications:
   disk_quota: 1GB
   memory: 1GB
   path: ./loaders
-  command: node ./grants.gov/cron.js
+  command: node cron.js grants-nightly
   buildpack: nodejs_buildpack
   env:
+    CRON_TIME: "30 12 * * *"
     ES_SERVICE_NAME: es-idx
     FBOPEN_INDEX: fbopen
-    NEW_RELIC_APP_NAME: Loaders-grants.gov (dev)
+    NEW_RELIC_APP_NAME: loaders-grants.gov (dev)
     # NEW_RELIC_LICENSE_KEY: use cf set-env
     # use trace while debugging and getting client running, later info
     NEW_RELIC_LOG_LEVEL: trace
@@ -52,12 +53,13 @@ applications:
   disk_quota: 1GB
   memory: 1GB
   path: ./loaders
-  command: node ./fbo.gov/cron.js
+  command: node cron.js fbo-nightly
   buildpack: nodejs_buildpack
   env:
+    CRON_TIME: "35 12 * * *"
     ES_SERVICE_NAME: es-idx
     FBOPEN_INDEX: fbopen
-    NEW_RELIC_APP_NAME: Loaders-fbo.gov (dev)
+    NEW_RELIC_APP_NAME: loaders-fbo.gov (dev)
     # NEW_RELIC_LICENSE_KEY: use cf set-env
     # use trace while debugging and getting client running, later info
     NEW_RELIC_LOG_LEVEL: trace
@@ -69,9 +71,10 @@ applications:
   disk_quota: 512MB
   memory: 512MB
   path: ./loaders
-  command: node ./bids.state.gov/cron.js
+  command: node cron.js bids-nightly
   buildpack: nodejs_buildpack
   env:
+    CRON_TIME: "40 12 * * *"
     ES_SERVICE_NAME: es-idx
     FBOPEN_INDEX: fbopen
     NEW_RELIC_APP_NAME: loaders-bids.state.gov (dev)
