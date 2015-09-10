@@ -175,15 +175,12 @@ app.get('/v0/opps', function(req, res) {
     fieldlist = req.query.fl.split(',');
   }
 
-  var results_callback = function(error, body, status_code) {
-    // massage results into the format we want
-    var results_out = {};
-    results_out.status = status_code;
-
-    if (status_code !== 200) {
-      results_out.error = error;
-      return res.json(results_out);
+  var results_callback = function(body) {
+    if (!(body.hits && body.hits.total)) {
+      return res.json({numFound: 0});
     }
+
+    var results_out = {};
 
     if (_u.has(body, 'hits') && _u.has(body.hits, 'total')) {
       results_out.numFound = body.hits.total;
@@ -234,7 +231,6 @@ app.get('/v0/opps', function(req, res) {
     res.json(results_out);
   };
 
-
   var sorts = [];
   if (S(q).isEmpty()) {
     queries.should(ejs.MatchAllQuery());
@@ -276,7 +272,11 @@ app.get('/v0/opps', function(req, res) {
     index: config.elasticsearch.index,
     type: "opp",
     body: request.toJSON()
-  }, results_callback);
+  }).then(function(body) {
+    results_callback(body);
+  }, function(error) {
+      return res.json({'error': error});
+  });
 });
 
 
