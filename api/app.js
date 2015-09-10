@@ -10,22 +10,20 @@
  */
 
 var express = require('express'),
-  path = require('path'),
   http_auth = require('http-auth'),
 
   // other useful stuff
   ejs = require('./elastic.min.js'),
   es = require('elasticsearch'),
   S = require('string'), // stringjs.com
-  util = require('util'),
+  //util = require('util'),
   _u = require('underscore'),
   LogClass = require('./log_setup'),
   serve_favicon = require('serve-favicon'),
   errorhandler = require('errorhandler'),
   winston = require('winston'),
-  express_winston = require('express-winston');
-
-var config = require('./config');
+  express_winston = require('express-winston'),
+  config = require('./config');
 
 var app = express();
 module.exports = app;
