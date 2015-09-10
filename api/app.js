@@ -30,7 +30,7 @@ module.exports = app;
 
 // Create Elasticsearch client
 
-var client = es.Client({
+app.locals.client = es.Client({
   host: config.elasticsearch.uri,
   log: LogClass,
   api_version: '1.1'
@@ -81,7 +81,7 @@ app.get('/v0/?', function(req, res) {
 });
 
 app.get('/v0/hello', function(req, res) {
-  client.ping({
+  app.locals.client.ping({
     requestTimeout: 10000,
     hello: "elasticsearch!"
   }, function (error) {
@@ -272,7 +272,7 @@ app.get('/v0/opps', function(req, res) {
 
   // console.log(util.inspect(request.query().bool.should, null));
 
-  client.search({
+  app.locals.client.search({
     index: config.elasticsearch.index,
     type: "opp",
     body: request.toJSON()
@@ -281,7 +281,7 @@ app.get('/v0/opps', function(req, res) {
 
 
 app.get('/v0/opp/:id', function(req, res) {
-  client.search({
+  app.locals.client.search({
       index: config.elasticsearch.index,
       type: "opp",
       _id: req.params.id
@@ -293,7 +293,7 @@ app.get('/v0/opp/:id', function(req, res) {
 });
 
 app.get('/v0/agg/data_source', function(req, res) {
-  client.search({
+  app.locals.client.search({
     index: config.elasticsearch.index,
     type: 'opp',
     body: {
@@ -318,7 +318,7 @@ app.get('/v0/agg/data_source', function(req, res) {
 });
 
 app.get('/v0/agg/notice_type', function(req, res) {
-  client.search({
+  app.locals.client.search({
     index: config.elasticsearch.index,
     type: 'opp',
     body: {
@@ -343,7 +343,7 @@ app.get('/v0/agg/notice_type', function(req, res) {
 });
 
 app.get('/v0/agg/data_source/notice_type', function(req, res) {
-  client.search({
+  app.locals.client.search({
     index: config.elasticsearch.index,
     type: 'opp',
     body: {
