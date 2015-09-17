@@ -5,9 +5,8 @@
 * Move static scripts into place
     * `sudo cp ./conf/scripts/* <YOUR_ES_SCRIPTS_DIR>/`
 * Restart Elasticsearch
-* Create an index on your Elasticsearch cluster with the proper field mappings and settings (relative path to mapping given from the FBOpen root):
-    * `curl -XPUT localhost:9200/fbopen0 --data-binary @elasticsearch/init.json`
-        - _Note that [current best practices, circa Elasticsearch 1.3](http://www.elasticsearch.org/blog/aliases-ftw/), call for using aliases on top of your indexes at all times, so the index we created in the last step was given a versioned name, while `init.json` defines the canonical `fbopen` index to point to it._
+* Create an index called `fbopen0` on your Elasticsearch cluster, aliased with `fbopen`, with the proper field mappings and settings (run from the FBOpen root project dir):
+    * `make es-local-init`
 
 # 18F/Cloud Foundry Elasticsearch Configuration
 

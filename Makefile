@@ -39,5 +39,8 @@ load-grants:
 load-bids:
 	./loaders/bids.state.gov/bids-nightly.sh
 
+es-local-init:
+	curl -XPUT localhost:9200/fbopen0 --data-binary @elasticsearch/init.json
 
-.PHONY: test test-api test-loaders npm-install travis-setup load-fbo load-grants load-bids
+
+.PHONY: test test-api test-loaders npm-install travis-setup load-fbo load-grants load-bids es-local-init
