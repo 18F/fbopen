@@ -383,7 +383,7 @@ app.use(express_winston.errorLogger({
   transports: [
     new winston.transports.Console({
       json: true,
-        colorize: true
+      colorize: true
     }),
     new winston.transports.File({
       filename: config.logger.path,
@@ -397,6 +397,4 @@ app.use(express_winston.errorLogger({
 var server = app.listen(config.app.port, function() {
   var host = server.address().address;
   var port = server.address().port;
-
-  console.log('FBOpen API listening at http://%s:%s', host, port);
 });

@@ -8,7 +8,7 @@ function LogClass(config) {
   var logger = (new winston.Logger({
     name: 'es_client',
     transports: [
-      new (winston.transports.Console)({ level: 'info', handleExceptions: true }),
+      new (winston.transports.Console)({ level: 'warning', handleExceptions: true }),
       new (winston.transports.File)({ level: 'warning', filename: cfg.logger.path, handleExceptions: true })
     ],
     exitOnError: false

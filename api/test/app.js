@@ -13,12 +13,12 @@ describe("The FBOpen API", function() {
   var expect = chai.expect;
 
   before(function(done) {
-    console.log(process.env.ELASTICSEARCH_HOST);
+    // console.log(process.env.ELASTICSEARCH_HOST);
     index_name = 'fbopen_api_test';
 
     client = new elasticsearch.Client({
       host: 'localhost:9200',
-      log: 'warning'
+      log: 'error'
     });
     async.series([
       function (callback) {
@@ -49,11 +49,11 @@ describe("The FBOpen API", function() {
           }
         }}, callback);
       }, function (callback) {
-        console.log("Loading data with command...");
+        console.log("    Loading data with command...");
         child_cmd = 'elasticdump --input ' + path.resolve('./api/test/data/test_data.json') + ' --output=http://localhost:9200/'+index_name+' --limit=50';
         // NOTE: if you have trouble with the test loading data properly, run the elasticdump command separately.
         // Make sure elasticdump says it has WRITTEN the objects.
-        console.log(child_cmd);
+        console.log('    ' + child_cmd);
         child_process.exec(child_cmd, callback);
       }, function(callback) {
         setTimeout(callback, 3000);
@@ -79,7 +79,6 @@ describe("The FBOpen API", function() {
 
   var record_with_field = function(field, index, value) {
     return function(resp) {
-      console.log(util.inspect(resp.body));
       if (resp.body.docs) {
         // in case of multiple returned docs
         expect(resp.body.docs[index]).to.have.property(field, value);
@@ -285,11 +284,11 @@ describe("The FBOpen API", function() {
     console.log(process.env.ELASTICSEARCH_HOST);
 
     async.series([
-      function (callback) {
-        client.indices.delete({index: index_name}, callback);
-      }], function (err, resp) {
-        //console.log(resp);
-        if (err) console.log(err);
+        function (callback) {
+          client.indices.delete({index: index_name}, callback);
+        }], function (err, resp) {
+          //console.log(resp);
+          if (err) console.log(err);
         done();
       }
     );

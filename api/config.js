@@ -28,7 +28,7 @@ config.app.listen_https = false;
 
 // logger
 config.logger = {};
-config.logger.path = process.env.FBOPEN_ROOT + '/log/api.log';
+config.logger.path = __dirname + '/../log/api.log';
 
 // settings from cloud foundry env
 cf_services = JSON.parse((process.env.VCAP_SERVICES || '{}'));
