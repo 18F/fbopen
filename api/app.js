@@ -274,12 +274,11 @@ app.get('/v0/opps', function(req, res) {
   }).then(function(body) {
     results_callback(body);
   }, function(error) {
-      return res.json({'error': error});
+    return res.json({'error': error});
   });
 });
 
-
-app.get('/v0/opp/:id', function(req, res) {
+app.get('/v1/opp/:id', function(req, res) {
   app.locals.client.search({
       index: config.elasticsearch.index,
       type: "opp",
@@ -291,7 +290,7 @@ app.get('/v0/opp/:id', function(req, res) {
   );
 });
 
-app.get('/v0/agg/data_source', function(req, res) {
+app.get('/v1/agg/data_source', function(req, res) {
   app.locals.client.search({
     index: config.elasticsearch.index,
     type: 'opp',
@@ -316,7 +315,7 @@ app.get('/v0/agg/data_source', function(req, res) {
   });
 });
 
-app.get('/v0/agg/notice_type', function(req, res) {
+app.get('/v1/agg/notice_type', function(req, res) {
   app.locals.client.search({
     index: config.elasticsearch.index,
     type: 'opp',
@@ -341,7 +340,7 @@ app.get('/v0/agg/notice_type', function(req, res) {
   });
 });
 
-app.get('/v0/agg/data_source/notice_type', function(req, res) {
+app.get('/v1/agg/data_source/notice_type', function(req, res) {
   app.locals.client.search({
     index: config.elasticsearch.index,
     type: 'opp',
