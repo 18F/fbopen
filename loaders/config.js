@@ -18,6 +18,4 @@ if (!config.elasticsearch) {
 
 console.log(config.elasticsearch);
 
-config.pid_path = (process.env.PID_PATH || path.resolve('./loader_grants.pid'));
-
 module.exports = config;

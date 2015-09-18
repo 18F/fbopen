@@ -1,5 +1,5 @@
 var CronJob = require('cron').CronJob,
-  config = require('./config'),
+  config = require('../config'),
   spawn = require('child_process').spawn,
   fs = require('fs'),
   path = require('path'),
