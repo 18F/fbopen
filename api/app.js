@@ -99,9 +99,6 @@ app.get('/v0/opps', function(req, res) {
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Content-Type', 'application/json;charset=utf-8');
 
-  var q = req.query.q;
-  var fq = req.query.fq;
-
   var queries = ejs.BoolQuery();
   var filters = ejs.AndFilter([]);
 
@@ -126,14 +123,14 @@ app.get('/v0/opps', function(req, res) {
   // if it's not defined or it's false, add this filter
   if (!req.query.show_closed || S(req.query.show_closed).toBoolean() === false) {
     var show_closed = ejs.OrFilter([
-      ejs.QueryFilter(ejs.MatchQuery("ext.Status", "Pipeline")), //bids.stat.gov data has no close date, only status field
+      ejs.QueryFilter(ejs.MatchQuery("ext.Status", "Pipeline")), //bids.state.gov data has no close date, only status field
       ejs.AndFilter([
         ejs.QueryFilter(ejs.RangeQuery('close_dt').gt(config.elasticsearch.now_str)),
         ejs.MissingFilter('ext.Status')
       ])
     ]);
 
-    if (q !== '') {
+    if (req.query.q !== '') {
       filters.filters(show_closed);
     } else {
       queries.should(show_closed);
@@ -161,12 +158,11 @@ app.get('/v0/opps', function(req, res) {
 
   // default to using 'p' if present, as that will come from the webclient
   // calculate 'start' from 'p' and 'limit'
-  var p = req.query.p;
   var start;
-  if (!p) {
+  if (!req.query.p) {
     start = req.query.start || 0;
   } else {
-    start = (p - 1) * size;
+    start = (req.query.p - 1) * size;
   }
 
   // specify fields to be included in results
@@ -232,19 +228,19 @@ app.get('/v0/opps', function(req, res) {
   };
 
   var sorts = [];
-  if (S(q).isEmpty()) {
+  if (S(req.query.q).isEmpty()) {
     queries.should(ejs.MatchAllQuery());
     sorts.push({ close_dt: { order: 'asc', unmapped_type: 'date' }});
     sorts.push({ solnbr: { order: 'asc' }});
   } else {
-    var qsq = ejs.QueryStringQuery(decodeURIComponent(q));
+    var qsq = ejs.QueryStringQuery(decodeURIComponent(req.query.q));
     var child_query = ejs.HasChildQuery(qsq, "opp_attachment");
     queries.should(qsq);
     queries.should(child_query);
   }
 
-  if (!S(fq).isEmpty()) {
-    filters.filters(ejs.QueryFilter(ejs.QueryStringQuery(fq)));
+  if (!S(req.query.fq).isEmpty()) {
+    filters.filters(ejs.QueryFilter(ejs.QueryStringQuery(req.query.fq)));
   } else {
     filters.filters(ejs.MatchAllFilter());
   }
@@ -260,10 +256,13 @@ app.get('/v0/opps', function(req, res) {
     .query(queries)
     .filter(filters);
 
-  if (fieldlist) request.fields = fieldlist;
+  // specify fields to be whitelisted in results
+  if (req.query.fl) request.fields = req.query.fl;
 
   request_json = request.toJSON();
 
+  // due to incompatibility between new sort syntax and the Elastic.js library
+  // the sorts need to be added *after* the conversion to JSON
   if (sorts.length > 0) request_json.sort = sorts;
 
   // console.log(util.inspect(request.query().bool.should, null));
