@@ -19,6 +19,9 @@ module.exports = {
   clean_solnbr: function (solnbr) {
     return S(solnbr).trim().slugify().s;
   },
+  clean_setaside: function(setaside) {
+    return (setaside == 'N/A') ? '' : setaside;
+  },
   clean_field_value: function (field, val) {
     // unescape entity codes; strip out all other HTML
     var field_value = S(val).decodeHTMLEntities().stripTags();

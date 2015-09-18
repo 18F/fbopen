@@ -11,6 +11,7 @@ describe("The FBOpen API", function() {
   var client;
   var index_name;
   var expect = chai.expect;
+  chai.use(require('chai-things'));
 
   before(function(done) {
     // console.log(process.env.ELASTICSEARCH_HOST);
@@ -89,200 +90,457 @@ describe("The FBOpen API", function() {
     };
   };
 
-  it('should have 409 total opp records in the test index (including closed and sole source)', function(done) {
-    request(app)
-    .get('/v0/opps?show_noncompeted=1&show_closed=1')
-    .expect(200)
-    .expect('Content-Type', /json/)
-    .expect(num_found(409))
-    .end(done);
+  describe('version 0', function() {
+    it('should have 409 total opp records in the test index (including closed and sole source)', function(done) {
+      request(app)
+        .get('/v0/opps?show_noncompeted=1&show_closed=1')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(num_found(409))
+        .end(done);
+    });
+
+    it('should return all competed, open opps (default filter set)', function(done) {
+      request(app)
+        .get('/v0/opps')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(359))
+        .end(done);
+    });
+
+    it('should return only open opps (including non-competed)', function(done) {
+      request(app)
+        .get('/v0/opps?show_noncompeted=1')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(377))
+        .end(done);
+    });
+
+    it('should return all competed, open opps', function(done) {
+      request(app)
+        .get('/v0/opps?show_noncompeted=0')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(359))
+        .end(done);
+    });
+
+    it('should return all competed opps, whether open or closed', function(done) {
+      request(app)
+        .get('/v0/opps?show_closed=1')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(389))
+        .end(done);
+    });
+
+    it('should return all competed, open opps', function(done) {
+      request(app)
+        .get('/v0/opps?show_closed=0')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(359))
+        .end(done);
+    });
+
+    it('should return **all** opps', function(done) {
+      request(app)
+        .get('/v0/opps?show_closed=1&show_noncompeted=1')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(409))
+        .end(done);
+    });
+
+    it('should return competed, open opps about "computer"', function(done) {
+      request(app)
+        .get('/v0/opps?q=computer')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(13))
+        .expect(/computer/)
+        .end(done);
+    });
+
+    it('should return competed, open opps, filtered to "air force"', function(done) {
+      request(app)
+        .get('/v0/opps?fq="air%20force"')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(18))
+        .expect(/air force/i)
+        .end(done);
+    });
+
+    it('should return competed, open opps, filtered to "air force" and about "safety"', function(done) {
+      request(app)
+        .get('/v0/opps?fq="air%20force"&q="safety"')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(1))
+        .expect(/air force/i)
+        .expect(/safety/i)
+        .end(done);
+    });
+
+    //TODO: we need data from more sources, or to mark some test data as being from other sources, to properly test this
+    it('should return results from FBO', function(done) {
+      request(app)
+        .get('/v0/opps?data_source=fbo.gov&show_noncompeted=1&show_closed=1')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(186))
+        .end(done);
+    });
+
+    it('should return results from FBO, case insensitively', function(done) {
+      request(app)
+        .get('/v0/opps?data_source=FBO.gov&show_noncompeted=1&show_closed=1')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(186))
+        .end(done);
+    });
+
+    it('should not return any results for missing dataset', function(done) {
+      request(app)
+        .get('/v0/opps?data_source=foobar&show_noncompeted=1&show_closed=1')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(0))
+        .end(done);
+    });
+
+    it('should allow limiting results', function(done) {
+      request(app)
+        .get('/v0/opps?limit=2')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(359))
+        .expect(num_returned(2))
+        // that this record has moved to the front will be confirmed in the test
+        // "should allow paging results"
+        .expect(record_with_field('solnbr', 1, 'DHS-14-MT-041-000-01'))
+        .end(done);
+    });
+
+    it('should allow paging results with start/limit', function(done) {
+      request(app)
+        .get('/v0/opps?start=1&limit=2')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(359))
+        .expect(num_returned(2))
+        .expect(record_with_field('solnbr', 0, 'DHS-14-MT-041-000-01'))
+        .end(done);
+    });
+
+    it('should allow paging results with p', function(done) {
+      request(app)
+        .get('/v0/opps?p=2&limit=1')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(359))
+        .expect(num_returned(1))
+        .expect(record_with_field('solnbr', 0, 'DHS-14-MT-041-000-01'))
+        .end(done);
+    });
+
+    it('should accept a whitelist of fields to return', function(done) {
+      request(app)
+        .get('/v0/opps?fl=solnbr,close_dt')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(359))
+        .expect(record_with_field('solnbr', 0, 'ag-0355-s-14-0006'))
+        .expect(function(resp) { 
+          expect(resp.body.docs).to.not.have.property('agency'); 
+          expect(resp.body.docs).to.not.have.property('description');
+          expect(resp.body.docs).to.not.have.property('contact');
+        })
+        .end(done);
+    });
+    it('should order results such that first result matches solicitation number exactly when filtering to solnbr', function(done) {
+      request(app)
+        .get('/v0/opps?q=fa8571-14-r-0008')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(137))
+        .expect(record_with_field('solnbr', 0, 'fa8571-14-r-0008'))
+        .end(done);
+    });
+    it('should not allow users to return a single record by id', function(done) {
+      request(app)
+        .get('/v0/opp/fbo.gov:COMBINE:fa8571-14-r-0008')
+        .expect(404)
+        .end(done);
+    });
+    it('should have results for bids.state.gov data', function(done){
+      request(app)
+        .get('/v0/opps?data_source=bids.state.gov')
+        .expect(200)
+        .expect(num_found(24))
+        .end(done);
+    });
+    it('should have `score` but not `_score`', function(done){
+      request(app)
+        .get('/v0/opps?q=procure')
+        .expect(200)
+        .expect(function(resp) { expect(resp.body).to.have.property('docs'); })
+        .expect(function(resp) { expect(resp.body.docs).to.all.not.have.property('_score'); })
+        .expect(function(resp) { expect(resp.body.docs).to.all.have.property('score'); })
+        .end(function(err, resp) {
+          if (err) {
+            done(err);
+          } else {
+            // console.log(util.inspect(resp.body.docs[0])); // for debugging, with failing asserts commented out above
+            done();
+          }
+        });
+    });
+    it('should have `data_type`` but not `_type`', function(done){
+      request(app)
+        .get('/v0/opps?q=procure')
+        .expect(200)
+        .expect(function(resp) { expect(resp.body.docs).to.all.not.have.property('_type'); })
+        .expect(function(resp) { expect(resp.body.docs).to.all.have.property('data_type'); })
+        .end(function(err, resp) {
+          if (err) {
+            done(err);
+          } else {
+            // console.log(util.inspect(resp.body.docs[0])); // for debugging, with failing asserts commented out above
+            done();
+          }
+        });
+    });
   });
 
-  it('should return all competed, open opps (default filter set)', function(done) {
-    request(app)
-    .get('/v0/opps')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(359))
-    .end(done);
-  });
+  describe('version 1', function() {
+    it('should have 409 total opp records in the test index (including closed and sole source)', function(done) {
+      request(app)
+        .get('/v1/opps?show_noncompeted=1&show_closed=1')
+        .expect(200)
+        .expect('Content-Type', /json/)
+        .expect(num_found(409))
+        .end(done);
+    });
 
-  it('should return only open opps (including non-competed)', function(done) {
-    request(app)
-    .get('/v0/opps?show_noncompeted=1')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(377))
-    .end(done);
-  });
+    it('should return all competed, open opps (default filter set)', function(done) {
+      request(app)
+        .get('/v1/opps')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(359))
+        .end(done);
+    });
 
-  it('should return all competed, open opps', function(done) {
-    request(app)
-    .get('/v0/opps?show_noncompeted=0')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(359))
-    .end(done);
-  });
+    it('should return only open opps (including non-competed)', function(done) {
+      request(app)
+        .get('/v1/opps?show_noncompeted=1')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(377))
+        .end(done);
+    });
 
-  it('should return all competed opps, whether open or closed', function(done) {
-    request(app)
-    .get('/v0/opps?show_closed=1')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(389))
-    .end(done);
-  });
+    it('should return all competed, open opps', function(done) {
+      request(app)
+        .get('/v1/opps?show_noncompeted=0')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(359))
+        .end(done);
+    });
 
-  it('should return all competed, open opps', function(done) {
-    request(app)
-    .get('/v0/opps?show_closed=0')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(359))
-    .end(done);
-  });
+    it('should return all competed opps, whether open or closed', function(done) {
+      request(app)
+        .get('/v1/opps?show_closed=1')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(389))
+        .end(done);
+    });
 
-  it('should return **all** opps', function(done) {
-    request(app)
-    .get('/v0/opps?show_closed=1&show_noncompeted=1')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(409))
-    .end(done);
-  });
+    it('should return all competed, open opps', function(done) {
+      request(app)
+        .get('/v1/opps?show_closed=0')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(359))
+        .end(done);
+    });
 
-  it('should return competed, open opps about "computer"', function(done) {
-    request(app)
-    .get('/v0/opps?q=computer')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(13))
-    .expect(/computer/)
-    .end(done);
-  });
+    it('should return **all** opps', function(done) {
+      request(app)
+        .get('/v1/opps?show_closed=1&show_noncompeted=1')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(409))
+        .end(done);
+    });
 
-  it('should return competed, open opps, filtered to "air force"', function(done) {
-    request(app)
-    .get('/v0/opps?fq="air%20force"')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(18))
-    .expect(/air force/i)
-    .end(done);
-  });
+    it('should return competed, open opps about "computer"', function(done) {
+      request(app)
+        .get('/v1/opps?q=computer')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(13))
+        .expect(/computer/)
+        .end(done);
+    });
 
-  it('should return competed, open opps, filtered to "air force" and about "safety"', function(done) {
-    request(app)
-    .get('/v0/opps?fq="air%20force"&q="safety"')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(1))
-    .expect(/air force/i)
-    .expect(/safety/i)
-    .end(done);
-  });
+    it('should return competed, open opps, filtered to "air force"', function(done) {
+      request(app)
+        .get('/v1/opps?fq="air%20force"')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(18))
+        .expect(/air force/i)
+        .end(done);
+    });
 
-  //TODO: we need data from more sources, or to mark some test data as being from other sources, to properly test this
-  it('should return results from FBO', function(done) {
-    request(app)
-    .get('/v0/opps?data_source=fbo.gov&show_noncompeted=1&show_closed=1')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(186))
-    .end(done);
-  });
+    it('should return competed, open opps, filtered to "air force" and about "safety"', function(done) {
+      request(app)
+        .get('/v1/opps?fq="air%20force"&q="safety"')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(1))
+        .expect(/air force/i)
+        .expect(/safety/i)
+        .end(done);
+    });
 
-  it('should return results from FBO, case insensitively', function(done) {
-    request(app)
-    .get('/v0/opps?data_source=FBO.gov&show_noncompeted=1&show_closed=1')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(186))
-    .end(done);
-  });
+    //TODO: we need data from more sources, or to mark some test data as being from other sources, to properly test this
+    it('should return results from FBO', function(done) {
+      request(app)
+        .get('/v1/opps?data_source=fbo.gov&show_noncompeted=1&show_closed=1')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(186))
+        .end(done);
+    });
 
-  it('should not return any results for missing dataset', function(done) {
-    request(app)
-    .get('/v0/opps?data_source=foobar&show_noncompeted=1&show_closed=1')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(0))
-    .end(done);
-  });
+    it('should return results from FBO, case insensitively', function(done) {
+      request(app)
+        .get('/v1/opps?data_source=FBO.gov&show_noncompeted=1&show_closed=1')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(186))
+        .end(done);
+    });
 
-  it('should allow limiting results', function(done) {
-    request(app)
-    .get('/v0/opps?limit=2')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(359))
-    .expect(num_returned(2))
-    // that this record has moved to the front will be confirmed in the test
-    // "should allow paging results"
-    .expect(record_with_field('solnbr', 1, 'DHS-14-MT-041-000-01'))
-    .end(done);
-  });
+    it('should not return any results for missing dataset', function(done) {
+      request(app)
+        .get('/v1/opps?data_source=foobar&show_noncompeted=1&show_closed=1')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(0))
+        .end(done);
+    });
 
-  it('should allow paging results with start/limit', function(done) {
-    request(app)
-    .get('/v0/opps?start=1&limit=2')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(359))
-    .expect(num_returned(2))
-    .expect(record_with_field('solnbr', 0, 'DHS-14-MT-041-000-01'))
-    .end(done);
-  });
+    it('should allow limiting results', function(done) {
+      request(app)
+        .get('/v1/opps?limit=2')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(359))
+        .expect(num_returned(2))
+        // that this record has moved to the front will be confirmed in the test
+        // "should allow paging results"
+        .expect(record_with_field('solnbr', 1, 'DHS-14-MT-041-000-01'))
+        .end(done);
+    });
 
-  it('should allow paging results with p', function(done) {
-    request(app)
-    .get('/v0/opps?p=2&limit=1')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(359))
-    .expect(num_returned(1))
-    .expect(record_with_field('solnbr', 0, 'DHS-14-MT-041-000-01'))
-    .end(done);
-  });
+    it('should allow paging results with start/limit', function(done) {
+      request(app)
+        .get('/v1/opps?start=1&limit=2')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(359))
+        .expect(num_returned(2))
+        .expect(record_with_field('solnbr', 0, 'DHS-14-MT-041-000-01'))
+        .end(done);
+    });
 
-  it('should accept a whitelist of fields to return', function(done) {
-    request(app)
-    .get('/v0/opps?fl=solnbr,close_dt')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(359))
-    .expect(record_with_field('solnbr', 0, 'ag-0355-s-14-0006'))
-    .end(done);
-  });
- it('should order results such that first result matches solicitation number exactly when filtering to solnbr', function(done) {
-    request(app)
-    .get('/v0/opps?q=fa8571-14-r-0008')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(num_found(137))
-    .expect(record_with_field('solnbr', 0, 'fa8571-14-r-0008'))
-    .end(done);
-  });
- it('should allow users to return a single record by id', function(done) {
-    request(app)
-    .get('/v0/opp/fbo.gov:COMBINE:fa8571-14-r-0008')
-    .expect(200)
-    .expect('Content-Type', 'application/json; charset=utf-8')
-    .expect(record_with_field('solnbr', 0, 'fa8571-14-r-0008'))
-    .end(done);
-  });
-  it('should have results for bids.state.gov data', function(done){
-    request(app)
-    .get('/v0/opps?data_source=bids.state.gov')
-    .expect(200)
-    .expect(num_found(24))
-    .end(done);
-  });
+    it('should allow paging results with p', function(done) {
+      request(app)
+        .get('/v1/opps?p=2&limit=1')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(359))
+        .expect(num_returned(1))
+        .expect(record_with_field('solnbr', 0, 'DHS-14-MT-041-000-01'))
+        .end(done);
+    });
 
+    it('should accept a whitelist of fields to return', function(done) {
+      request(app)
+        .get('/v1/opps?fl=solnbr,close_dt')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(359))
+        .expect(record_with_field('solnbr', 0, 'ag-0355-s-14-0006'))
+        .end(done);
+    });
+    it('should order results such that first result matches solicitation number exactly when filtering to solnbr', function(done) {
+      request(app)
+        .get('/v1/opps?q=fa8571-14-r-0008')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(num_found(137))
+        .expect(record_with_field('solnbr', 0, 'fa8571-14-r-0008'))
+        .end(done);
+    });
+    it('should allow users to return a single record by id', function(done) {
+      request(app)
+        .get('/v1/opp/fbo.gov:COMBINE:fa8571-14-r-0008')
+        .expect(200)
+        .expect('Content-Type', 'application/json; charset=utf-8')
+        .expect(record_with_field('solnbr', 0, 'fa8571-14-r-0008'))
+        .end(done);
+    });
+    it('should have results for bids.state.gov data', function(done){
+      request(app)
+        .get('/v1/opps?data_source=bids.state.gov')
+        .expect(200)
+        .expect(num_found(24))
+        .end(done);
+    });
+    it('should have `_score` but not `score`', function(done){
+      request(app)
+        .get('/v1/opps?q=procure')
+        .expect(200)
+        .expect(function(resp) { expect(resp.body).to.have.property('docs'); })
+        .expect(function(resp) { expect(resp.body.docs).to.all.not.have.property('score'); })
+        .expect(function(resp) { expect(resp.body.docs).to.all.have.property('_score'); })
+        .end(function(err, resp) {
+          if (err) {
+            done(err);
+          } else {
+            // console.log(util.inspect(resp.body.docs[0])); // for debugging, with failing asserts commented out above
+            done();
+          }
+        });
+    });
+    it('should have `_type` but not `data_type`', function(done){
+      request(app)
+        .get('/v1/opps?q=procure')
+        .expect(200)
+        .expect(function(resp) { expect(resp.body.docs).to.all.not.have.property('data_type'); })
+        .expect(function(resp) { expect(resp.body.docs).to.all.have.property('_type'); })
+        .end(function(err, resp) {
+          if (err) {
+            done(err);
+          } else {
+            // console.log(util.inspect(resp.body.docs[0])); // for debugging, with failing asserts commented out above
+            done();
+          }
+        });
+    });
+  });
   after(function(done) {
-    console.log(process.env.ELASTICSEARCH_HOST);
-
     async.series([
         function (callback) {
           client.indices.delete({index: index_name}, callback);

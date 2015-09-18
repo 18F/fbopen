@@ -23,7 +23,9 @@ var express = require('express'),
   errorhandler = require('errorhandler'),
   winston = require('winston'),
   express_winston = require('express-winston'),
-  config = require('./config');
+  config = require('./config'),
+  results_formatter = require('./formatter');
+
 
 var app = express();
 module.exports = app;
@@ -94,17 +96,12 @@ app.get('/v0/hello', function(req, res) {
 });
 
 // Queries
-app.get('/v0/opps', function(req, res) {
-
+app.get('/:api_version(v[01])/opps', function(req, res) {
   res.set('Access-Control-Allow-Origin', '*');
   res.set('Content-Type', 'application/json;charset=utf-8');
 
   var queries = ejs.BoolQuery();
   var filters = ejs.AndFilter([]);
-
-  //
-  // special fields
-  //
 
   if (!(req.query.show_noncompeted && S(req.query.show_noncompeted).toBoolean())) {
     // omit non-competed listings unless otherwise specified
@@ -165,68 +162,6 @@ app.get('/v0/opps', function(req, res) {
     start = (req.query.p - 1) * size;
   }
 
-  // specify fields to be included in results
-  var fieldlist;
-  if (req.query.fl) {
-    fieldlist = req.query.fl.split(',');
-  }
-
-  var results_callback = function(body) {
-    if (!(body.hits && body.hits.total)) {
-      return res.json({numFound: 0});
-    }
-
-    var results_out = {};
-
-    if (_u.has(body, 'hits') && _u.has(body.hits, 'total')) {
-      results_out.numFound = body.hits.total;
-    } else {
-      results_out.numFound = 0;
-      return res.json(results_out);
-    }
-
-    // map highlights into docs, instead of separate data,
-    // and do a few other cleanup manipulations
-    var sorted_by_score = false;
-
-    results_out.docs = _u.map(body.hits.hits, function(doc) {
-      var doc_out = _u.omit(doc, '_id', '_source', '_index', 'fields');
-      doc_out.id = doc._id;
-
-      _u.extend(doc_out, doc._source);
-
-      // if a fieldlist (fl) is specified, the fields are returned
-      // under a "fields" key, and the values are returned as arrays
-      // the following is to flatten that structure
-      _u.each(_u.keys(doc.fields), function(key) {
-        doc_out[key] = doc.fields[key][0];
-      });
-
-      // adjust score to 0-100
-      if (doc._score !== null) {
-        sorted_by_score = true;
-        doc_out.score = Math.min(Math.round(doc._score * 100), 100);
-      }
-
-      // clean up fields
-      doc_out.data_source = doc_out.data_source || '';
-      if (doc_out.FBO_SETASIDE == 'N/A') doc_out.FBO_SETASIDE = '';
-
-      // type-specific changes, until we've normalized the data import
-      if (doc_out.FBO_CONTACT !== '') doc_out.contact = doc_out.FBO_CONTACT;
-      if (doc_out.AgencyContact_t !== '') doc_out.contact = doc_out.AgencyContact_t;
-
-      return doc_out;
-    });
-
-    // required by sort indicator
-    results_out.sorted_by = sorted_by_score ? 'relevance' : 'due date (oldest first), opportunity #';
-    // required by paging
-    results_out.start = start;
-
-    res.json(results_out);
-  };
-
   var sorts = [];
   if (S(req.query.q).isEmpty()) {
     queries.should(ejs.MatchAllQuery());
@@ -272,7 +207,7 @@ app.get('/v0/opps', function(req, res) {
     type: "opp",
     body: request.toJSON()
   }).then(function(body) {
-    results_callback(body);
+    results_formatter(body, start, res, req.params.api_version);
   }, function(error) {
     return res.json({'error': error});
   });

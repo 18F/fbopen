@@ -6,27 +6,29 @@
     "start": "node app.js"
   },
   "devDependencies": {
-    "chai": "^3.2.0",
-    "mocha": "^2.3.0",
     "async": "^1.4.2",
-    "supertest": "^1.1.0",
-    "chai-as-promised": "^5.1.0"
+    "chai": "^3.2.0",
+    "chai-as-promised": "^5.1.0",
+    "chai-things": "^0.2.0",
+    "mocha": "^2.3.0",
+    "supertest": "^1.1.0"
   },
   "dependencies": {
-    "express": "^4.13.3",
-    "serve-favicon": "^2.3.0",
     "body-parser": "^1.13.3",
-    "method-override": "^2.3.5",
-    "errorhandler": "",
-    "morgan": "",
-    "jade": "*",
     "cfenv": "^1.0.0",
-    "request": "*",
     "elasticsearch": "*",
-    "string": ">=1.8.1",
+    "errorhandler": "",
+    "express": "^4.13.3",
+    "express-winston": "*",
     "http-auth": "*",
+    "jade": "*",
+    "method-override": "^2.3.5",
+    "morgan": "",
+    "request": "*",
+    "serve-favicon": "^2.3.0",
+    "string": ">=1.8.1",
     "underscore": "*",
-    "winston": "*",
-    "express-winston": "*"
+    "underscore-contrib": "^0.3.0",
+    "winston": "*"
   }
 }

@@ -121,6 +121,7 @@ var field_map = {
 	, 'ApplicationsDueDate': 'close_dt'
 	, 'FundingOppDescription': 'description'
 	, 'listing_url': 'listing_url' // constructed below
+  , 'AgencyContact': 'contact'
 };
 
 var multiple_list = ['EligibilityCategory', 'AgencyContact', 'FundingInstrumentType', 'FundingActivityCategory', 'CFDANumber'];

@@ -17,6 +17,7 @@ var field_map = {
 	, 'RESPDATE': 'close_dt'
 	, 'DESC': 'description'
 	, 'URL': 'listing_url'
+	, 'CONTACT': 'contact'
 };
 
 var ext_field_map = {
@@ -75,6 +76,8 @@ es.pipeline(
                 if (field == 'DATE') {
                     val_in = val_in + notice.YEAR;
                 }
+
+                if (field == 'SETASIDE') val_out = tools.clean_setaside(notice[field]);
 
                 // fix up data fields
                 val_out = tools.clean_field_value(field_out, val_in);
