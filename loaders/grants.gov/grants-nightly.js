@@ -140,16 +140,16 @@ function process_notice(notice, notice_idx) {
   var es_obj = { 'ext': {} };
 	// collect fields and reformat them for Solr ingestion
 	var notice_values = []; // clean values
-	var notice_fields = new Array(); // formatted fields for Solr-friendly XML
+	var notice_fields = []; // formatted fields for Solr-friendly XML
 	var el, el_tag, el_value, solnbr, solnbr_raw, link_url, s_out, notice_type;
 	var email_tag, email_child_el;
 
-	notice_type = notice['tag']; // always "FundingOppSynopsis" or "FundingOppModSynopsis"
+	notice_type = notice.tag; // always "FundingOppSynopsis" or "FundingOppModSynopsis"
 
 	for (var el_idx in notice.children) {
 
-		el = notice['children'][el_idx];
-		el_tag = el['tag'];
+		el = notice.children[el_idx];
+		el_tag = el.tag;
     el_value = clean_field(el);
 
 		// skip certain fields
@@ -164,13 +164,13 @@ function process_notice(notice, notice_idx) {
     if (el_tag in field_map){
         es_obj[field_map[el_tag]] = el_value;
     } else if (multiple_list.indexOf(el_tag) > -1) {
-        if(es_obj['ext'][el_tag] !== undefined) {
-            es_obj['ext'][el_tag].push(el_value);
+        if(es_obj.ext[el_tag] !== undefined) {
+            es_obj.ext[el_tag].push(el_value);
         } else {
-            es_obj['ext'][el_tag] = [el_value];
+            es_obj.ext[el_tag] = [el_value];
         }
     } else {
-        es_obj['ext'][el_tag] = el_value;
+        es_obj.ext[el_tag] = el_value;
     }
 
 		// TESTING
@@ -185,7 +185,7 @@ function process_notice(notice, notice_idx) {
 		// ... AND use solnbr for lookup to construct listing_url
 		if (el_tag == 'FundingOppNumber') {
 
-			solnbr_raw = el['text'];
+			solnbr_raw = el.text;
 			solnbr = tools.clean_solnbr(el_value);
 
 			// For awards, add the sequential number of this award.
@@ -195,22 +195,28 @@ function process_notice(notice, notice_idx) {
 			// 	notice_solr_id += '__AWARD__' + award_count;
 			// }
 
-      es_obj['id'] = datasource_id + ':' + notice_id;
-      es_obj['data_source'] = datasource_id;
+      es_obj.id = datasource_id + ':' + notice_id;
+      es_obj.data_source = datasource_id;
 
 			// console.log('solnbr ' + solnbr + ': notice_type = ' + notice_type + ', id = ' + notice_fields['id']);
 		}
 
 	} // for el_idx in notice['children']
 
+  // Filter final records to import.
+  // Criteria:
+  // - Must have close_dt
+  // - close_dt must follow current date (or date passed in with -d flag)
+  // Explanation:
+  // - Archived records have no close_dt (nor listing_Url), so they must also be excluded
 
-	// FOR NOW, only load grants that haven't closed yet
-	if (moment(es_obj['close_dt'], 'YYYY-MM-DD') > datetime_now) {
-		// get the unique ID, via REST request, to construct the URL
-		es_obj['listing_url'] = get_listing_url(solnbr_raw);
-    output_data.push(JSON.stringify(es_obj));
-    track_output_completion();
-	}
+  if (es_obj.close_dt) { // only include record if close_dt is present-- the alternative is that it has been archived, and it won't have a listing_url
+    if (moment(es_obj.close_dt, 'YYYY-MM-DD') > datetime_now) { // only import non-closed (and non-archived) records
+      es_obj.listing_url = get_listing_url(solnbr_raw);
+      output_data.push(JSON.stringify(es_obj));
+      track_output_completion();
+    }
+  }
 }
 
 
