@@ -27,7 +27,6 @@ var config = require('./config.js');
 
 var log_file = config.log_file || 'grants-nightly.log';
 var datasource_id = config.datasource_id || 'grants.gov';
-var datetime_now = moment();
 
 var cdata_regex = /<!\[CDATA\[(.*)\]\]>/;
 
@@ -38,12 +37,21 @@ var argv = optimist
 	.describe('f', 'optional XML file to process; default = downloads/GrantsDBExtract[YYYYMMDD].xml')
 	.alias('j', 'jsondata')
 	.describe('j', 'optional JSON file to use for id-to-URL mapping; default = downloads/grants-ids-latest.json')
+  .alias('d', 'date')
+  .describe('d', 'optional date [YYYY-MM-DD] to be used for filtering closed records instead of current datetime')
 	.alias('h', 'Help')
 	.argv;
 
 if (argv.h) { // show help
 	console.log(optimist.help());
 	process.exit(0);
+}
+
+var datetime_now;
+if (argv.d) {
+  datetime_now = moment(argv.d);
+} else {
+  datetime_now = moment();
 }
 
 if (argv.f) {
