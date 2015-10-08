@@ -1,16 +1,19 @@
 var request = require('supertest'),
     chai = require('chai'),
+    expect = require('chai').expect,
+    tv4 = require('tv4'),
     app = require('../app.js'),
     async = require('async'),
     path = require('path'),
     child_process = require('child_process'),
     util = require('util'),
-    elasticsearch = require('elasticsearch');
+    elasticsearch = require('elasticsearch'),
+    v0 = require('../v0.js'),
+    v1 = require('../v1.js');
 
 describe("The FBOpen API", function() {
   var client;
   var index_name;
-  var expect = chai.expect;
   chai.use(require('chai-things'));
 
   before(function(done) {
@@ -31,11 +34,11 @@ describe("The FBOpen API", function() {
       }, function (callback) {
         client.indices.putMapping({index: index_name, type: 'opp_attachment', body: {
           "opp_attachment" : {
-            "_parent": { "type": "opp" }, 
-            "_source": { "excludes": [ "content" ] }, 
+            "_parent": { "type": "opp" },
+            "_source": { "excludes": [ "content" ] },
             "properties": {
-              "content": { 
-                "type": "attachment", 
+              "content": {
+                "type": "attachment",
                 "fields": {
                   "content": { "store": "no" },
                   "author": { "store": "no" },
@@ -44,8 +47,8 @@ describe("The FBOpen API", function() {
                   "keywords": { "store": "no", "analyzer": "keyword" },
                   "_name": { "store": "no" },
                   "_content_type": { "store": "no" }
-                } 
-              } 
+                }
+              }
             }
           }
         }}, callback);
@@ -91,6 +94,19 @@ describe("The FBOpen API", function() {
   };
 
   describe('version 0', function() {
+    it('should have a valid v0 schema', function(done){
+      request(app)
+        .get('/v0/opps?q=software')
+        .expect(200)
+        .end(function(err, resp) {
+          tv4.validateResult(resp.body, v0, false, true, function(isValid, validationError) {
+            console.log(validationError);
+            expect(isValid).to.be.true;
+            expect(validationError).to.have.length(0, validationError);
+          });
+          done(err);
+        });
+    });
     it('should have 409 total opp records in the test index (including closed and sole source)', function(done) {
       request(app)
         .get('/v0/opps?show_noncompeted=1&show_closed=1')
@@ -255,8 +271,8 @@ describe("The FBOpen API", function() {
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(num_found(359))
         .expect(record_with_field('solnbr', 0, 'ag-0355-s-14-0006'))
-        .expect(function(resp) { 
-          expect(resp.body.docs).to.not.have.property('agency'); 
+        .expect(function(resp) {
+          expect(resp.body.docs).to.not.have.property('agency');
           expect(resp.body.docs).to.not.have.property('description');
           expect(resp.body.docs).to.not.have.property('contact');
         })
@@ -284,7 +300,7 @@ describe("The FBOpen API", function() {
         .expect(num_found(24))
         .end(done);
     });
-    it('should have `score` but not `_score`', function(done){
+    it.skip('should have `score` but not `_score`', function(done){
       request(app)
         .get('/v0/opps?q=procure')
         .expect(200)
@@ -300,7 +316,7 @@ describe("The FBOpen API", function() {
           }
         });
     });
-    it('should have `data_type`` but not `_type`', function(done){
+    it.skip('should have `data_type` but not `_type`', function(done){
       request(app)
         .get('/v0/opps?q=procure')
         .expect(200)
@@ -318,6 +334,19 @@ describe("The FBOpen API", function() {
   });
 
   describe('version 1', function() {
+    it('should have a valid v1 schema', function(done){
+      request(app)
+        .get('/v1/opps?q=software')
+        .expect(200)
+        .end(function(err, resp) {
+          tv4.validateMultiple(resp.body, v1, false, true, function(isValid, validationError) {
+            console.log(validationError);
+            expect(isValid).to.be.true;
+            expect(validationError).to.have.length(0, validationError);
+          });
+          done(err);
+        });
+    });
     it('should have 409 total opp records in the test index (including closed and sole source)', function(done) {
       request(app)
         .get('/v1/opps?show_noncompeted=1&show_closed=1')
