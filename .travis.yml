@@ -5,7 +5,7 @@ script: make test
 #services: elasticsearch
 #sudo: false
 node_js:
-    - "4.1.2"
+    - "0.12.7"
 addons:
     apt:
         packages:
