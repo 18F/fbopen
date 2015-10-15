@@ -3,7 +3,6 @@ var request = require('supertest'),
     chai = require('chai'),
     expect = require('chai').expect,
     tv4 = require('tv4'),
-    app = require('../app.js'),
     async = require('async'),
     path = require('path'),
     child_process = require('child_process'),
@@ -13,14 +12,20 @@ var request = require('supertest'),
     v1 = require('../v1.js');
 
 describe("The FBOpen API", function() {
+  var app;
   var client;
   var index_name;
   chai.use(require('chai-things'));
 
   before(function(done) {
     this.timeout(10000);
-    // console.log(process.env.ELASTICSEARCH_HOST);
     index_name = 'fbopen_api_test';
+
+    process.env.ELASTICSEARCH_NOW = '2014-04-05';
+    process.env.ELASTICSEARCH_INDEX = index_name;
+    process.env.ELASTICSEARCH_HOST = 'localhost';
+
+    app = require('../app.js');
 
     client = new elasticsearch.Client({
       host: 'localhost:9200',
