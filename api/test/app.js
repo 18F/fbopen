@@ -99,11 +99,8 @@ describe("The FBOpen API", function() {
         .get('/v0/opps?q=software')
         .expect(200)
         .end(function(err, resp) {
-          tv4.validateResult(resp.body, v0, false, true, function(isValid, validationError) {
-            console.log(validationError);
-            expect(isValid).to.be.true;
-            expect(validationError).to.have.length(0, validationError);
-          });
+          validation = tv4.validateMultiple(resp.body, v0, true, true);
+          console.log(validation);
           done(err);
         });
     });
@@ -300,7 +297,7 @@ describe("The FBOpen API", function() {
         .expect(num_found(24))
         .end(done);
     });
-    it.skip('should have `score` but not `_score`', function(done){
+    it('should have `score` but not `_score`', function(done){
       request(app)
         .get('/v0/opps?q=procure')
         .expect(200)
@@ -316,7 +313,7 @@ describe("The FBOpen API", function() {
           }
         });
     });
-    it.skip('should have `data_type` but not `_type`', function(done){
+    it('should have `data_type` but not `_type`', function(done){
       request(app)
         .get('/v0/opps?q=procure')
         .expect(200)
