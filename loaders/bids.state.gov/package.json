@@ -2,6 +2,7 @@
   "name": "bids.state.gov",
   "version": "0.0.1",
   "description": "BIDS data loader",
+  "private": true,
   "dependencies": {
     "sha1": "*"
   }

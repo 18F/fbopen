@@ -43,7 +43,9 @@ var results_formatter = function (body, start, res, api_version) {
     if (doc_out.ext.SETASIDE == 'N/A') doc_out.ext.SETASIDE = '';
 
     if (api_version == 'v0') {
-      doc_out = backwards_compat(doc_out);
+      // the "default" version for this code is really v1
+      // this is to make v1 look and feel like v0
+      doc_out = make_backwards_compatible(doc_out);
     }
 
     return doc_out;
@@ -53,8 +55,6 @@ var results_formatter = function (body, start, res, api_version) {
     return Math.max((prev.score || prev._score), (curr.score || curr._score));
   });
 
-  results_out.facets = {};
-
   // required by sort indicator
   results_out.sorted_by = sorted_by_score ? 'relevance' : 'due date (oldest first), opportunity #';
   // required by paging
@@ -63,7 +63,7 @@ var results_formatter = function (body, start, res, api_version) {
   res.json(results_out);
 };
 
-var backwards_compat = function (doc_out) {
+var make_backwards_compatible = function (doc_out) {
   if (doc_out.ext) {
     // at v1 we changed to always using the domain name consistently
     doc_out.data_source = (doc_out.data_source == 'fbo.gov') ? 'FBO' : doc_out.data_source;
@@ -80,6 +80,9 @@ var backwards_compat = function (doc_out) {
 
   doc_out.data_type = doc_out._type;
   delete doc_out._type;
+
+  doc_out.highlights = doc_out.highlight;
+  delete doc_out.highlight;
 
   delete doc_out.sort;
 
