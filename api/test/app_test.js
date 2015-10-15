@@ -55,13 +55,13 @@ describe("The FBOpen API", function() {
           }
         }}, callback);
       }, function (callback) {
-        console.log("    Loading data with command...");
-        child_cmd = 'elasticdump --input ' + path.resolve('./api/test/data/test_data.json') + ' --output=http://localhost:9200/'+index_name+' --limit=50';
+        child_cmd = 'elasticdump --input ' + path.resolve(path.join(__dirname, '/data/test_data.json')) + ' --output=http://localhost:9200/'+index_name+' --limit=50';
         // NOTE: if you have trouble with the test loading data properly, run the elasticdump command separately.
         // Make sure elasticdump says it has WRITTEN the objects.
-        console.log('    ' + child_cmd);
+        console.log("    Loading data with command: " + child_cmd);
         child_process.exec(child_cmd, callback);
       }, function(callback) {
+        // wait for indexing
         setTimeout(callback, 3000);
       }], function (err, resp) {
         //console.log(resp);
