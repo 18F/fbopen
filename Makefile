@@ -3,7 +3,7 @@ TESTS=api/test/*.js
 test-api:
 	mkdir -p log/
 	touch log/api.log
-	ELASTICSEARCH_NOW=2014-04-05 ELASTICSEARCH_INDEX=fbopen_api_test ELASTICSEARCH_HOST=localhost mocha --bail --timeout 10000 --reporter spec $(TESTS)
+	ELASTICSEARCH_NOW=2014-04-05 ELASTICSEARCH_INDEX=fbopen_api_test ELASTICSEARCH_HOST=localhost mocha --bail --reporter spec $(TESTS)
 
 travis-setup:
 	sudo service elasticsearch stop

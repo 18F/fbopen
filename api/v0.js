@@ -12,7 +12,7 @@ schema = {
       "description": "The index of the record to start returning results at (zero-indexed)"
     },
     "maxScore": {
-      "type": "integer",
+      "type": ["integer", "null"],
       "description": "The top score given to any record matching the search"
     },
     "facets": {
@@ -28,6 +28,10 @@ schema = {
         }
       }
     },
+    "sorted_by": {
+      "type": "string",
+      "description": "The field or fields the results have been sorted by"
+    },
     "docs": {
       "type": "array",
       "description": "A paginated subset of records matching the search",
@@ -42,11 +46,11 @@ schema = {
       "description": "A single record outlining an opportunity to do business with the federal government",
       "properties": {
         "data_type": {
-          "type": { "enum": [ "opp" ] },
+          "enum": [ "opp" ],
           "description": "The type of record in the FBOpen system"
         },
         "data_source": {
-          "type": { "enum": ["FBO", "fbo.gov", "grants.gov", "dodsbir.net", "bids.state.gov"] },
+          "enum": ["FBO", "fbo.gov", "grants.gov", "dodsbir.net", "bids.state.gov"],
           "description": "The source of the data",
         },
         "notice_type": {

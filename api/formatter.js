@@ -55,8 +55,6 @@ var results_formatter = function (body, start, res, api_version) {
     return Math.max((prev.score || prev._score), (curr.score || curr._score));
   });
 
-  results_out.facets = {};
-
   // required by sort indicator
   results_out.sorted_by = sorted_by_score ? 'relevance' : 'due date (oldest first), opportunity #';
   // required by paging

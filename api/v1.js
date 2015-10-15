@@ -13,8 +13,12 @@ schema = {
       "description": "The index of the record to start returning results at (zero-indexed)"
     },
     "maxScore": {
-      "type": "integer",
+      "type": ["integer", "null"],
       "description": "The top score given to any record matching the search"
+    },
+    "sorted_by": {
+      "type": "string",
+      "description": "The field or fields the results have been sorted by"
     },
     "docs": {
       "type": "array",
@@ -32,11 +36,11 @@ schema = {
       "properties": {
         "required": [ "numFound", "start", "maxScore", "docs" ],
         "_type": {
-          "type": { "enum": [ "opp", "opp_attachment" ] },
+          "enum": [ "opp", "opp_attachment" ],
           "description": "The type of record in the FBOpen system"
         },
         "data_source": {
-          "type": { "enum": ["FBO", "fbo.gov", "grants.gov", "dodsbir.net", "bids.state.gov"] },
+          "enum": ["FBO", "fbo.gov", "grants.gov", "dodsbir.net", "bids.state.gov"],
           "description": "The source of the data",
         },
         "notice_type": {
@@ -97,7 +101,7 @@ schema = {
           "type": "number",
           "description": "The search score"
         },
-        "highlights": {
+        "highlight": {
           "type": "object",
           "description": "Object containing the fields matched, with search terms wrapped in <highlight></highlight> tags.",
           "additionalProperties": true

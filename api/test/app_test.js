@@ -1,3 +1,4 @@
+/*jshint expr: true*/
 var request = require('supertest'),
     chai = require('chai'),
     expect = require('chai').expect,
@@ -17,6 +18,7 @@ describe("The FBOpen API", function() {
   chai.use(require('chai-things'));
 
   before(function(done) {
+    this.timeout(10000);
     // console.log(process.env.ELASTICSEARCH_HOST);
     index_name = 'fbopen_api_test';
 
@@ -93,16 +95,16 @@ describe("The FBOpen API", function() {
     };
   };
 
-  describe('version 0', function() {
+  describe('Version 0', function() {
     it('should have a valid v0 schema', function(done){
       request(app)
         .get('/v0/opps?q=software')
         .expect(200)
-        .end(function(err, resp) {
+        .expect(function(resp) {
           validation = tv4.validateMultiple(resp.body, v0, true, true);
-          console.log(validation);
-          done(err);
-        });
+          expect(validation.errors).to.have.length(0, util.inspect(validation.errors));
+        })
+        .end(done);
     });
     it('should have 409 total opp records in the test index (including closed and sole source)', function(done) {
       request(app)
@@ -335,14 +337,11 @@ describe("The FBOpen API", function() {
       request(app)
         .get('/v1/opps?q=software')
         .expect(200)
-        .end(function(err, resp) {
-          tv4.validateMultiple(resp.body, v1, false, true, function(isValid, validationError) {
-            console.log(validationError);
-            expect(isValid).to.be.true;
-            expect(validationError).to.have.length(0, validationError);
-          });
-          done(err);
-        });
+        .expect(function(resp) {
+          validation = tv4.validateMultiple(resp.body, v1, true, true);
+          expect(validation.errors).to.have.length(0, util.inspect(validation.errors));
+        })
+        .end(done);
     });
     it('should have 409 total opp records in the test index (including closed and sole source)', function(done) {
       request(app)
