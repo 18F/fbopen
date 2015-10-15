@@ -1,21 +1,31 @@
+/*jshint expr: true*/
 var request = require('supertest'),
     chai = require('chai'),
-    app = require('../app.js'),
+    expect = require('chai').expect,
+    tv4 = require('tv4'),
     async = require('async'),
     path = require('path'),
     child_process = require('child_process'),
     util = require('util'),
-    elasticsearch = require('elasticsearch');
+    elasticsearch = require('elasticsearch'),
+    v0 = require('../v0.js'),
+    v1 = require('../v1.js');
 
 describe("The FBOpen API", function() {
+  var app;
   var client;
   var index_name;
-  var expect = chai.expect;
   chai.use(require('chai-things'));
 
   before(function(done) {
-    // console.log(process.env.ELASTICSEARCH_HOST);
+    this.timeout(10000);
     index_name = 'fbopen_api_test';
+
+    process.env.ELASTICSEARCH_NOW = '2014-04-05';
+    process.env.ELASTICSEARCH_INDEX = index_name;
+    process.env.ELASTICSEARCH_HOST = 'localhost';
+
+    app = require('../app.js');
 
     client = new elasticsearch.Client({
       host: 'localhost:9200',
@@ -31,11 +41,11 @@ describe("The FBOpen API", function() {
       }, function (callback) {
         client.indices.putMapping({index: index_name, type: 'opp_attachment', body: {
           "opp_attachment" : {
-            "_parent": { "type": "opp" }, 
-            "_source": { "excludes": [ "content" ] }, 
+            "_parent": { "type": "opp" },
+            "_source": { "excludes": [ "content" ] },
             "properties": {
-              "content": { 
-                "type": "attachment", 
+              "content": {
+                "type": "attachment",
                 "fields": {
                   "content": { "store": "no" },
                   "author": { "store": "no" },
@@ -44,19 +54,19 @@ describe("The FBOpen API", function() {
                   "keywords": { "store": "no", "analyzer": "keyword" },
                   "_name": { "store": "no" },
                   "_content_type": { "store": "no" }
-                } 
-              } 
+                }
+              }
             }
           }
         }}, callback);
       }, function (callback) {
-        console.log("    Loading data with command...");
-        child_cmd = 'elasticdump --input ' + path.resolve('./api/test/data/test_data.json') + ' --output=http://localhost:9200/'+index_name+' --limit=50';
+        child_cmd = 'elasticdump --input ' + path.resolve(path.join(__dirname, '/data/test_data.json')) + ' --output=http://localhost:9200/'+index_name+' --limit=50';
         // NOTE: if you have trouble with the test loading data properly, run the elasticdump command separately.
         // Make sure elasticdump says it has WRITTEN the objects.
-        console.log('    ' + child_cmd);
+        console.log("    Loading data with command: " + child_cmd);
         child_process.exec(child_cmd, callback);
       }, function(callback) {
+        // wait for indexing
         setTimeout(callback, 3000);
       }], function (err, resp) {
         //console.log(resp);
@@ -90,7 +100,17 @@ describe("The FBOpen API", function() {
     };
   };
 
-  describe('version 0', function() {
+  describe('Version 0', function() {
+    it('should have a valid v0 schema', function(done){
+      request(app)
+        .get('/v0/opps?q=software')
+        .expect(200)
+        .expect(function(resp) {
+          validation = tv4.validateMultiple(resp.body, v0, true, true);
+          expect(validation.errors).to.have.length(0, util.inspect(validation.errors));
+        })
+        .end(done);
+    });
     it('should have 409 total opp records in the test index (including closed and sole source)', function(done) {
       request(app)
         .get('/v0/opps?show_noncompeted=1&show_closed=1')
@@ -255,8 +275,8 @@ describe("The FBOpen API", function() {
         .expect('Content-Type', 'application/json; charset=utf-8')
         .expect(num_found(359))
         .expect(record_with_field('solnbr', 0, 'ag-0355-s-14-0006'))
-        .expect(function(resp) { 
-          expect(resp.body.docs).to.not.have.property('agency'); 
+        .expect(function(resp) {
+          expect(resp.body.docs).to.not.have.property('agency');
           expect(resp.body.docs).to.not.have.property('description');
           expect(resp.body.docs).to.not.have.property('contact');
         })
@@ -300,7 +320,7 @@ describe("The FBOpen API", function() {
           }
         });
     });
-    it('should have `data_type`` but not `_type`', function(done){
+    it('should have `data_type` but not `_type`', function(done){
       request(app)
         .get('/v0/opps?q=procure')
         .expect(200)
@@ -318,6 +338,16 @@ describe("The FBOpen API", function() {
   });
 
   describe('version 1', function() {
+    it('should have a valid v1 schema', function(done){
+      request(app)
+        .get('/v1/opps?q=software')
+        .expect(200)
+        .expect(function(resp) {
+          validation = tv4.validateMultiple(resp.body, v1, true, true);
+          expect(validation.errors).to.have.length(0, util.inspect(validation.errors));
+        })
+        .end(done);
+    });
     it('should have 409 total opp records in the test index (including closed and sole source)', function(done) {
       request(app)
         .get('/v1/opps?show_noncompeted=1&show_closed=1')
