@@ -45,10 +45,8 @@ var spawnLoader = nr.createBackgroundTransaction(fmt('loader:%s:spawn', LOADER_N
         FBOPEN_URI: config.elasticsearch.uri,
         PATH: process.env.PATH,
       }
-    }).on('data', function(data) { console.log(data.toString()); })
-    .on('error', function(err) { callback(err); })
-    .on('exit', function(code, signal) { callback(); })
-    .on('close', nr.createTracer(fmt('loader:%s:finishing', LOADER_NAME), function(code) {
+    });
+    child.on('close', nr.createTracer(fmt('loader:%s:finishing', LOADER_NAME), function(code) {
       if (code !== 0) {
         callback('Script returned non-zero exit status');
       } else {
