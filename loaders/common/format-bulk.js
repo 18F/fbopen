@@ -46,7 +46,7 @@ var index_command = function(id, type) {
     type = type || DEFAULT_TYPE;
     bulk_fmt = {index: { _id: id, _type: type }};
     if (index_name) {
-        bulk_fmt['index']['_index'] = index_name;
+        bulk_fmt.index._index = index_name;
     }
     return bulk_fmt;
 };
@@ -55,7 +55,7 @@ var update_command = function(id, type) {
     type = type || DEFAULT_TYPE;
     bulk_fmt = {update: { _id: id, _type: type }};
     if (index_name) {
-        bulk_fmt['update']['_index'] = index_name;
+        bulk_fmt.update._index = index_name;
     }
     return bulk_fmt;
 };
@@ -78,8 +78,9 @@ var bulkify_data = function (data) {
             description = _delete(data, 'description');
             // we may need to figure out how to bypass this for grants
             descrip_obj = {};
-            descrip_obj['script'] = "fbopen_append_desc";
-            descrip_obj['params'] = { "description": description, "posted_dt": data['posted_dt'] };
+            descrip_obj.script_file = "fbopen_append_desc";
+            descrip_obj.lang = "mvel";
+            descrip_obj.params = { "description": description, "posted_dt": data.posted_dt };
 
             lines.push(JSON.stringify(update_command(id)));
             lines.push(JSON.stringify(descrip_obj));
@@ -87,8 +88,8 @@ var bulkify_data = function (data) {
 
         // for updates, we need to wrap the data in a "doc" attribute
         new_data = {};
-        new_data['doc_as_upsert'] = true;
-        new_data['doc'] = data;
+        new_data.doc_as_upsert = true;
+        new_data.doc = data;
 
         lines.push(JSON.stringify(update_command(id)));
         lines.push(JSON.stringify(new_data));
