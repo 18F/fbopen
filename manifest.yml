@@ -35,7 +35,7 @@ applications:
   disk_quota: 1GB
   memory: 1GB
   path: ./loaders
-  command: node cron.js grants-nightly
+  command: node cron.js grants.gov/grants-nightly
   buildpack: nodejs_buildpack
   env:
     CRON_TIME: "30 12 * * *"
@@ -52,7 +52,7 @@ applications:
   disk_quota: 1GB
   memory: 1GB
   path: ./loaders
-  command: node cron.js fbo-nightly
+  command: node cron.js fbo.gov/fbo-nightly
   buildpack: nodejs_buildpack
   env:
     CRON_TIME: "35 12 * * *"
@@ -70,7 +70,7 @@ applications:
   disk_quota: 512MB
   memory: 512MB
   path: ./loaders
-  command: node cron.js bids-nightly
+  command: node cron.js bids.state.gov/bids-nightly
   buildpack: nodejs_buildpack
   env:
     CRON_TIME: "40 12 * * *"

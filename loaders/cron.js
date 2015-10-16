@@ -10,9 +10,10 @@ var CronJob = require('cron').CronJob,
 // Invocation:
 // node cron.js <loader_name>
 
-var LOADER_NAME;
+var LOADER_NAME, LOADER_PATH;
 if (process.argv[2]) {
-  LOADER_NAME = process.argv[2];
+  LOADER_PATH = process.argv[2];
+  LOADER_NAME = path.basename(LOADER_PATH);
 } else {
   console.error(new Error("Loader name not specified!"));
   process.exit(1);
@@ -36,7 +37,7 @@ var loaderNightly = nr.createBackgroundTransaction(fmt('loader:%s:check', LOADER
 
 var spawnLoader = nr.createBackgroundTransaction(fmt('loader:%s:spawn', LOADER_NAME), function (callback) {
   var child = nr.createTracer(fmt('loader:%s:start', LOADER_NAME), function() {
-    spawn(path.join(__dirname, fmt('%s.sh', LOADER_NAME)), [], {
+    child = spawn(path.join(__dirname, fmt('%s.sh', LOADER_PATH)), [], {
       detached: true,
       stdio: 'inherit',
       env: {
