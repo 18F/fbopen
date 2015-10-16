@@ -4,8 +4,8 @@
   "description": "Parses nightly grants.gov data dumps and loads them into Elasticsearch.",
   "private": true,
   "repository": {
-      "type": "git",
-      "url": "https://github.com/18F/fbopen.git"
+    "type": "git",
+    "url": "https://github.com/18F/fbopen.git"
   },
   "dependencies": {
     "big-xml": "^0.7.0",
@@ -14,12 +14,14 @@
     "date-format-lite": "^0.7.4",
     "event-stream": "^3.3.1",
     "json": "^9.0.3",
-    "loaders-grants.gov": "./grants.gov",
     "loaders-fbo.gov": "./fbo.gov",
+    "loaders-grants.gov": "./grants.gov",
     "moment": "^2.10.6",
+    "moment-timezone": "^0.3.1",
     "newrelic": "^1.21.2",
     "optimist": "^0.6.1",
     "request": "^2.60.0",
+    "sha1": "^1.1.1",
     "string": "^3.3.1",
     "underscore": "^1.8.3",
     "xml-splitter": "^1.2.1"
