@@ -8,6 +8,7 @@ applications:
     ES_SERVICE_NAME: es-idx
   services:
     - es-idx
+    - elk-logs
 - name: web
   host: fbopen-dev-web
   path: ./flask-www
@@ -15,6 +16,7 @@ applications:
   buildpack: python_buildpack
   services:
     - creds
+    - elk-logs
   env:
     FBOPEN_API_HOST: http://fbopen-dev-api.18f.gov/
     FBOPEN_API_PATH: /v0/opps
@@ -30,6 +32,7 @@ applications:
     CRON_SCHEDULE: "* * * * * *"
   services:
     - es-idx
+    - elk-logs
 - name: grants
   no-route: true
   disk_quota: 1GB
@@ -47,6 +50,7 @@ applications:
     NEW_RELIC_LOG_LEVEL: trace
   services:
     - es-idx
+    - elk-logs
 - name: fbo
   no-route: true
   disk_quota: 1GB
@@ -65,6 +69,7 @@ applications:
     PATH: $HOME/vendor/node/bin/:$PATH
   services:
     - es-idx
+    - elk-logs
 - name: bids
   no-route: true
   disk_quota: 512MB
@@ -83,3 +88,4 @@ applications:
     PATH: $HOME/vendor/node/bin/:$PATH
   services:
     - es-idx
+    - elk-logs
