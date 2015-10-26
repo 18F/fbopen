@@ -12,3 +12,11 @@ links:
 - url: https://pages.18f.gov/fbopen
   text: FBOpen API Documentation
 tasks: https://github.com/18F/fbopen/issues
+team:
+  - github: arowla
+    id: alison
+    role: lead
+licenses:
+  fbopen:
+    id: CC0
+    url: https://github.com/18F/fbopen/tree/master/LICENSE.md
