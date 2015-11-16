@@ -6,8 +6,7 @@ var config = {};
 cf_services = JSON.parse(process.env.VCAP_SERVICES || '{}');
 
 // elasticsearch
-console.log(process.env.ES_SERVICE_NAME);
-config.elasticsearch = appEnv.getServiceCreds(process.env.ES_SERVICE_NAME);
+config.elasticsearch = appEnv.getServiceCreds("es-.*");
 
 // if running locally
 if (!config.elasticsearch) {

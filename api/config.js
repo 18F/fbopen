@@ -34,7 +34,9 @@ config.logger.path = __dirname + '/../log/api.log';
 cf_services = JSON.parse((process.env.VCAP_SERVICES || '{}'));
 
 // elasticsearch
-config.elasticsearch = appEnv.getServiceCreds(process.env.ES_SERVICE_NAME);
+// henceforth, all ES service instances shall be named "es-YYYYMMDD",
+// with the date being the day they were instantiated
+config.elasticsearch = appEnv.getServiceCreds("es-.*");
 // the above defines the following keys: [ hostname, password, port, uri, username ]
 
 // if running locally
