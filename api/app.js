@@ -24,11 +24,18 @@ var express = require('express'),
   winston = require('winston'),
   express_winston = require('express-winston'),
   config = require('./config'),
+  raven = require('raven'),
   results_formatter = require('./formatter');
 
 
 var app = express();
 module.exports = app;
+
+if (app.get('env') !== 'development') {
+  // Set up Raven Sentry client
+  app.locals.raven = new raven.Client(config.sentry_uri);
+  app.locals.raven.patchGlobal();
+}
 
 // Create Elasticsearch client
 
@@ -42,9 +49,12 @@ app.set('views', __dirname + '/views');
 app.set('view engine', 'jade');
 app.use(serve_favicon(__dirname + '/public/favicon.png'));
 
-if ('development' === process.env.NODE_ENV) {
-  app.use(errorhandler());
+// http basic auth, if required in config
+if (config.app.require_http_basic_auth) {
+  var basic = http_auth.basic(config.app.http_basic_auth);
+  app.use(http_auth.connect(basic));
 }
+
 
 app.get('/v0/status', function(req, res) {
   // this route is used for server health checks, so it should always return 200
@@ -53,12 +63,6 @@ app.get('/v0/status', function(req, res) {
 
   res.send('API is up!');
 });
-
-// http basic auth, if required in config
-if (config.app.require_http_basic_auth) {
-  var basic = http_auth.basic(config.app.http_basic_auth);
-  app.use(http_auth.connect(basic));
-}
 
 // Allow cross-site queries (CORS)
 app.get('*', function(req, res, next) {
@@ -82,16 +86,17 @@ app.get('/v0/?', function(req, res) {
   res.send('FBOpen API v0. See https://18f.github.io/fbopen for initial documentation.');
 });
 
-app.get('/v0/hello', function(req, res) {
+app.get('/v0/hello', function(req, res, next) {
   app.locals.client.ping({
     requestTimeout: 10000,
     hello: "elasticsearch!"
   }, function (error) {
     if (error) {
       res.send('Elasticsearch cluster is not responding!');
-    } else {
-      res.send('All is well and Elasticsearch sends you its best wishes.');
+      return next(error);
     }
+
+    res.send('All is well and Elasticsearch sends you its best wishes.');
   });
 });
 
@@ -209,7 +214,7 @@ app.get('/:api_version(v[01])/opps', function(req, res) {
   }).then(function(body) {
     results_formatter(body, start, res, req.params.api_version);
   }, function(error) {
-    return res.json({'error': error});
+    return next(error);
   });
 });
 
@@ -326,6 +331,28 @@ app.use(express_winston.errorLogger({
     })
   ]
 }));
+
+// development error handler
+// will print stacktrace
+if (app.get('env') === 'development') {
+  app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+        message: err.message,
+        error: err
+    });
+  });
+}
+
+// production error handler
+// no stacktraces leaked to user
+app.use(function(err, req, res, next) {
+    res.status(err.status || 500);
+    res.render('error', {
+        message: err.message,
+        error: {}
+    });
+});
 
 var server = app.listen(config.app.port, function() {
   var host = server.address().address;

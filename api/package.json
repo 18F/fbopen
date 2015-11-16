@@ -17,6 +17,7 @@
   "dependencies": {
     "body-parser": "^1.13.3",
     "cfenv": "^1.0.0",
+    "connect-raven": "^1.0.0",
     "elasticsearch": "*",
     "errorhandler": "",
     "express": "^4.13.3",
@@ -25,6 +26,7 @@
     "jade": "*",
     "method-override": "^2.3.5",
     "morgan": "",
+    "raven": "^0.8.1",
     "request": "*",
     "serve-favicon": "^2.3.0",
     "string": ">=1.8.1",

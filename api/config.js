@@ -52,5 +52,14 @@ config.elasticsearch.index = process.env.ELASTICSEARCH_INDEX || 'fbopen';
 // this is used to adjust the date math that's used for searching within the (statically-dated) test data
 config.elasticsearch.now_str = process.env.ELASTICSEARCH_NOW || 'now';
 
+// Sentry config
+if (process.env.env !== 'development') {
+  config.sentry_uri = appEnv.getServiceURL('sentry');
+
+  if (!config.sentry_uri) {
+    console.error('The Sentry URI could not be found.');
+    process.exit(1);
+  }
+}
 
 module.exports = config;
