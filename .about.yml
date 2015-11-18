@@ -8,6 +8,8 @@ status: active
 stage: beta
 testable: true
 mission: 'To aggregate and make more accessible diverse opportunities to do business with the U.S. Government'
+partners:
+- General Services Administration
 links:
 - url: https://pages.18f.gov/fbopen
   text: FBOpen API Documentation
