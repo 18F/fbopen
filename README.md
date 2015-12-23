@@ -15,22 +15,25 @@ As of 2014-03-12, we're live at https://fbopen.gsa.gov .
 
 This gets you a minimum viable setup:
 
-```sh
-$ cd fbopen
-$ FBOPEN_ROOT=~/your/root/to/fbopen ./inital-dev-setup.sh
-```
+    cd fbopen
+    export FBOPEN_ROOT=~/your/root/to/fbopen 
+    chmod 755 inital-dev-setup.sh
+    ./inital-dev-setup.sh
 
 To clean out any new files created from that script, as well as uninstall Elasticsearch, you can run:
 
-```sh
-$ ./initial-dev-uninstall.sh
-```
+    ./initial-dev-uninstall.sh
+
 
 ### How to get started (manually)
 * Clone this repo.
 * This repo has an external dependency on another git repo, which needs to be populated at first, so `cd` to the repo and run: `git submodule update --init --recursive`.
-* Then install Elasticsearch. FBOpen requires at least version 1.2.
-* Get the API server up and running. See the README.md in `/api`.
+* Then install and start Elasticsearch. FBOpen requires at least version 1.2.
+* Start Elasticsearch:
+
+        elasticsearch
+
+* Get the API server up and running. See the [README.md](https://github.com/18F/fbopen/blob/cloud_foundry/api/README.md) in `/api`.
 * Load data into the search index using the import tools in `/loaders` -- or roll your own, ~~or use the API's POST `/v0/opp` to post opportunities one at a time~~ (POST functionality is temporarily disabled).
 * To run a simple query web page, try the sample app in `/sample-www`.
   * A quick and easy way to access this page at localhost, provided you have Python installed, is to `cd` to the `/sample-www` directory and run: `python -m SimpleHTTPServer`. By default, you'll then be able to access the client at http://localhost:8000
