@@ -26,6 +26,14 @@ To clean out any new files created from that script, as well as uninstall Elasti
 $ ./initial-dev-uninstall.sh
 ```
 
+### Quickstart (Requires Docker) (experimental)
+
+```sh
+$ cd fbopen
+$ ./fbopen-docker-setup.sh
+```
+
+
 ### How to get started (manually)
 * Clone this repo.
 * This repo has an external dependency on another git repo, which needs to be populated at first, so `cd` to the repo and run: `git submodule update --init --recursive`.
