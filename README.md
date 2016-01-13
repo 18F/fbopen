@@ -30,7 +30,7 @@ $ ./initial-dev-uninstall.sh
 
 ```sh
 $ cd fbopen
-$ ./fbopen-docker-setup.sh
+$ ./fbo-docker-setup.sh
 ```
 
 
