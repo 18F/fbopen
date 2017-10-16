@@ -1,3 +1,5 @@
+## This codebase is deprecated and no longer hosted by 18F.
+
 FBOpen
 ======
 

@@ -14,7 +14,7 @@ To install:
 To run: `node app.js` (or, say, [`nodemon app.js`](https://github.com/remy/nodemon))
 
 ### API Documentation and Examples
-Documentation for this API is at [https://pages.18f.gov/fbopen/](https://pages.18f.gov/fbopen/), but here are a couple quick sample queries to get you started:
+Documentation for this API is at [https://github.com/18F/fbopen/tree/18f-pages](https://github.com/18F/fbopen/tree/18f-pages), but here are a couple quick sample queries to get you started:
 
 To query for the first page (i.e., numbers 0 through 9) of opportunities that mention software development:
 [http://localhost:3000/v0/opps?q=software+development](http://localhost:3000/v0/opps?q=software+development)
