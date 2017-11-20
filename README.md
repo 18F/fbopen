@@ -9,7 +9,7 @@ Underneath the Google-style query page (`/sample-www`), we built a simple REST A
 
 Then someone realized we didn't have to limit this server to FBO data. There's a second sample data loader that can be used to load data nightly from [grants.gov](http://www.grants.gov), and the API allows you to post opportunities, too. Many more data loaders are on their way.
 
-As of 2014-03-12, we're live at https://fbopen.gsa.gov .
+As of 2014-03-12, the project was live at https://fbopen.gsa.gov.  However in early 2017, the service was phased out.
 
 ### Quickstart (OSX-only) (experimental)
 
