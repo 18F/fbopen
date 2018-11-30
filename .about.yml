@@ -9,8 +9,13 @@ stage: beta
 testable: true
 mission: 'To aggregate and make more accessible diverse opportunities to do business with the U.S. Government'
 links:
+- url: https://fbopen.gsa.gov
+  text: FBOpen homepage
 - url: https://pages.18f.gov/fbopen
   text: FBOpen API Documentation
+stack:
+- Python
+- JavaScript/Node
 tasks: https://github.com/18F/fbopen/issues
 team:
   - github: arowla
