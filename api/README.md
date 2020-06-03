@@ -1,17 +1,34 @@
 # FBOpen API Server
 
 ### Install and Run
-To install:
-* First [install Elasticsearch](https://github.com/18f/fbopen/tree/master/elasticsearch) if you haven't already.
-* For local usage:
-    * `$ cp config-sample_dev.js config.js`
-* For production usage:
-    * `$ cp config-sample.js config.js`
-* Install dependencies: `$ npm install`
-    * If your default version of Python is > 2, you will need to specify your path to Python 2.7 for npm to successfully install one of the Node packages.
-        * `$ npm install --python=/usr/local/bin/python2.7`
+1. To install, first [install Elasticsearch](https://github.com/18f/fbopen/tree/master/elasticsearch) if you haven't already.
+2. Run elasticsearch:
 
-To run: `node app.js` (or, say, [`nodemon app.js`](https://github.com/remy/nodemon))
+        elasticsearch
+
+3. For local usage, re-name the sample JS file:
+
+        cp api/config-sample_dev.js api/config.js
+
+4. Go into the `api` directory:
+
+        cd api/
+
+5. For production usage:
+
+        cp api/config-sample.js api/config.js
+
+6. Install dependencies:
+
+        npm install
+
+    Note: If your default version of Python is > 2, you will need to specify your path to Python 2.7 for npm to successfully install one of the Node packages:
+
+            npm install --python=/usr/local/bin/python2.7
+
+7. To run the app:
+
+        node app.js (or, say, [`nodemon app.js`](https://github.com/remy/nodemon))
 
 ### API Documentation and Examples
 Documentation for this API is at [https://pages.18f.gov/fbopen/](https://pages.18f.gov/fbopen/), but here are a couple quick sample queries to get you started:
